@@ -1,0 +1,60 @@
+Particle Fire Screen Saver version 2.1.5, by Seumas McNally.
+Copyright 2000-2016 by Longbow Digital Arts Incorporated.
+
+Additional Programming: Russ Williams, Rob McConnell, Rick Yorgason
+
+Installation
+------------
+
+The install program normally does this for you, but if for some reason
+you need to re-install, simply right-click on the .scr file and choose
+the 'Install' option.
+
+NOTE:  Particle Fire may run slower in multi-colored (24-bit or
+32-bit) mode.  If you find it performing poorly, try switching modes.
+
+
+Settings
+--------
+
+To get to the Settings dialog for Particle Fire, simply right click
+the Desktop, choose Properties, then the Screen Saver tab, and finally
+click the Settings button (make sure Particle Fire is the selected
+Screen Saver).
+
+Fire Options:  Click the two Custom color buttons to select a medium
+and a hot color for the Custom Color scheme.  If Cycle is on, the
+flame color will slowly cycle linearly between the various schemes
+while the screen saver is running.  With Random on, the schemes will
+be cycled between randomly.  Random without Cycle will choose a random
+scheme when the screen saver starts, and keep that color throughout.
+Wall of flame toggles the constant fire on the top and bottom of the
+screen.  Fade out speed is the number of levels (out of 256) that the
+fire will fade each frame.  Experiment with the extremes, such as 0 and 80.
+
+Particles:  Num sets the number of particles on screen at once.  The
+max is 10,000, which is only recommended for seriously beefy systems
+with seriously high screen resolutions.  Below that is the Style,
+which includes the Starfield mode (traveling through space).  The
+rest of the Styles just change the sorts of effects that happen
+during normal Particle Fire operation.  The Normal style has a blend
+of all effects, except Starfield.  The Avg. event time sets the
+average number of seconds between random effects (the minimum is 1,
+which causes an effect every second).  Grav change time sets the
+number of seconds between 90 degree rotations of the gravity
+direction (every 180 degrees, the wall of flame switches from top
+to bottom or bottom to top).
+
+Disable Random Text:  Disables the random quips that pop up from
+time to time while the screen saver is running.
+
+Custom text can be added by supplying a text file with one quote per line. 
+
+
+Contact
+-------
+
+For additional help, contact help@longbowgames.com, use the forums at
+longbowgames.com, or send us a message on Facebook.
+
+

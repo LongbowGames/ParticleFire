@@ -1,0 +1,232 @@
+// This file is part of Particle Fire.
+// 
+// Particle Fire is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// Particle Fire is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "LDA.ico"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG1 DIALOGEX 0, 0, 216, 220
+STYLE DS_MODALFRAME | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Seumas McNally's Particle Fire.  v2.1.4"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,200,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,158,200,50,14
+    GROUPBOX        "Fire Options",IDC_STATIC,7,1,100,93,BS_CENTER
+    COMBOBOX        IDC_COMBOCOLOR,10,25,85,175,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE
+    CONTROL         "Use random scheme",IDC_CHECKRANDCOL,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,40,85,10
+    GROUPBOX        "Particles",IDC_STATIC,109,1,100,93,BS_CENTER
+    LTEXT           "Quantity:",IDC_STATIC,118,10,36,10
+    GROUPBOX        "Text",IDC_STATIC,7,94,202,35,BS_CENTER
+    PUSHBUTTON      "http://www.LongbowGames.com/",IDC_BUTTONLDA,42,
+                    181,130,10
+    CTEXT           "Particle Fire was written by Seumas McNally.",
+                    IDC_STATIC,15,169,185,8
+    CONTROL         "",IDC_BUTTONCOLOR1,"Button",BS_OWNERDRAW | WS_TABSTOP,
+                    45,10,20,10
+    CONTROL         "",IDC_BUTTONCOLOR2,"Button",BS_OWNERDRAW | WS_TABSTOP,
+                    70,10,20,10
+    LTEXT           "Custom:",IDC_STATIC,10,8,30,10
+    CONTROL         "Cycle between colors",IDC_CHECKCYCLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,50,85,10
+    COMBOBOX        IDC_COMBOSTYLE,142,25,65,75,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE
+    LTEXT           "Fade Speed:",IDC_STATIC,10,73,42,10
+    LTEXT           "Events:",IDC_STATIC,118,68,27,10
+    LTEXT           "Gravity:",IDC_STATIC,118,81,30,10
+    CONTROL         "Disable Random Text",IDC_CHECKTEXT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,14,99,85,10
+    CONTROL         "Multi-Colored Fire",IDC_CHECKMULTI,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,60,85,10
+    COMBOBOX        IDC_COMBOSTYLE2,142,41,65,75,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE
+    CTEXT           "Seumas McNally\nFebruary 10th 1979 to March 21st 2000\nA bright light extinguished too soon.",
+                    IDC_STATIC,15,140,185,26
+    EDITTEXT        IDC_QUOTEFILENAME,110,113,96,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "Find Quote Text File",IDC_BUTTON_FIND_QUOTE_FILENAME,13,
+                    112,82,13
+    CONTROL         "Slider1",IDC_SLIDER_TEXT_SPEED,"msctls_trackbar32",
+                    TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,152,99,56,11
+    LTEXT           "Text Delay:",IDC_STATIC,113,102,39,9
+    CONTROL         "Slider1",IDC_SLIDER_FADE_SPEED,"msctls_trackbar32",
+                    TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,50,70,56,11
+    LTEXT           "Cycling Delay",IDC_STATIC,139,57,44,8
+    CONTROL         "Slider1",IDC_SLIDER_EVENT_SPEED,"msctls_trackbar32",
+                    TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,152,65,56,11
+    CONTROL         "Slider1",IDC_SLIDER_GRAVITY_SPEED,"msctls_trackbar32",
+                    TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,152,78,56,11
+    GROUPBOX        "About",IDC_STATIC,7,131,202,65,BS_CENTER
+    CONTROL         "Slider1",IDC_SLIDER_PARTICLE_NUM,"msctls_trackbar32",
+                    TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,152,8,56,11
+    LTEXT           "Style:",IDC_STATIC,111,27,18,8
+    LTEXT           "Fire Wall:",IDC_STATIC,111,43,30,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 209
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 286
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+1 VERSIONINFO
+ FILEVERSION 1,1,3,1
+ PRODUCTVERSION 1,1,3,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "Longbow Digital Arts\0"
+            VALUE "FileDescription", "Particle Fire Screen Saver\0"
+            VALUE "FileVersion", "1.3\0"
+            VALUE "InternalName", "Particle Fire\0"
+            VALUE "LegalCopyright", "Copyright © 1998-2004 by Longbow Digital Arts\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "Particle Fire.scr\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "Longbow Digital Arts Particle Fire Screen Saver\0"
+            VALUE "ProductVersion", "1.3\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    1                       "Particle Fire!"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    1000                    "Foo bar"
+    1001                    "Baz!"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
