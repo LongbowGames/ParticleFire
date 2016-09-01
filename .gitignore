@@ -1,3 +1,5 @@
 /.vs
 /ParticleFire-vc14.VC.VC.opendb
 /ParticleFire-vc14.VC.db
+/build
+/Release
