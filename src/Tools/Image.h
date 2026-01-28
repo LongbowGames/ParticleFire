@@ -61,7 +61,7 @@ using namespace std;
 //Need TrueColorFormat definiton.
 #include <BackBuffer.h>
 //Need dynamic strings too.
-#include <CStr.h>
+#include <string>
 
 struct ARGB{
 	union{
@@ -511,7 +511,7 @@ public:
 class ImageSet : public Image {
 private:
 	Image *img;
-	CStr *names;
+	std::wstring *names;
 	int nImages;
 public:
 	ImageSet(int n = 0) : img(NULL), names(NULL), nImages(1) {
@@ -551,7 +551,7 @@ public:
 	int InitSet(int n){	//Ok, now InitSet does NOT harm the original bitmap!!
 		FreeSet();
 		if(n > 0){
-			if(names = new(nothrow) CStr[n]){
+			if(names = new(nothrow) std::wstring[n]){
 				if(n == 1) return TRUE;
 				if(n > 1){
 					if((img = new(nothrow) Image[n - 1])){
@@ -563,31 +563,31 @@ public:
 		}
 		return FALSE;
 	};
-	CStr GetName(int n){
+	std::wstring GetName(int n){
 		if(names && n >= 0 && n < nImages){
 			return names[n];
 		}
-		return CStr();
+		return std::wstring();
 	};
-	int SetName(int n, const char *s){
+	int SetName(int n, const wchar_t*s){
 		if(names && s && n >= 0 && n < nImages){
 			names[n] = s;
 			return TRUE;
 		}
 		return FALSE;
 	};
-	Image *FindImage(const char *s){
+	Image *FindImage(const wchar_t*s){
 		if(names){
 			for(int n = 0; n < nImages; n++){
-				if(CmpLower(s, names[n])) return &(*this)[n];
+				if(CompareStringOrdinal(s, -1, names[n].c_str(), -1, true)) return &(*this)[n];
 			}
 		}
 		return NULL;
 	};
-	int FindImageIndex(const char *s){
+	int FindImageIndex(const wchar_t*s){
 		if(names){
 			for(int n = 0; n < nImages; n++){
-				if(CmpLower(s, names[n])) return n;
+				if(CompareStringOrdinal(s, -1, names[n].c_str(), -1, true)) return n;
 			}
 		}
 		return -1;
@@ -645,7 +645,7 @@ public:
 		return TRUE;
 	};
 	int LoadSet(FILE *f);
-	int LoadSet(const char *n);
+	int LoadSet(const wchar_t*n);
 };
 
 #endif

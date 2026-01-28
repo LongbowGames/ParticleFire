@@ -94,7 +94,7 @@ int BackBuffer::Pointer(int flag){
 	pointer = flag;
 	return ret;
 }
-int BackBuffer::InitWindow(int w, int h, const char *Name, HINSTANCE hInst, HWND *phWnd, LRESULT (CALLBACK *WProc)(HWND, UINT, WPARAM, LPARAM), DWORD Icon){
+int BackBuffer::InitWindow(int w, int h, const wchar_t *Name, HINSTANCE hInst, HWND *phWnd, LRESULT (CALLBACK *WProc)(HWND, UINT, WPARAM, LPARAM), DWORD Icon){
 	if(m_Locks > 0) return FALSE;
 	m_wc.cbSize			= sizeof(m_wc);
 	m_wc.style			= CS_HREDRAW | CS_VREDRAW;

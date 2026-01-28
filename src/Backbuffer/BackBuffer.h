@@ -84,7 +84,7 @@ class BackBuffer{
 public:
 	BackBuffer();
 	~BackBuffer();
-	int InitWindow(int w, int h, const char *Name, HINSTANCE hInst, HWND *phWnd, LRESULT (CALLBACK *WProc)(HWND, UINT, WPARAM, LPARAM), DWORD Icon = NULL);
+	int InitWindow(int w, int h, const wchar_t *Name, HINSTANCE hInst, HWND *phWnd, LRESULT (CALLBACK *WProc)(HWND, UINT, WPARAM, LPARAM), DWORD Icon = NULL);
 		//Creates the main window and the DirectDraw object.  Requires a width, height,
 		//name, hInstance, and a pointer to a WindowProcedure function.
 		//Set icon to NULL to use standard, or to a resource identifier to load that

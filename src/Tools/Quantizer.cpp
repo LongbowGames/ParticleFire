@@ -178,7 +178,7 @@ int MixTable::MakeLookup(PALETTEENTRY *pe, int disk){
 	int r, g, b, c, i;//, k, diff, col, t,
 	int OK;
 //	unsigned char tempfooey;
-	const char fn[] = "MixLookup.dat";
+	const wchar_t fn[] = L"MixLookup.dat";
 	const int tablesize = 256 * 256 * 4;
 	PALETTEENTRY tpe[256];
 	FILE *f;
@@ -187,7 +187,7 @@ int MixTable::MakeLookup(PALETTEENTRY *pe, int disk){
 	//that a lookup has to be made for, the old lookup is loaded in.
 #ifndef TEST_CUBE_LERP
 	if(disk){
-		if((f = fopen(fn, "rb")) != NULL){
+		if((f = _wfopen(fn, L"rb")) != NULL){
 			fread(tpe, sizeof(PALETTEENTRY), 256, f);
 			OK = 1;
 			for(i = 0; i < 256; i++){
@@ -263,7 +263,7 @@ int MixTable::MakeLookup(PALETTEENTRY *pe, int disk){
 
 #endif
 	if(disk){
-		if((f = fopen(fn, "wb")) != NULL){
+		if((f = _wfopen(fn, L"wb")) != NULL){
 			fwrite(pe, sizeof(PALETTEENTRY), 256, f);
 			fwrite(Mix4, 1, tablesize, f);
 			fclose(f);

@@ -91,9 +91,9 @@ int MakeRemapTable(unsigned char *Remap, const PALETTEENTRY *oldpe, const Invers
 
 //Load and save functions now work if pe pointer is NULL.
 
-int LoadBMP(const char *name, Bitmap *bmp, PALETTEENTRY *pe){
+int LoadBMP(const wchar_t *name, Bitmap *bmp, PALETTEENTRY *pe){
 	FILE *f;
-	if(f = fopen(name, "rb")){
+	if(f = _wfopen(name, L"rb")){
 		int t = LoadBMP(f, bmp, pe);
 		fclose(f);
 		return t;
@@ -185,9 +185,9 @@ int LoadPackedBMP(void *bmi, Bitmap *bmp, PALETTEENTRY *pe){
 	}
 	return TRUE;
 }
-int SaveBMP(const char *name, Bitmap *bmp, PALETTEENTRY *pe, int noflip){
+int SaveBMP(const wchar_t *name, Bitmap *bmp, PALETTEENTRY *pe, int noflip){
 	FILE *f;
-	if(f = fopen(name, "wb")){
+	if(f = _wfopen(name, L"wb")){
 		int t = SaveBMP(f, bmp, pe, noflip);
 		fclose(f);
 		return t;
@@ -1010,9 +1010,9 @@ void Bitmap::FreeAnalyze(){
 	if(LineRight) delete [] LineRight; LineRight = NULL;
 }
 
-int ImageSet::LoadSet(const char *n){
+int ImageSet::LoadSet(const wchar_t *n){
 	FILE *f;
-	if((f = fopen(n, "rb"))){
+	if((f = _wfopen(n, L"rb"))){
 		int ret = LoadSet(f);
 		fclose(f);
 		return ret;
@@ -1021,14 +1021,14 @@ int ImageSet::LoadSet(const char *n){
 }
 #define IMAGESETVERSION 1
 int ImageSet::LoadSet(FILE *f){
-	char buf[1024];
+	wchar_t buf[1024];
 	memset(buf, 0, sizeof(buf));
 	if(f){
 		fread(buf, 4, 1, f);
-		if(strcmp("IMST", buf) == 0){
+		if(wcscmp(L"IMST", buf) == 0){
 			int Version = ReadLong(f);
 			if(Version > IMAGESETVERSION){
-				OutputDebugString("Bad ImageSet version!\n");
+				OutputDebugString(L"Bad ImageSet version!\n");
 				return 0;
 			}
 			int nImg = ReadLong(f);

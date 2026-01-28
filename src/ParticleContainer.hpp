@@ -41,7 +41,7 @@ public:
 	ParticleParticle particle;
 
 	// Local vars
-	char QuoteFilename[255];			// Quotes filename
+	wchar_t QuoteFilename[255];			// Quotes filename
 
 	// System
 	int XMouse;

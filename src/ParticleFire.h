@@ -44,13 +44,13 @@ public:
 void DoFrame();
 
 #define NUMSCHEMES 6
-const char ColorName[NUMSCHEMES][100] = {
-	"Fiery Orange",
-	"Skyish Teal",
-	"Velvet Blue",
-	"Slimy Green",
-	"Burning Pink",
-	"Flaming Metal"
+const wchar_t ColorName[NUMSCHEMES][100] = {
+	L"Fiery Orange",
+	L"Skyish Teal",
+	L"Velvet Blue",
+	L"Slimy Green",
+	L"Burning Pink",
+	L"Flaming Metal"
 };
 
 enum {
@@ -73,17 +73,17 @@ enum {
 	STYLE_GEOFF = 42000,
 };
 
-const char StyleName[NUMSTYLES][100] = {
-	"Random",
-	"StarField",
-	"Explosive",
-	"Rings",
-	"Spirals",
-	"Popcorn",
-	"Rainbow Hole",
-	"Worms",
-	"Galactic Storm",
-	"Pixie Dust"//,
+const wchar_t StyleName[NUMSTYLES][100] = {
+	L"Random",
+	L"StarField",
+	L"Explosive",
+	L"Rings",
+	L"Spirals",
+	L"Popcorn",
+	L"Rainbow Hole",
+	L"Worms",
+	L"Galactic Storm",
+	L"Pixie Dust"//,
 //	"Geoff"
 };
 
@@ -95,11 +95,11 @@ enum {
 	NUMSTYLEWALLS,
 };
 
-const char StyleWallName[NUMSTYLEWALLS][100] = {
-	"Random",
-	"Rainbow",
-	"Smoke",
-	"None"
+const wchar_t StyleWallName[NUMSTYLEWALLS][100] = {
+	L"Random",
+	L"Rainbow",
+	L"Smoke",
+	L"None"
 };
 
 #endif

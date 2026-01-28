@@ -18,19 +18,25 @@
 
 #include "Reg.h"
 
-#include <CStr.h>
-
 #include <cstdlib>
 
-Registry::Registry(const char *company, const char *title, int global){
-	strcpy(sKey, "Software");
+
+static std::wstring concat_valueName(const wchar_t* sPrefix, const wchar_t* name) {
+	std::wstring vn;
+	if (sPrefix && *sPrefix) { vn.assign(sPrefix); }
+	if (name) { vn += name; }
+	return vn;
+}
+
+Registry::Registry(const wchar_t *company, const wchar_t *title, int global){
+	wcscpy(sKey, L"Software");
 	if(company){
-		strcat(sKey, "\\");
-		strcat(sKey, company);
+		wcscat(sKey, L"\\");
+		wcscat(sKey, company);
 	}
 	if(title){
-		strcat(sKey, "\\");
-		strcat(sKey, title);
+		wcscat(sKey, L"\\");
+		wcscat(sKey, title);
 	}
 	hKey = NULL;
 	sPrefix[0] = '\0';
@@ -55,28 +61,30 @@ int Registry::CloseKey(){
 	}
 	return FALSE;
 }
-int Registry::SetPrefix(const char *prefix){
-	if(prefix && strlen(prefix) < 1000){
-		strcpy(sPrefix, prefix);
+int Registry::SetPrefix(const wchar_t *prefix){
+	if(prefix && wcslen(prefix) < 1000){
+		wcscpy(sPrefix, prefix);
 		return 1;
 	}else{
 		sPrefix[0] = '\0';
 		return 0;
 	}
 }
-int Registry::WriteDword(const char *name, unsigned long val){
+int Registry::WriteDword(const wchar_t *name, unsigned long val){
 	if(name && OpenKey()){
-		if(ERROR_SUCCESS == RegSetValueEx(hKey, CStr(sPrefix) + name, NULL, REG_DWORD, (BYTE*)&val, sizeof(val))){
+		const std::wstring vn = concat_valueName(sPrefix, name);
+		if(ERROR_SUCCESS == RegSetValueEx(hKey, vn.c_str(), NULL, REG_DWORD, (BYTE*)&val, sizeof(val))) {
 			return CloseKey();
 		}
 	}
 	CloseKey();
 	return FALSE;
 }
-int Registry::ReadDword(const char *name, unsigned long *val){
+int Registry::ReadDword(const wchar_t *name, unsigned long *val){
 	DWORD tsize = sizeof(*val), ttype = REG_DWORD, temp;
 	if(name && val && OpenKey()){
-		if(ERROR_SUCCESS == RegQueryValueEx(hKey, CStr(sPrefix) + name, NULL, &ttype, (BYTE*)&temp, &tsize)){
+		const std::wstring vn = concat_valueName(sPrefix, name);
+		if(ERROR_SUCCESS == RegQueryValueEx(hKey, vn.c_str(), NULL, &ttype, (BYTE*)&temp, &tsize)) {
 			*val = temp;
 			return CloseKey();
 		}
@@ -84,10 +92,10 @@ int Registry::ReadDword(const char *name, unsigned long *val){
 	CloseKey();
 	return FALSE;
 }
-int Registry::WriteFloat(const char *name, float val){
+int Registry::WriteFloat(const wchar_t *name, float val){
 	return WriteDword(name, *((unsigned long*)&val));
 }
-int Registry::ReadFloat(const char *name, float *val){
+int Registry::ReadFloat(const wchar_t *name, float *val){
 	unsigned long t;
 	if(ReadDword(name, &t)){
 		*val = *((float*)&t);
@@ -96,28 +104,31 @@ int Registry::ReadFloat(const char *name, float *val){
 	return 0;
 }
 
-int Registry::WriteString(const char *name, const char *val){
+int Registry::WriteString(const wchar_t *name, const wchar_t *val){
 	if(name && val && OpenKey()){
-		if(ERROR_SUCCESS == RegSetValueEx(hKey, CStr(sPrefix) + name, NULL, REG_SZ, (BYTE*)val, strlen(val) + 1)){
+		const std::wstring vn = concat_valueName(sPrefix, name);
+		if(ERROR_SUCCESS == RegSetValueEx(hKey, vn.c_str(), NULL, REG_SZ, (BYTE*)val, DWORD((wcslen(val) + 1) * sizeof(wchar_t)))) {
 			return CloseKey();
 		}
 	}
 	CloseKey();
 	return FALSE;
 }
-int Registry::ReadString(const char *name, char *val, int maxlen){
+int Registry::ReadString(const wchar_t *name, wchar_t *val, int maxlen){
 	DWORD ttype = REG_SZ;
 	if(name && val && maxlen > 0 && OpenKey()){
-		if(ERROR_SUCCESS == RegQueryValueEx(hKey, CStr(sPrefix) + name, NULL, &ttype, (BYTE*)val, (DWORD*)&maxlen)){
-			val[maxlen - 1] = '\0';	//Add safety null.
+		const std::wstring vn = concat_valueName(sPrefix, name);
+		DWORD cb = static_cast<DWORD>(maxlen) * sizeof(wchar_t);
+		if(ERROR_SUCCESS == RegQueryValueEx(hKey, vn.c_str(), NULL, &ttype, (BYTE*)val, &cb)) {
+			val[maxlen - 1] = L'\0';	//Add safety null.
 			return CloseKey();
 		}
 	}
 	CloseKey();
 	return FALSE;
 }
-int Registry::ReadString(const char *name, CStr *str){
-	char b[1024];
+int Registry::ReadString(const wchar_t *name, std::wstring*str){
+	wchar_t b[1024];
 	if(str && ReadString(name, b, 1024)){
 		*str = b;
 		return TRUE;
@@ -125,48 +136,48 @@ int Registry::ReadString(const char *name, CStr *str){
 	return FALSE;
 }
 
-int Registry::SaveWindowPos(HWND hwnd, const char *name, int Size, int Max){
-	char buf[256];
+int Registry::SaveWindowPos(HWND hwnd, const wchar_t *name, int Size, int Max){
+	wchar_t buf[256];
 	if(hwnd && name && OpenKey()){
 		RECT rc;
 		GetWindowRect(hwnd, &rc);
-		strcpy(buf, name); strcat(buf, "X"); WriteDword(buf, rc.left);
-		strcpy(buf, name); strcat(buf, "Y"); WriteDword(buf, rc.top);
+		wcscpy(buf, name); wcscat(buf, L"X"); WriteDword(buf, rc.left);
+		wcscpy(buf, name); wcscat(buf, L"Y"); WriteDword(buf, rc.top);
 		if(Size){
-			strcpy(buf, name); strcat(buf, "W"); WriteDword(buf, abs(rc.right - rc.left));
-			strcpy(buf, name); strcat(buf, "H"); WriteDword(buf, abs(rc.bottom - rc.top));
+			wcscpy(buf, name); wcscat(buf, L"W"); WriteDword(buf, abs(rc.right - rc.left));
+			wcscpy(buf, name); wcscat(buf, L"H"); WriteDword(buf, abs(rc.bottom - rc.top));
 		}
 		if(Max){	//Save Maximised state.
-			strcpy(buf, name); strcat(buf, "S"); WriteDword(buf, IsZoomed(hwnd) ? 1 : 0);
+			wcscpy(buf, name); wcscat(buf, L"S"); WriteDword(buf, IsZoomed(hwnd) ? 1 : 0);
 		}
 		CloseKey();
 		return TRUE;
 	}
 	return FALSE;
 }
-int Registry::RestoreWindowPos(HWND hwnd, const char *name, int Size, int Max){
-	char buf[256];
+int Registry::RestoreWindowPos(HWND hwnd, const wchar_t *name, int Size, int Max){
+	wchar_t buf[256];
 	if(hwnd && name && OpenKey()){
 		RECT rc, wrc;
 		int PosOK = FALSE, SizeOK = FALSE, StateOK = FALSE, state;
-		strcpy(buf, name); strcat(buf, "X");
+		wcscpy(buf, name); wcscat(buf, L"X");
 		if(ReadDword(buf, (DWORD*)&rc.left)){
-			strcpy(buf, name); strcat(buf, "Y");
+			wcscpy(buf, name); wcscat(buf, L"Y");
 			if(ReadDword(buf, (DWORD*)&rc.top)){
 				PosOK = TRUE;
 			}
 		}
 		if(Size){
-			strcpy(buf, name); strcat(buf, "W");
+			wcscpy(buf, name); wcscat(buf, L"W");
 			if(ReadDword(buf, (DWORD*)&rc.right)){
-				strcpy(buf, name); strcat(buf, "H");
+				wcscpy(buf, name); wcscat(buf, L"H");
 				if(ReadDword(buf, (DWORD*)&rc.bottom)){
 					SizeOK = TRUE;
 				}
 			}
 		}
 		if(Max){
-			strcpy(buf, name); strcat(buf, "S");
+			wcscpy(buf, name); wcscat(buf, L"S");
 			if(ReadDword(buf, (DWORD*)&state)) StateOK = TRUE;
 		}
 		if(PosOK){
@@ -192,3 +203,4 @@ int Registry::RestoreWindowPos(HWND hwnd, const char *name, int Size, int Max){
 	}
 	return FALSE;
 }
+

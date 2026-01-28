@@ -42,7 +42,7 @@ ParticleScreen::ParticleScreen ()
 
 ParticleScreen::~ParticleScreen ()
 {
-	if (RealQuotes != NULL && RealQuotes != (char*) Quotes)	
+	if (RealQuotes != NULL && RealQuotes != (wchar_t*) Quotes)
 		free (RealQuotes);
 }
 
@@ -129,20 +129,11 @@ void ParticleScreen::InitScreen (HWND hwnd)
 	
 	//WIDTH = __min(rc.right - rc.left, GetSystemMetrics(SM_CXSCREEN));
 	
-	WIDTH = __min(rc.right - rc.left, GetSystemMetrics(SM_CXVIRTUALSCREEN));
-	HEIGHT = __min(rc.bottom - rc.top, GetSystemMetrics(SM_CYVIRTUALSCREEN));
+	//use whole area
+	WIDTH = rc.right - rc.left;
+	HEIGHT = rc.bottom - rc.top;
 		
 	dib.CreateHBitmap( hwnd, WIDTH, HEIGHT, UseTrueColor ? 32 : 8);
-
-	if( Preview )
-	{
-		iDstX = iDstY = 0;
-	}
-	else
-	{
-		iDstX = rc.left;
-		iDstY = rc.top;
-	}
 
 	//
 	if(CustomScheme) ColorScheme = -1;
@@ -420,17 +411,8 @@ void ParticleScreen::Draw ()
 	tmr.Start();
 	dib.Lock();
 
-	if( Preview ) dib.Blit(0, 0, 0, 0, dib.Width(), dib.Height());
-	else
-	{
-		RECT	rc;
-		GetWindowRect(m_hWnd, &rc);
-		
-		iDstX = rc.left;
-		iDstY = rc.top;
-
-		dib.Blit(iDstX, iDstY, 0, 0, dib.Width(), dib.Height());
-	}
+	//always start in upper left
+	dib.Blit(0, 0, 0, 0, dib.Width(), dib.Height());
 	
 	dib.Unlock();
 	BlitTimes += tmr.Check(10000);
@@ -613,46 +595,46 @@ void ParticleScreen::Palette(int ColorScheme)
 void ParticleScreen::LoadText ()
 {
 	// If there is a filename
-	if (strcmp (parent->QuoteFilename, "\0") )
+	if (wcscmp (parent->QuoteFilename, L"\0") )
 	{
 		FILE *fp;
-		fp = fopen (parent->QuoteFilename, "r+");
+		fp = _wfopen (parent->QuoteFilename, L"r+");
 		if (fp != NULL)
 		{
-			char buff[512];
+			wchar_t buff[512];
 			RealQuoteLines = 0;
 
 			// Count the number of lines
 			while (!feof (fp)) {
-				fgets (buff, 512, fp);
+				fgetws (buff, 512, fp);
 				RealQuoteLines++;
 			}
 			fseek (fp, NULL, 0);
-			this->RealQuotes = (char*) malloc (sizeof (char) * 512 * RealQuoteLines);
+			this->RealQuotes = (wchar_t*) malloc (sizeof (wchar_t) * 512 * RealQuoteLines);
 
 			int numLine = 0;
 			while (!feof (fp)) {
-				fgets (buff, 512, fp);
+				fgetws (buff, 512, fp);
 
-				for (int i = 0; i < strlen (buff); i++) {
+				for (int i = 0; i < wcslen (buff); i++) {
 					if (buff[i] == '\n') buff[i] = '\0';
 				}
 
-				strcpy (&this->RealQuotes[512*numLine], buff);
+				wcscpy (&this->RealQuotes[512*numLine], buff);
 				numLine++;
 			}
 
 			fclose (fp);
 		}
 		else
-			strcpy (parent->QuoteFilename, "\0");
+			wcscpy (parent->QuoteFilename, L"\0");
 	}
 
 	// If the Quote filename is blank
-	if (!strcmp (parent->QuoteFilename, "\0") )
+	if (!wcscmp (parent->QuoteFilename, L"\0") )
 	{
 		// Set to pre-made quotes
-		this->RealQuotes = (char*) Quotes;
+		this->RealQuotes = (wchar_t*) Quotes;
 		this->RealQuoteLines = NUMQUOTES;
 	}
 
@@ -667,7 +649,7 @@ int ParticleScreen::SetupFont(int height)
 	lf.lfItalic = 0;//(flags & FONT_ITALIC) != 0;
 	lf.lfUnderline = 0;//(flags & FONT_UNDERLINE) != 0;
 	lf.lfStrikeOut = 0;//(flags & FONT_STRIKEOUT) != 0;
-	strcpy(lf.lfFaceName, "Arial");
+	wcscpy(lf.lfFaceName, L"Arial");
 	if(hfont = CreateFontIndirect(&lf)){	//Make font once...
 		return TRUE;
 	}
@@ -723,14 +705,14 @@ void ParticleScreen::HandleText ()
 	}
 }
 
-int ParticleScreen::DrawFont(const char *text, int mode)
+int ParticleScreen::DrawFont(const wchar_t *text, int mode)
 {
 	int lineLen = 37;
 	int numLine = 0;
 
 	// Cut up the text
-	int len, curChar = 0;	char buff[512];
-	len = strlen (text);
+	int len, curChar = 0;	wchar_t buff[512];
+	len = wcslen (text);
 
 	static int col_r, col_g, col_b;
 	// If normal random mode
@@ -771,7 +753,7 @@ int ParticleScreen::DrawFont(const char *text, int mode)
 				lastSpace = lineLen;
 
 			// Copy over these letters to be drawn
-			strncpy (buff, &text[curChar], lastSpace+1);
+			wcsncpy (buff, &text[curChar], lastSpace+1);
 			buff[lastSpace+1] = 0;
 			curChar += lastSpace+1;
 
@@ -785,7 +767,7 @@ int ParticleScreen::DrawFont(const char *text, int mode)
 	return TRUE;
 }
 
-int ParticleScreen::DrawCenteredFont(const char *text, int lines, int lineNum, int col_r, int col_g, int col_b)
+int ParticleScreen::DrawCenteredFont(const wchar_t *text, int lines, int lineNum, int col_r, int col_g, int col_b)
 {
 	int x, y;
 
@@ -803,7 +785,7 @@ int ParticleScreen::DrawCenteredFont(const char *text, int lines, int lineNum, i
 //		SetTextColor(fontdc, RGB(255, 255, 255));
 //		SetTextColor(fontdc, RGB((text[5]+120)%255, (text[12]+120)%255, (text[15]+120)%255) );
 		SetTextColor(fontdc, RGB(col_r, col_g, col_b) );
-		GetTextExtentPoint32(fontdc, text, strlen(text), &sz);
+		GetTextExtentPoint32(fontdc, text, wcslen(text), &sz);
 
 		if(1) x = (WIDTH - sz.cx) / 2;
 		//	else x = -(int)(xoff * xsize);
@@ -811,7 +793,7 @@ int ParticleScreen::DrawCenteredFont(const char *text, int lines, int lineNum, i
 		//	else y = -(int)(yoff * ysize);
 		if(1) y = (HEIGHT - sz.cy) / 2 + yMod;//ysize) / 2;
 
-		TextOut(fontdc, x, y, text, strlen(text));
+		TextOut(fontdc, x, y, text, wcslen(text));
 		GdiFlush();
 		SelectObject(fontdc, holdfont);
 		SelectObject(fontdc, holdbitmap);
@@ -821,7 +803,7 @@ int ParticleScreen::DrawCenteredFont(const char *text, int lines, int lineNum, i
 	return FALSE;
 }
 
-int ParticleScreen::DrawXYFont(const char *text, int x, int y, int col_r, int col_g, int col_b)
+int ParticleScreen::DrawXYFont(const wchar_t *text, int x, int y, int col_r, int col_g, int col_b)
 {
 	if(text && (fontdc = CreateCompatibleDC(NULL))){
 		holdfont = (HFONT)SelectObject(fontdc, hfont);
@@ -831,13 +813,13 @@ int ParticleScreen::DrawXYFont(const char *text, int x, int y, int col_r, int co
 		SetBkMode(fontdc, TRANSPARENT);
 
 		SetTextColor(fontdc, RGB(col_r, col_g, col_b) );
-		GetTextExtentPoint32(fontdc, text, strlen(text), &sz);
+		GetTextExtentPoint32(fontdc, text, wcslen(text), &sz);
 
 		// Bound the words
 		if (x > (WIDTH - sz.cx))			x = WIDTH - sz.cx - 10;
 		if (y > (HEIGHT - sz.cy))			y = WIDTH - sz.cy - 10;
 
-		TextOut(fontdc, x, y, text, strlen(text));
+		TextOut(fontdc, x, y, text, wcslen(text));
 		GdiFlush();
 		SelectObject(fontdc, holdfont);
 		SelectObject(fontdc, holdbitmap);

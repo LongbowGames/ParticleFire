@@ -45,7 +45,7 @@ ParticleContainer::~ParticleContainer ()
 	
 void ParticleContainer::Init ()
 {
-	strcpy (QuoteFilename, "\0");
+	wcscpy (QuoteFilename, L"\0");
 
 	XMouse = 0;
 	YMouse = 0;

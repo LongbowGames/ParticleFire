@@ -39,9 +39,6 @@
     <ClCompile Include="src\Tools\Basis.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tools\CStr.cpp">
-      <Filter>Tools</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tools\Image.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
@@ -95,9 +92,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Tools\Basis.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tools\CStr.h">
       <Filter>Tools</Filter>
     </ClInclude>
     <ClInclude Include="src\Tools\neuquant.h">

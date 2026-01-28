@@ -107,6 +107,19 @@ TEXTMETRIC tm;
 int QuoteCount[1000];
 #endif
 
+//vars to be used for evading a random mouse move when the saver starts
+// --- file-scope state (top of ParticleFire.cpp) ---
+static ULONGLONG s_startTick = 0;
+static POINT     s_lastPt = { LONG_MIN, LONG_MIN };
+static bool      s_armed = false;
+
+// Optional knobs
+static const DWORD ARM_DELAY_MS = 1111;  // ignore noise for first 1.111s
+static const int   MOVE_THRESH = 5;    // pixels required to count as real move
+//end - vars to be used for evading a random mouse move when the saver starts
+
+
+
 // For testing out stuff or gathering errors
 void error_print (char *buff)
 {
@@ -126,6 +139,16 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 //	int ret = -1;	//Do DefScrProc
 	switch(iMsg){
 		case WM_CREATE :
+
+
+			//setting up to ignore mouse moves right after start up
+			s_startTick = GetTickCount64();
+			s_armed = false;
+			s_lastPt.x = LONG_MIN;
+			s_lastPt.y = LONG_MIN;
+
+
+
 			//
 #ifdef COUNTQUOTE
 			memset(QuoteCount, 0, sizeof(QuoteCount));
@@ -209,7 +232,7 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			BlankedSecs = time(NULL) - SecsStart;
 			partFire.screen.TotalSecs += BlankedSecs;
 // GH-CHANGED
-			partFire.registry.RegistryWrite ("SecondsBlanked", partFire.screen.TotalSecs);
+			partFire.registry.RegistryWrite (L"SecondsBlanked", partFire.screen.TotalSecs);
 //			REG.WriteDword("SecondsBlanked", partFire.screen.TotalSecs);
 
 			//
@@ -238,7 +261,31 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			//
 		//	PostQuitMessage(0);
 			return 0;
-			
+		//handling mousemove to defeat pseudo mousemoves
+		case WM_MOUSEMOVE:
+		{
+#if PF_DEBUG
+			pf_log("PF: WM_MOUSEMOVE\n");
+#endif
+			if (partFire.screen.Preview) return 0;  // never dismiss from hover in preview
+
+			// Arm after a short delay to ignore activation jitter
+			if (!s_armed && GetTickCount64() - s_startTick >= ARM_DELAY_MS) s_armed = true;
+
+			POINT p; GetCursorPos(&p);
+			if (s_lastPt.x == LONG_MIN) { s_lastPt = p; return 0; } // first sample
+
+			const int dx = abs(p.x - s_lastPt.x);
+			const int dy = abs(p.y - s_lastPt.y);
+			s_lastPt = p;
+
+			// Only dismiss on deliberate movement
+			if (s_armed && (dx > MOVE_THRESH || dy > MOVE_THRESH)) {
+				PostMessage(hwnd, WM_CLOSE, 0, 0);
+			}
+			return 0; // swallow for now to see if jitter is the cause
+		}
+
 	}//Switch
 //	return DefWindowProc(hwnd, iMsg, wParam, lParam);
 	//
@@ -261,8 +308,8 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 bool BrowseForFile ()
 {
 	OPENFILENAME ofn;       // common dialog box structure
-	char szFile[260];       // buffer for file name
-	strcpy (szFile, "\0");
+	wchar_t szFile[260];       // buffer for file name
+	wcscpy (szFile, L"\0");
 //	HWND hwnd;              // owner window
 	HANDLE hf;              // file handle
 
@@ -273,7 +320,7 @@ bool BrowseForFile ()
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
 //	ofn.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
-	ofn.lpstrFilter = "Text\0*.TXT\0";
+	ofn.lpstrFilter = L"Text\0*.TXT\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
@@ -285,7 +332,7 @@ bool BrowseForFile ()
 	int RESULT;
 	RESULT = GetOpenFileName(&ofn);
 	if (RESULT == TRUE)
-		strcpy (partFire.QuoteFilename, ofn.lpstrFile);
+		wcscpy (partFire.QuoteFilename, ofn.lpstrFile);
 
 /*	if (GetOpenFileName(&ofn)==TRUE) 
 		hf = CreateFile(ofn.lpstrFile, GENERIC_READ,
@@ -294,6 +341,76 @@ bool BrowseForFile ()
 			(HANDLE) NULL);*/
 
 	return true;
+}
+
+// Populate all controls from current in-memory state (partFire)
+static void PopulateSettingsDialogFromState(HWND dlgwnd){
+	SendDlgItemMessage(dlgwnd, IDC_CHECKRANDCOL, BM_SETCHECK, (partFire.screen.RandomColor ? BM_SETCHECK : FALSE), 0);
+
+	SendDlgItemMessageW(dlgwnd, IDC_COMBOCOLOR, CB_RESETCONTENT, 0, 0);
+	for (int i = 0; i < NUMSCHEMES + 1; i++) {
+		if (i == 0) SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Custom"));
+		else SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(&ColorName[i - 1][0]));
+	}
+	SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_SETCURSEL, partFire.screen.CustomScheme ? 0 : partFire.screen.ColorScheme + 1, 0);
+
+	EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
+	//
+//			SetDlgItemInt(dlgwnd, IDC_EDITBURNFADE, partFire.screen.BURNFADE, FALSE);
+	SendDlgItemMessage(dlgwnd, IDC_CHECKCYCLE, BM_SETCHECK, (partFire.screen.CycleColors ? BM_SETCHECK : FALSE), 0);
+	SendDlgItemMessage(dlgwnd, IDC_CHECKTEXT, BM_SETCHECK, (partFire.screen.DisableText ? BM_SETCHECK : FALSE), 0);
+
+	//
+	SendDlgItemMessageW(dlgwnd, IDC_COMBOSTYLE, CB_RESETCONTENT, 0, 0);
+	for (int i = 0; i < NUMSTYLES; i++) {
+		SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(&StyleName[i][0]));
+	}
+	SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_SETCURSEL, partFire.particle.ParticleStyle, 0);
+
+	//
+	SendDlgItemMessageW(dlgwnd, IDC_COMBOSTYLE2, CB_RESETCONTENT, 0, 0);
+	for (int i = 0; i < NUMSTYLEWALLS; i++) {
+		SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(&StyleWallName[i][0]));
+	}
+	SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_SETCURSEL, partFire.particle.WallStyle, 0);
+
+	//
+	SendDlgItemMessage(dlgwnd, IDC_CHECKMULTI, BM_SETCHECK, (partFire.screen.UseTrueColor ? BM_SETCHECK : FALSE), 0);
+	//
+	SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(partFire.QuoteFilename));
+	//
+	//
+	{	// Quote Text speed
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.screen.QuoteSecs / 2;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETPOS, TRUE, static_cast<LPARAM>(slider_position));
+	}
+	{	// Burn Fade speed
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.screen.BURNFADE;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETPOS, TRUE, static_cast<LPARAM>(slider_position));
+	}
+	{	// Number of particles
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.particle.nParticles / 500;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETPOS, TRUE, static_cast<LPARAM>(slider_position));
+	}
+	{	// Event Change speed
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.particle.RANDEFFECT / 5;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETPOS, TRUE, static_cast<LPARAM>(slider_position));
+	}
+	{	// Gravity Change speed
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.particle.GRAV_TIME / 10;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETPOS, TRUE, static_cast<LPARAM>(slider_position));
+	}
+
+	//redraw custom color buttons
+	HWND hBtn1 = GetDlgItem(dlgwnd, IDC_BUTTONCOLOR1);
+	HWND hBtn2 = GetDlgItem(dlgwnd, IDC_BUTTONCOLOR2);
+	RedrawWindow(hBtn1, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW);
+	RedrawWindow(hBtn2, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW);
 }
 
 BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, LPARAM lParam){
@@ -309,59 +426,9 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 			m_hWnd = dlgwnd;
 			//
 			partFire.registry.LoadOpts();
-			SendDlgItemMessage(dlgwnd, IDC_CHECKRANDCOL, BM_SETCHECK, (partFire.screen.RandomColor ? BM_SETCHECK : FALSE), 0);
 
-			for(i = 0; i < NUMSCHEMES + 1; i++){
-				if(i == 0) SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LONG)((char*)"Custom"));
-				else SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LONG)&ColorName[i - 1][0]);
-			}
-			SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_SETCURSEL, partFire.screen.CustomScheme ? 0 : partFire.screen.ColorScheme + 1, 0);
-			EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
-			//
-//			SetDlgItemInt(dlgwnd, IDC_EDITBURNFADE, partFire.screen.BURNFADE, FALSE);
-			SendDlgItemMessage(dlgwnd, IDC_CHECKCYCLE, BM_SETCHECK, (partFire.screen.CycleColors ? BM_SETCHECK : FALSE), 0);
-			SendDlgItemMessage(dlgwnd, IDC_CHECKTEXT, BM_SETCHECK, (partFire.screen.DisableText ? BM_SETCHECK : FALSE), 0);
-			//
-			for(i = 0; i < NUMSTYLES; i++){
-				SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_ADDSTRING, 0, (LONG)&StyleName[i][0]);
-			}
-			SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_SETCURSEL, partFire.particle.ParticleStyle, 0);
-			//
-			for(i = 0; i < NUMSTYLEWALLS; i++){
-				SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_ADDSTRING, 0, (LONG)&StyleWallName[i][0]);
-			}
-			SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_SETCURSEL, partFire.particle.WallStyle, 0);
-			//
-			SendDlgItemMessage(dlgwnd, IDC_CHECKMULTI, BM_SETCHECK, (partFire.screen.UseTrueColor ? BM_SETCHECK : FALSE), 0);
-			//
-			SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (long) partFire.QuoteFilename);
-			//
-			//
-			{	// Quote Text speed
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.screen.QuoteSecs / 2;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETPOS, TRUE, (long) slider_position);
-			}
-			{	// Burn Fade speed
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.screen.BURNFADE;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETPOS, TRUE, (long) slider_position);
-			}
-			{	// Number of particles
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.particle.nParticles / 500;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETPOS, TRUE, (long) slider_position);
-			}
-			{	// Event Change speed
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.particle.RANDEFFECT / 5;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETPOS, TRUE, (long) slider_position);
-			}
-			{	// Gravity Change speed
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.particle.GRAV_TIME / 10;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETPOS, TRUE, (long) slider_position);
-			}
+			PopulateSettingsDialogFromState(dlgwnd);
+
 			return TRUE;
 		case WM_HSCROLL:
 			ctrl = (HWND) lParam;
@@ -415,7 +482,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 				//	EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
 					return TRUE;
 				case IDC_BUTTONLDA :
-					ShellExecute(NULL, "open", "http://www.longbowgames.com/", NULL, NULL, NULL);
+					ShellExecute(NULL, L"open", L"http://www.longbowgames.com/", NULL, NULL, NULL);
 					break;
 				case IDOK :
 					partFire.registry.SaveOpts();
@@ -426,9 +493,16 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 					EndDialog(dlgwnd, FALSE);
 					return TRUE;
 				case IDC_BUTTON_FIND_QUOTE_FILENAME:
-//					strcpy (partFire.QuoteFilename, "Filename Here");
+//					wcscpy (partFire.QuoteFilename, "Filename Here");
 					BrowseForFile ();
-					SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (long) partFire.QuoteFilename);
+					SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(partFire.QuoteFilename));
+					return TRUE;
+				case IDC_RESETDEFAULTS:
+					//
+					partFire.registry.SaveOpts(true);
+
+					PopulateSettingsDialogFromState(dlgwnd);
+
 					return TRUE;
 				}
 			}
