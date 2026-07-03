@@ -113,6 +113,11 @@ void ParticleScreen::InitScreen (HWND hwnd)
 	RECT rc;
 	GetClientRect(hwnd, &rc);
 
+	// If preview, reduce the number of particles.
+	if ((GetWindowLong(hwnd, GWL_STYLE) & WS_CHILD) != 0) {
+		parent->particle.nParticles /= 100;
+	}
+
 	//
 	SecsStart = long(time(NULL));
 	//

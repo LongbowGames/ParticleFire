@@ -58,13 +58,11 @@ ParticleFire - November 12th 1998.
 #include <stdio.h>
 #include <windows.h>
 #include <commctrl.h>
-//#include <BackBuffer.h>
 #include <Cdib.h>
 #include "ParticleFire.h"
 #include <Timer.h>
 #include <Basis.h>
 #include <Reg.h>
-#include <scrnsave.h>
 #include "resource.h"
 #include <CStr.h>
 
@@ -116,10 +114,48 @@ void error_print (char *buff)
 	fclose (fp);
 }
 
+static POINT g_lastMouse = {};
+static bool g_hasMouse = false;
+
+static void CheckForExitOnInput(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+			PostQuitMessage(0);
+			break;
+
+		case WM_MOUSEMOVE:
+		{
+			POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+
+			if (!g_hasMouse)
+			{
+				g_lastMouse = pt;
+				g_hasMouse = true;
+			}
+			else
+			{
+				if (pt.x != g_lastMouse.x || pt.y != g_lastMouse.y)
+					PostQuitMessage(0);
+			}
+			break;
+		}
+	}
+}
+
 LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam){
 	//
 	m_hWnd = hwnd;
 	//
+
+	// If not preview, check for input to stop screensaver.
+	if((GetWindowLong(hwnd, GWL_STYLE) & WS_CHILD) == 0) {
+		CheckForExitOnInput(hwnd, iMsg, wParam, lParam);
+	}
 
 	switch(iMsg){
 		case WM_CREATE :
@@ -129,27 +165,15 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 #endif
 			//
 			partFire.registry.LoadOpts();
-			//
-		//	InitStuff(hwnd);
-		//	SetTimer(hwnd, 1, 50, NULL);
+
 			SetTimer(hwnd, 1, 40, NULL);
-		//	PostMessage(hwnd, WM_INFINITE, 0, 0);
-			//
+
 			return 0;
-		//	ret = 0;
-		//	break;
 		case WM_ACTIVATE :
 			return 0;
 			break;
 		case WM_INFINITE :
-		//	PostMessage(hwnd, WM_INFINITE, 0, 0);
-			//
 		case WM_TIMER :
-		//	if(Hack8Bit && !Realized){
-		//		hdc = GetDC(NULL);
-		//		SetSystemPaletteUse(hdc, SYSPAL_NOSTATIC);
-		//		ReleaseDC(NULL, hdc);
-		//	}
 			if(Frames == 10) partFire.screen.InitScreen (hwnd);
 			if(Frames < 10){
 				Frames++;
@@ -198,24 +222,14 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			}
 			//
 			Realized = TRUE;
-		//	ret = 1;
-		//	break;
 			return TRUE;
 		case WM_DESTROY :
 			//
 			BlankedSecs = int(time(NULL) - SecsStart);
 			partFire.screen.TotalSecs += BlankedSecs;
-// GH-CHANGED
-			partFire.registry.RegistryWrite (L"SecondsBlanked", partFire.screen.TotalSecs);
-//			REG.WriteDword("SecondsBlanked", partFire.screen.TotalSecs);
 
-			//
-		//	if(Hack8Bit){
-		//		hdc = GetDC(NULL);
-		//		SetSystemPaletteUse(hdc, SYSPAL_STATIC);
-		//		ReleaseDC(NULL, hdc);
-		//		PostMessage(HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
-		//	}
+			partFire.registry.RegistryWrite (L"SecondsBlanked", partFire.screen.TotalSecs);
+
 			//
 			partFire.screen.dib.DeleteHBitmap();
 			KillTimer(hwnd, 1);
@@ -232,27 +246,13 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			}
 #endif
 
-			//
-		//	PostQuitMessage(0);
+			PostQuitMessage(0);
+
 			return 0;
 			
 	}//Switch
-//	return DefWindowProc(hwnd, iMsg, wParam, lParam);
-	//
-//	MSG tm;
-//	if(PeekMessage(&tm, hwnd, NULL, NULL, PM_NOREMOVE) == 0){
-//		PostMessage(hwnd, WM_INFINITE, 0, 0);
-//	}
-//	if(ret != -1){
-//		return ret;
-//	}else{
-//	}
-//	if(IgnoreMouse){
-//		return 0;
-//		return DefWindowProc(hwnd, iMsg, wParam, lParam);
-//	}else{
-		return DefScreenSaverProc(hwnd, iMsg, wParam, lParam);
-//	}
+
+	return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }//WndProc
 
 bool BrowseForFile ()
@@ -301,6 +301,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 	switch(iMsg){
 		case WM_INITDIALOG :
 			m_hWnd = dlgwnd;
+
 			//
 			partFire.registry.LoadOpts();
 			SendDlgItemMessage(dlgwnd, IDC_CHECKRANDCOL, BM_SETCHECK, (partFire.screen.RandomColor ? BM_SETCHECK : FALSE), 0);
