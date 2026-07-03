@@ -116,7 +116,6 @@ void error_print (char *buff)
 	fclose (fp);
 }
 
-
 LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam){
 	//
 	m_hWnd = hwnd;

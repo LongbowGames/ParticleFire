@@ -123,9 +123,6 @@ public:
 	// Unknown
 	Basis *basis;
 
-	// Preview mode?
-	int Preview;
-
 	// Particle style info
 	int CustomScheme;
 	int ColorScheme;

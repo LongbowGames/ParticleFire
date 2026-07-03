@@ -91,8 +91,6 @@ void ParticleScreen::Init ()
 	// Had to shift it into a pointer to make it work inside the class
 	basis = new Basis (0);
 
-	Preview = FALSE;
-
 	CustomScheme = 0;
 //Color palette.
 	ColorScheme = 0;
@@ -113,36 +111,17 @@ void ParticleScreen::InitScreen (HWND hwnd)
 	m_hWnd = hwnd;
 
 	RECT rc;
-	GetWindowRect(hwnd, &rc);
-	if((rc.right - rc.left) < GetSystemMetrics(SM_CXSCREEN) - 32){
-		Preview = TRUE;
-		parent->particle.nParticles /= 10;
-	}else{
-		Preview = FALSE;
-	}
+	GetClientRect(hwnd, &rc);
+
 	//
 	SecsStart = long(time(NULL));
 	//
 	srand((unsigned)time(NULL));
-	//
-	GetWindowRect(hwnd, &rc);
 	
-	//WIDTH = __min(rc.right - rc.left, GetSystemMetrics(SM_CXSCREEN));
-	
-	WIDTH = __min(rc.right - rc.left, GetSystemMetrics(SM_CXVIRTUALSCREEN));
-	HEIGHT = __min(rc.bottom - rc.top, GetSystemMetrics(SM_CYVIRTUALSCREEN));
+	WIDTH = rc.right;
+	HEIGHT = rc.bottom;
 		
 	dib.CreateHBitmap( hwnd, WIDTH, HEIGHT, UseTrueColor ? 32 : 8);
-
-	if( Preview )
-	{
-		iDstX = iDstY = 0;
-	}
-	else
-	{
-		iDstX = rc.left;
-		iDstY = rc.top;
-	}
 
 	//
 	if(CustomScheme) ColorScheme = -1;
@@ -420,17 +399,7 @@ void ParticleScreen::Draw ()
 	tmr.Start();
 	dib.Lock();
 
-	if( Preview ) dib.Blit(0, 0, 0, 0, dib.Width(), dib.Height());
-	else
-	{
-		RECT	rc;
-		GetWindowRect(m_hWnd, &rc);
-		
-		iDstX = rc.left;
-		iDstY = rc.top;
-
-		dib.Blit(iDstX, iDstY, 0, 0, dib.Width(), dib.Height());
-	}
+	dib.Blit(iDstX, iDstY, 0, 0, dib.Width(), dib.Height());
 	
 	dib.Unlock();
 	BlitTimes += tmr.Check(10000);
