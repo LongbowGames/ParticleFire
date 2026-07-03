@@ -590,7 +590,7 @@ void ParticleScreen::LoadText ()
 	if (wcscmp (parent->QuoteFilename, L"\0") )
 	{
 		FILE *fp;
-		fp = _wfopen (parent->QuoteFilename, L"r+");
+		fp = _wfopen (parent->QuoteFilename, L"r+, ccs=UTF-8");
 		if (fp != NULL)
 		{
 			wchar_t buff[512];
@@ -766,7 +766,7 @@ int ParticleScreen::DrawCenteredFont(const wchar_t *text, int lines, int lineNum
 	// Calc Y line modifier
 	int yMod = 0;
 	yMod += lines/2 * -30;
-	yMod += lineNum * 30;
+	yMod += lineNum * 200;
 
 	if(text && (fontdc = CreateCompatibleDC(NULL))){
 		holdfont = (HFONT)SelectObject(fontdc, hfont);

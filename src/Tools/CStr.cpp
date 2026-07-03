@@ -44,7 +44,7 @@ wchar_t CStr::Playground[] = L"\0\0";
 #define GRAN(a) (((a) + (GRANULARITY - 1)) & (~(GRANULARITY - 1)))
 
 void CStr::InitialInit(){
-	pData = (wchar_t*) malloc(GRANULARITY);
+	pData = (wchar_t*) malloc(GRANULARITY*sizeof(wchar_t));
 	nLength = 0;
 	if(pData) pData[0] = '\0';
 	return;
@@ -65,7 +65,7 @@ CStr::CStr(const wchar_t *s){
 		return;
 	}
 	nLength = wcslen(s);
-	pData = (wchar_t*) malloc(GRAN(nLength + 1));
+	pData = (wchar_t*) malloc(GRAN(nLength + 1) * sizeof(wchar_t));
 	if(!pData){
 		nLength = 0;
 		return;
@@ -75,7 +75,7 @@ CStr::CStr(const wchar_t *s){
 }
 CStr::CStr(const CStr &s){
 	nLength = s.len();
-	pData = (wchar_t*) malloc(GRAN(nLength + 1));
+	pData = (wchar_t*) malloc(GRAN(nLength + 1) * sizeof(wchar_t));
 	if(!pData){
 		nLength = 0;
 		return;
@@ -88,7 +88,7 @@ CStr::CStr(const wchar_t *s, const wchar_t *ins, int pos){
 		return;
 	}
 	nLength = wcslen(s) + wcslen(ins);
-	pData = (wchar_t*) malloc(GRAN(nLength + 1));
+	pData = (wchar_t*) malloc(GRAN(nLength + 1) * sizeof(wchar_t));
 	if(!pData){
 		nLength = 0;
 		return;
@@ -101,13 +101,14 @@ CStr::CStr(const wchar_t *s, const wchar_t *ins, int pos){
 
 CStr::~CStr(){
 	if(pData) free(pData);
+	pData = NULL;
 }
 
 size_t CStr::alloc(int size){
 	if(size > 0){
 		if(GRAN(nLength + 1) != GRAN(size + 1) || pData == NULL){
 			if(pData) free(pData);
-			pData = (wchar_t*)malloc(GRAN(size + 1));
+			pData = (wchar_t*)malloc(GRAN(size + 1) * sizeof(wchar_t));
 		}
 		if(pData){
 			pData[size] = 0;	//Set null, to be safe.
@@ -126,7 +127,7 @@ void CStr::cpy(const wchar_t *s){
 		if(GRAN(nLength + 1) != GRAN(n + 1)){
 			if(pData)
 				free(pData);
-			pData = (wchar_t*) malloc(GRAN(n + 1));
+			pData = (wchar_t*) malloc(GRAN(n + 1) * sizeof(wchar_t));
 			if(!pData){
 				nLength = 0;
 				return;
@@ -144,7 +145,7 @@ void CStr::cat(const wchar_t *s){
 		if(n <= 0) return;
 		if(GRAN(nLength + 1) != GRAN(nLength + n + 1)){
 			wchar_t *pTemp;
-			pTemp = (wchar_t*) malloc(GRAN(n + nLength + 1));
+			pTemp = (wchar_t*) malloc(GRAN(n + nLength + 1) * sizeof(wchar_t));
 			if(!pTemp) return;
 			if(pData) wcscpy(pTemp, pData);
 			wcscat(pTemp, s);
@@ -197,7 +198,7 @@ CStr Mid(const CStr &str, size_t pos, size_t num){
 		return nstr;
 	if(num < 0) num = L;
 	num = Range(int(num), 0, int(L - pos));
-	tmp = (wchar_t*) malloc(num + 1);
+	tmp = (wchar_t*) malloc((num + 1) * sizeof(wchar_t));
 	if(!tmp)
 		return nstr;
 	memcpy(tmp, str.get() + pos, num);

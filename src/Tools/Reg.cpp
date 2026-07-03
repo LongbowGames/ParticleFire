@@ -98,7 +98,7 @@ int Registry::ReadFloat(const wchar_t *name, float *val){
 
 int Registry::WriteString(const wchar_t *name, const wchar_t *val){
 	if(name && val && OpenKey()){
-		if(ERROR_SUCCESS == RegSetValueEx(hKey, CStr(sPrefix) + name, NULL, REG_SZ, (BYTE*)val, DWORD(wcslen(val) + 1))){
+		if(ERROR_SUCCESS == RegSetValueEx(hKey, CStr(sPrefix) + name, NULL, REG_SZ, (BYTE*)val, DWORD(wcslen(val) + 1) * sizeof(wchar_t))){
 			return CloseKey();
 		}
 	}
@@ -107,8 +107,10 @@ int Registry::WriteString(const wchar_t *name, const wchar_t *val){
 }
 int Registry::ReadString(const wchar_t *name, wchar_t *val, int maxlen){
 	DWORD ttype = REG_SZ;
+	maxlen *= sizeof(wchar_t);
 	if(name && val && maxlen > 0 && OpenKey()){
 		if(ERROR_SUCCESS == RegQueryValueEx(hKey, CStr(sPrefix) + name, NULL, &ttype, (BYTE*)val, (DWORD*)&maxlen)){
+			maxlen /= sizeof(wchar_t);
 			val[maxlen - 1] = '\0';	//Add safety null.
 			return CloseKey();
 		}
