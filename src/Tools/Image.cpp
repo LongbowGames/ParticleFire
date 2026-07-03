@@ -34,8 +34,8 @@ extern "C" {
 
 };
 
-inline int WriteLong(int n, FILE *f){ return fwrite(&n, sizeof(int), 1, f); }
-inline int ReadLong(FILE *f){ int n = 0; fread(&n, sizeof(int), 1, f); return n; }
+inline size_t WriteLong(int n, FILE *f){ return fwrite(&n, sizeof(int), 1, f); }
+inline size_t ReadLong(FILE *f){ int n = 0; fread(&n, sizeof(int), 1, f); return n; }
 
 int BGRAfromPE(ARGB *argb, PALETTEENTRY *pe, unsigned char alpha){
 	if(argb && pe){
@@ -1027,14 +1027,14 @@ int ImageSet::LoadSet(FILE *f){
 		fread(buf, 4, 1, f);
 		buf[4] = 0;
 		if(wcsncmp(L"IMST", buf, 4) == 0){
-			int Version = ReadLong(f);
+			int Version = int(ReadLong(f));
 			if(Version > IMAGESETVERSION){
 				OutputDebugString(L"Bad ImageSet version!\n");
 				return 0;
 			}
-			int nImg = ReadLong(f);
+			int nImg = int(ReadLong(f));
 			if(!InitSet(nImg)) return FALSE;
-			int Cols = ReadLong(f);
+			int Cols = int(ReadLong(f));
 			PALETTEENTRY gpe[256];
 			memset(gpe, 0, sizeof(gpe));
 			int i, j, pos, w, h, y;
@@ -1046,15 +1046,15 @@ int ImageSet::LoadSet(FILE *f){
 				fgetc(f);
 			}
 			for(i = 0; i < nImg; i++){
-				pos = ReadLong(f);	//Size of name.
+				pos = int(ReadLong(f));	//Size of name.
 				fread(buf, __min(sizeof(buf) - 1, pos), 1, f);
 				if(names && i < nImages) names[i] = buf;	//Set the name.
 				ip = &((*this)[i]);
-				w = ReadLong(f);
-				h = ReadLong(f);
+				w = int(ReadLong(f));
+				h = int(ReadLong(f));
 				ReadLong(f);
 				ReadLong(f);
-				pos = ReadLong(f);	//Optional local palette colors.
+				pos = int(ReadLong(f));	//Optional local palette colors.
 				if(ip->Init(w, h, 8)){
 					if(pos > 0){	//Read local palette.
 						for(j = 0; j < pos; j++){

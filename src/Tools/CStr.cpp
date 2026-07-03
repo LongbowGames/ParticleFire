@@ -93,7 +93,7 @@ CStr::CStr(const wchar_t *s, const wchar_t *ins, int pos){
 		nLength = 0;
 		return;
 	}
-	pos = Range(pos, 0, wcslen(s));
+	pos = Range(pos, 0, int(wcslen(s)));
 	if(pos > 0) memcpy(pData, s, pos);
 	wcscpy(pData + pos, ins);
 	wcscpy(pData + pos + wcslen(ins), s + pos);
@@ -103,7 +103,7 @@ CStr::~CStr(){
 	if(pData) free(pData);
 }
 
-int CStr::alloc(int size){
+size_t CStr::alloc(int size){
 	if(size > 0){
 		if(GRAN(nLength + 1) != GRAN(size + 1) || pData == NULL){
 			if(pData) free(pData);
@@ -122,7 +122,7 @@ int CStr::alloc(int size){
 
 void CStr::cpy(const wchar_t *s){
 	if(s && s != pData){
-		int n = wcslen(s);
+		size_t n = wcslen(s);
 		if(GRAN(nLength + 1) != GRAN(n + 1)){
 			if(pData)
 				free(pData);
@@ -140,7 +140,7 @@ void CStr::cpy(const wchar_t *s){
 
 void CStr::cat(const wchar_t *s){
 	if(s){
-		int n = wcslen(s);
+		size_t n = wcslen(s);
 		if(n <= 0) return;
 		if(GRAN(nLength + 1) != GRAN(nLength + n + 1)){
 			wchar_t *pTemp;
@@ -161,7 +161,7 @@ int CStr::cmp(const wchar_t *s) const{
 	if(!pData || !s) return FALSE;	//NULL pData means there's been a malloc problem
 //	if((int)strlen(s) != nLength) return FALSE;	//Strict checking here
 //	if(0 == memcmp(pData, s, nLength)) return TRUE;
-	int n = 0;
+	size_t n = 0;
 	while(n < nLength && s[n] == pData[n] && s[n]) n++;
 	if(n == nLength && s[n] == 0) return TRUE;
 	return FALSE;
@@ -188,15 +188,15 @@ CStr operator+(const wchar_t *s, const CStr &str){
 #define LOWER(a) ( ((a) >= 'A' && (a) <= 'Z') ? (a) + ('a' - 'A') : (a))
 #define UPPER(a) ( ((a) >= 'a' && (a) <= 'z') ? (a) - ('a' - 'A') : (a))
 
-CStr Mid(const CStr &str, int pos, int num){
+CStr Mid(const CStr &str, size_t pos, size_t num){
 	CStr nstr;
 	if(num == 0) return nstr;
 	wchar_t *tmp;
-	int L = str.len();
+	size_t L = str.len();
 	if(L == 0 || pos >= L || pos < 0)
 		return nstr;
 	if(num < 0) num = L;
-	num = Range(num, 0, L - pos);
+	num = Range(int(num), 0, int(L - pos));
 	tmp = (wchar_t*) malloc(num + 1);
 	if(!tmp)
 		return nstr;
@@ -213,9 +213,9 @@ int Instr(const CStr &str, const CStr &fnd, int pos){
 	const wchar_t *pstr = str.get();
 	const wchar_t *pfnd = fnd.get();
 	const wchar_t *result;
-	int lstr = str.len();
-	int lfnd = fnd.len();
-	pos = Range(pos, 0, lstr);
+	size_t lstr = str.len();
+	size_t lfnd = fnd.len();
+	pos = Range(pos, 0, int(lstr));
 	if(!pstr || !pfnd || !lstr || !lfnd || pos + lfnd > lstr) return -1;
 	result = wcsstr(pstr + pos, pfnd);
 	if(result != NULL) return (int)(result - pstr);
@@ -225,7 +225,7 @@ int Instr(const CStr &str, const CStr &fnd, int pos){
 CStr Lower(const wchar_t *str){
 	if(str){
 		CStr out = str;
-		for(int i = 0; i < out.len(); i++){
+		for(size_t i = 0; i < out.len(); i++){
 			wchar_t c = out[i];
 			out[i] = LOWER(c);
 		}
@@ -236,7 +236,7 @@ CStr Lower(const wchar_t *str){
 CStr Upper(const wchar_t *str){
 	if(str){
 		CStr out = str;
-		for(int i = 0; i < out.len(); i++){
+		for(size_t i = 0; i < out.len(); i++){
 			wchar_t c = out[i];
 			out[i] = UPPER(c);
 		}
@@ -272,7 +272,7 @@ CStr String(const char c){
 CStr FileExtension(const wchar_t *n){
 	CStr str;
 	if(n){
-		for(int i = wcslen(n) - 1; i >= 0; i--){
+		for(size_t i = wcslen(n) - 1; i >= 0; i--){
 			if(n[i] == '.'){ str.cpy(&n[i + 1]); break; }
 			if(n[i] == '/' || n[i] == '\\' || n[i] == ':') break;
 		}
@@ -282,7 +282,7 @@ CStr FileExtension(const wchar_t *n){
 CStr FileNoExtension(const wchar_t *n){
 	CStr str(n);
 	if(n){
-		for(int i = wcslen(n) - 1; i >= 0; i--){
+		for(size_t i = wcslen(n) - 1; i >= 0; i--){
 			if(n[i] == '.'){ str = Left(str, i); break; }
 			if(n[i] == '/' || n[i] == '\\' || n[i] == ':') break;
 		}
@@ -292,7 +292,7 @@ CStr FileNoExtension(const wchar_t *n){
 CStr FilePathOnly(const wchar_t *n){
 	CStr str(n);
 	if(n){
-		for(int i = wcslen(n) - 1; i >= 0; i--){
+		for(size_t i = wcslen(n) - 1; i >= 0; i--){
 			if(n[i] == '/' || n[i] == '\\' || n[i] == ':'){ str = Left(str, i + 1); break; }
 			if(i == 0) str = L"";
 		}
@@ -302,7 +302,7 @@ CStr FilePathOnly(const wchar_t *n){
 CStr FileNameOnly(const wchar_t *n){
 	CStr str(n);
 	if(n){
-		for(int i = wcslen(n) - 1; i >= 0; i--){
+		for(size_t i = wcslen(n) - 1; i >= 0; i--){
 			if(n[i] == '/' || n[i] == '\\' || n[i] == ':'){ str.cpy(&n[i + 1]); break; }
 		}
 	}
@@ -327,7 +327,7 @@ int FileInPath(const wchar_t *n, const wchar_t *path){
 CStr FileMinusPath(const wchar_t *n, const wchar_t *path){
 	CStr str;
 	if(FileInPath(n, path)){
-		str = Mid(n, wcslen(path));
+		str = Mid(n, int(wcslen(path)));
 	}
 	return str;
 }
@@ -367,7 +367,7 @@ int CmpLower(const wchar_t *s1, const wchar_t *s2){
 CStr PadString(const wchar_t *str, int padlen, wchar_t padchar, bool clip){
 	static wchar_t padbuf[1024];
 	if(str && padlen > 0){
-		int len = wcslen(str);
+		size_t len = wcslen(str);
 		len = __min(1023, len);
 		padlen = __min(1023, padlen);
 		memset(padbuf, padchar, padlen);

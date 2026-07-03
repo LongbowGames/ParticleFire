@@ -59,7 +59,7 @@ class CreateDib
 		int GetWidth(void);
 		int GetHeight(void);
 		int GetPitch();
-		BYTE *Data(){ return GetSurface(); };	//Simplified alternate interface.
+		BYTE* Data(){ return GetSurface(); };	//Simplified alternate interface.
 		int Width(){ return GetWidth(); };
 		int Height(){ return GetHeight(); };
 		int Pitch(){ return GetPitch(); };

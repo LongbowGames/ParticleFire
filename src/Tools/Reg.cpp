@@ -98,7 +98,7 @@ int Registry::ReadFloat(const wchar_t *name, float *val){
 
 int Registry::WriteString(const wchar_t *name, const wchar_t *val){
 	if(name && val && OpenKey()){
-		if(ERROR_SUCCESS == RegSetValueEx(hKey, CStr(sPrefix) + name, NULL, REG_SZ, (BYTE*)val, wcslen(val) + 1)){
+		if(ERROR_SUCCESS == RegSetValueEx(hKey, CStr(sPrefix) + name, NULL, REG_SZ, (BYTE*)val, DWORD(wcslen(val) + 1))){
 			return CloseKey();
 		}
 	}

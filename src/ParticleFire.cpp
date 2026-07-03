@@ -307,8 +307,8 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 			SendDlgItemMessage(dlgwnd, IDC_CHECKRANDCOL, BM_SETCHECK, (partFire.screen.RandomColor ? BM_SETCHECK : FALSE), 0);
 
 			for(i = 0; i < NUMSCHEMES + 1; i++){
-				if(i == 0) SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LONG)((char*)"Custom"));
-				else SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LONG)&ColorName[i - 1][0]);
+				if(i == 0) SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LPARAM)(L"Custom"));
+				else SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LPARAM)&ColorName[i - 1][0]);
 			}
 			SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_SETCURSEL, partFire.screen.CustomScheme ? 0 : partFire.screen.ColorScheme + 1, 0);
 			EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
@@ -318,44 +318,44 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 			SendDlgItemMessage(dlgwnd, IDC_CHECKTEXT, BM_SETCHECK, (partFire.screen.DisableText ? BM_SETCHECK : FALSE), 0);
 			//
 			for(i = 0; i < NUMSTYLES; i++){
-				SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_ADDSTRING, 0, (LONG)&StyleName[i][0]);
+				SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_ADDSTRING, 0, (LPARAM)&StyleName[i][0]);
 			}
 			SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_SETCURSEL, partFire.particle.ParticleStyle, 0);
 			//
 			for(i = 0; i < NUMSTYLEWALLS; i++){
-				SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_ADDSTRING, 0, (LONG)&StyleWallName[i][0]);
+				SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_ADDSTRING, 0, (LPARAM)&StyleWallName[i][0]);
 			}
 			SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_SETCURSEL, partFire.particle.WallStyle, 0);
 			//
 			SendDlgItemMessage(dlgwnd, IDC_CHECKMULTI, BM_SETCHECK, (partFire.screen.UseTrueColor ? BM_SETCHECK : FALSE), 0);
 			//
-			SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (long) partFire.QuoteFilename);
+			SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM) partFire.QuoteFilename);
 			//
 			//
 			{	// Quote Text speed
 			SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
 			int slider_position = partFire.screen.QuoteSecs / 2;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETPOS, TRUE, (long) slider_position);
+			SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETPOS, TRUE, (LPARAM) slider_position);
 			}
 			{	// Burn Fade speed
 			SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
 			int slider_position = partFire.screen.BURNFADE;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETPOS, TRUE, (long) slider_position);
+			SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETPOS, TRUE, (LPARAM) slider_position);
 			}
 			{	// Number of particles
 			SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETRANGE, TRUE, MAKELONG (1,20));
 			int slider_position = partFire.particle.nParticles / 500;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETPOS, TRUE, (long) slider_position);
+			SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETPOS, TRUE, (LPARAM) slider_position);
 			}
 			{	// Event Change speed
 			SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
 			int slider_position = partFire.particle.RANDEFFECT / 5;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETPOS, TRUE, (long) slider_position);
+			SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETPOS, TRUE, (LPARAM) slider_position);
 			}
 			{	// Gravity Change speed
 			SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
 			int slider_position = partFire.particle.GRAV_TIME / 10;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETPOS, TRUE, (long) slider_position);
+			SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETPOS, TRUE, (LPARAM) slider_position);
 			}
 			return TRUE;
 		case WM_HSCROLL:
@@ -365,19 +365,19 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 
 			int slider_position;
 			// Quote text speed
-			slider_position = SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_GETPOS, 0, 0);
+			slider_position = int(SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_GETPOS, 0, 0));
 			partFire.screen.QuoteSecs = slider_position * 2;
 			// Fade out speed
-			slider_position = SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_GETPOS, 0, 0);
+			slider_position = int(SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_GETPOS, 0, 0));
 			partFire.screen.BURNFADE = slider_position;
 			// Number of particles
-			slider_position = SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM , TBM_GETPOS, 0, 0);
+			slider_position = int(SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM , TBM_GETPOS, 0, 0));
 			partFire.particle.nParticles = slider_position * 500;
 			// Event change speed
-			slider_position = SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED , TBM_GETPOS, 0, 0);
+			slider_position = int(SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED , TBM_GETPOS, 0, 0));
 			partFire.particle.RANDEFFECT = slider_position * 5;
 			// Gravity change speed
-			slider_position = SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_GETPOS, 0, 0);
+			slider_position = int(SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_GETPOS, 0, 0));
 			partFire.particle.GRAV_TIME = slider_position * 10;
 			return TRUE;
 			break;
@@ -423,7 +423,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 				case IDC_BUTTON_FIND_QUOTE_FILENAME:
 //					strcpy (partFire.QuoteFilename, "Filename Here");
 					BrowseForFile ();
-					SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (long) partFire.QuoteFilename);
+					SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM) partFire.QuoteFilename);
 					return TRUE;
 				}
 			}
@@ -432,7 +432,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 				switch(id){	//Switch on ID in all other cases.
 				case IDC_COMBOCOLOR :
 					if(code == CBN_SELCHANGE){
-						i = SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_GETCURSEL, 0, 0);
+						i = int(SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_GETCURSEL, 0, 0));
 						if(i > 0){
 							partFire.screen.ColorScheme = i - 1;
 							partFire.screen.CustomScheme = 0;
@@ -444,12 +444,12 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 					return TRUE;
 				case IDC_COMBOSTYLE :
 					if(code == CBN_SELCHANGE){
-						partFire.particle.ParticleStyle = SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_GETCURSEL, 0, 0);
+						partFire.particle.ParticleStyle = int(SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_GETCURSEL, 0, 0));
 					}
 					return TRUE;
 				case IDC_COMBOSTYLE2 :
 					if(code == CBN_SELCHANGE){
-						partFire.particle.WallStyle = SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_GETCURSEL, 0, 0);
+						partFire.particle.WallStyle = int(SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_GETCURSEL, 0, 0));
 					}
 					return TRUE;
 				}

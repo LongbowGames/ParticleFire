@@ -179,12 +179,12 @@ void ParticleScreen::Draw ()
 	//Lock buffer.
 	if(dib.Data()){
 		//Draw particles.
-		unsigned char *data;//, *data2;
+		void* data;//, *data2;
 		int pitch;
 		int /*d, e, dir,*/ x, y;//, dx, dy;
 		data = (unsigned char*)dib.Data();//bdesc.data;
 		pitch = dib.Pitch();//bdesc.pitch;
-		unsigned char *bdescdata = dib.Data();
+		void* bdescdata = dib.Data();
 		int bdescpitch = dib.Pitch();
 		int bdescwidth = dib.Width();
 		int bdescheight = dib.Height();
@@ -725,12 +725,12 @@ void ParticleScreen::HandleText ()
 
 int ParticleScreen::DrawFont(const wchar_t *text, int mode)
 {
-	int lineLen = 37;
+	size_t lineLen = 37;
 	int numLine = 0;
 
 	// Cut up the text
-	int len, curChar = 0;	wchar_t buff[512];
-	len = wcslen (text);
+	size_t curChar = 0;	wchar_t buff[512];
+	size_t len = wcslen (text);
 
 	static int col_r, col_g, col_b;
 	// If normal random mode
@@ -754,10 +754,10 @@ int ParticleScreen::DrawFont(const wchar_t *text, int mode)
 		// Cycle through the characters
 		while (curChar < len) 
 		{
-			int lastSpace = 0;
+			size_t lastSpace = 0;
 
 			// Find the last space in this line
-			for (int i=0; i < lineLen; i++)
+			for (size_t i=0; i < lineLen; i++)
 			{
 				if (text[curChar + i] == ' ')
 					lastSpace = i;	// Mark the space point
@@ -775,7 +775,7 @@ int ParticleScreen::DrawFont(const wchar_t *text, int mode)
 			buff[lastSpace+1] = 0;
 			curChar += lastSpace+1;
 
-			DrawCenteredFont (buff, len/lineLen, numLine, col_r, col_g, col_b);
+			DrawCenteredFont (buff, int(len/lineLen), numLine, col_r, col_g, col_b);
 			numLine++;	// Increment the number of lines so far
 		}
 	}
@@ -803,7 +803,7 @@ int ParticleScreen::DrawCenteredFont(const wchar_t *text, int lines, int lineNum
 //		SetTextColor(fontdc, RGB(255, 255, 255));
 //		SetTextColor(fontdc, RGB((text[5]+120)%255, (text[12]+120)%255, (text[15]+120)%255) );
 		SetTextColor(fontdc, RGB(col_r, col_g, col_b) );
-		GetTextExtentPoint32(fontdc, text, wcslen(text), &sz);
+		GetTextExtentPoint32(fontdc, text, int(wcslen(text)), &sz);
 
 		if(1) x = (WIDTH - sz.cx) / 2;
 		//	else x = -(int)(xoff * xsize);
@@ -811,7 +811,7 @@ int ParticleScreen::DrawCenteredFont(const wchar_t *text, int lines, int lineNum
 		//	else y = -(int)(yoff * ysize);
 		if(1) y = (HEIGHT - sz.cy) / 2 + yMod;//ysize) / 2;
 
-		TextOut(fontdc, x, y, text, wcslen(text));
+		TextOut(fontdc, x, y, text, int(wcslen(text)));
 		GdiFlush();
 		SelectObject(fontdc, holdfont);
 		SelectObject(fontdc, holdbitmap);
@@ -831,13 +831,13 @@ int ParticleScreen::DrawXYFont(const wchar_t *text, int x, int y, int col_r, int
 		SetBkMode(fontdc, TRANSPARENT);
 
 		SetTextColor(fontdc, RGB(col_r, col_g, col_b) );
-		GetTextExtentPoint32(fontdc, text, wcslen(text), &sz);
+		GetTextExtentPoint32(fontdc, text, int(wcslen(text)), &sz);
 
 		// Bound the words
 		if (x > (WIDTH - sz.cx))			x = WIDTH - sz.cx - 10;
 		if (y > (HEIGHT - sz.cy))			y = WIDTH - sz.cy - 10;
 
-		TextOut(fontdc, x, y, text, wcslen(text));
+		TextOut(fontdc, x, y, text, int(wcslen(text)));
 		GdiFlush();
 		SelectObject(fontdc, holdfont);
 		SelectObject(fontdc, holdbitmap);
@@ -850,12 +850,12 @@ int ParticleScreen::DrawXYFont(const wchar_t *text, int x, int y, int col_r, int
 void ParticleScreen::DrawParticles ()
 {
 	//Draw particles.
-	unsigned char *data, *data2;
+	BYTE *data, *data2;
 	int pitch;
 	int d, e, dir, x, y, dx, dy;
-	data = (unsigned char*)dib.Data();//bdesc.data;
+	data = dib.Data();//bdesc.data;
 	pitch = dib.Pitch();//bdesc.pitch;
-	unsigned char *bdescdata = dib.Data();
+	wchar_t *bdescdata = (wchar_t*)dib.Data();
 	int bdescpitch = dib.Pitch();
 	int bdescwidth = dib.Width();
 	int bdescheight = dib.Height();
@@ -967,7 +967,7 @@ void ParticleScreen::DrawParticles ()
 
 				if(UseTrueColor)
 				{
-					data2 = data + (x <<2) + y * pitch;// + (i % 3);
+					data2 = data + (x <<2 ) + y * pitch;// + (i % 3);
 				}
 				else
 				{

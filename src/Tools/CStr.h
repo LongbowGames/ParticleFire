@@ -30,11 +30,7 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CSTR_H
 #define CSTR_H
 
-//#include <string.h>
-//#include <stdlib.h>
-//#include <stdio.h>
-
-//using namespace std;
+#include <algorithm>
 
 #define TRUE 1
 #define FALSE 0
@@ -45,7 +41,7 @@ inline int Min(int a, int b) {return a > b ? b : a;}
 
 class CStr{
 	wchar_t	*pData;
-	int		nLength;
+	size_t	nLength;
 	const static wchar_t Dummy;
 	static wchar_t Playground[];
 	void InitialInit();
@@ -60,8 +56,8 @@ public:
 	~CStr();
 
 	const wchar_t	*get() const {return pData ? pData : &Dummy;}
-	int		len() const {return pData ? nLength : 0;}
-	int		alloc(int size);	//Allocates size _uninitialized_ bytes not counting ending null, ready to be filled.  Err, how, there's no non-const way to get at pData...  Sigh.
+	size_t	len() const {return pData ? nLength : 0;}
+	size_t	alloc(int size);	//Allocates size _uninitialized_ bytes not counting ending null, ready to be filled.  Err, how, there's no non-const way to get at pData...  Sigh.
 	void	cpy(const wchar_t  *s);
 	void	cat(const wchar_t *s);
 	int		cmp(const wchar_t *s) const;
@@ -70,7 +66,7 @@ public:
 		if(pos < (unsigned int)nLength) return pData[pos];
 		return 0;
 	};
-	wchar_t &operator[](int n){
+	wchar_t &operator[](size_t n){
 		if((unsigned int)n < (unsigned int)nLength) return pData[n];
 		Playground[0] = '\0';
 		return Playground[0];	//This will give any writes a safe place to play.
@@ -145,9 +141,9 @@ inline bool operator!=(const wchar_t *s, const CStr &str2){
 
 //Seperate CStr manipulation functions.
 
-CStr Mid(const CStr &str, int pos, int num = -1);
-inline CStr Left(const CStr &str, int num) {return Mid(str, 0, num);}
-inline CStr Right(const CStr &str, int num) {return Mid(str, Max(str.len() - num, 0));}
+CStr Mid(const CStr &str, size_t pos, size_t num = -1);
+inline CStr Left(const CStr &str, size_t num) {return Mid(str, 0, num);}
+inline CStr Right(const CStr &str, size_t num) {return Mid(str, std::max(str.len() - num, size_t(0)));}
 int Instr(const CStr &str, const CStr &fnd, int pos = 0);
 inline CStr Insert(const CStr &str, const CStr &ins, int pos) {CStr nstr(str, ins, pos); return nstr;}
 CStr Lower(const wchar_t *str);
