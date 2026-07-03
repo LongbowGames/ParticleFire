@@ -29,13 +29,13 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 
 class InversePal{
 private:
-	int r_center, g_center, b_center;
-	int r_skip1, r_skip2, g_skip1, g_skip2, b_skip1, b_skip2;
-	unsigned char *inv_pal;
-	int red_max, green_max, blue_max;
-	int gb_pow2, red_pow2, green_pow2, blue_pow2;
-	int r_quant, g_quant, b_quant;
-	unsigned char cur_color;
+	int r_center = 0, g_center = 0, b_center = 0;
+	int r_skip1 = 0, r_skip2 = 0, g_skip1 = 0, g_skip2 = 0, b_skip1 = 0, b_skip2 = 0;
+	unsigned char *inv_pal = NULL;
+	int red_max = 0, green_max = 0, blue_max = 0;
+	int gb_pow2 = 0, red_pow2 = 0, green_pow2 = 0, blue_pow2 = 0;
+	int r_quant = 0, g_quant = 0, b_quant = 0;
+	unsigned char cur_color = 0;
 	void red_init();
 	void green_init();
 	void blue_init();

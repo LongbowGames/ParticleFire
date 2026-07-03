@@ -121,9 +121,7 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 	//
 	m_hWnd = hwnd;
 	//
-//	PAINTSTRUCT ps;
-	HDC hdc;
-//	int ret = -1;	//Do DefScrProc
+
 	switch(iMsg){
 		case WM_CREATE :
 			//
@@ -206,7 +204,7 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			return TRUE;
 		case WM_DESTROY :
 			//
-			BlankedSecs = time(NULL) - SecsStart;
+			BlankedSecs = int(time(NULL) - SecsStart);
 			partFire.screen.TotalSecs += BlankedSecs;
 // GH-CHANGED
 			partFire.registry.RegistryWrite ("SecondsBlanked", partFire.screen.TotalSecs);
@@ -263,8 +261,6 @@ bool BrowseForFile ()
 	OPENFILENAME ofn;       // common dialog box structure
 	char szFile[260];       // buffer for file name
 	strcpy (szFile, "\0");
-//	HWND hwnd;              // owner window
-	HANDLE hf;              // file handle
 
 	// Initialize OPENFILENAME
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -297,7 +293,6 @@ bool BrowseForFile ()
 }
 
 BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, LPARAM lParam){
-	BOOL error;
 	HWND ctrl;
 	LPDRAWITEMSTRUCT lpdis;
 	HBRUSH brush;

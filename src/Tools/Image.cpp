@@ -514,7 +514,7 @@ int Bitmap::Scale(int NewWidth, int NewHeight, int lerp){
 				for(int y = 0; y < NewHeight; y++){
 					SrcX = 0;
 					unsigned char *td = newdata + y * NewPitch;
-					unsigned char *ts;
+					//unsigned char *ts;
 					int bts = bpp / 8;
 					int h2 = ((SrcY + Dy) >>16) - (SrcY >>16);
 					h2 = __min(h2, height - (SrcY >>16));
@@ -1025,7 +1025,8 @@ int ImageSet::LoadSet(FILE *f){
 	memset(buf, 0, sizeof(buf));
 	if(f){
 		fread(buf, 4, 1, f);
-		if(strcmp("IMST", buf) == 0){
+		buf[4] = 0;
+		if(strncmp("IMST", buf, 4) == 0){
 			int Version = ReadLong(f);
 			if(Version > IMAGESETVERSION){
 				OutputDebugString("Bad ImageSet version!\n");

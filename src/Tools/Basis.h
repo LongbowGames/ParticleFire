@@ -42,7 +42,7 @@ private:
 	float NoiseFloatTable[TABSIZE * 2];	//0.0 - 1.0
 	float NoiseNegTable[TABSIZE * 2];		//-0.5 - 0.5
 	unsigned char NoisePermTable[TABSIZE];
-	unsigned char NoiseCharTable[TABSIZE];
+	unsigned char NoiseCharTable[TABSIZE] = {0};
 public:
 	Basis(){};
 	Basis(int seed){ Seed(seed); };

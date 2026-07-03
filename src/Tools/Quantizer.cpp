@@ -81,9 +81,9 @@ unsigned char LerpRGB332(unsigned char rgb1, unsigned char rgb2, float t){
 	float r1 = (float)((rgb1 & RMASK) >>RSHIFT) + 0.5f;
 	float g1 = (float)((rgb1 & GMASK) >>GSHIFT) + 0.5f;
 	float b1 = (float)((rgb1 & BMASK) >>BSHIFT) + 0.5f;
-	float r2 = (float)(((rgb2 & RMASK) >>RSHIFT) + 0.5f) * t + r1 * (1.0 - t);
-	float g2 = (float)(((rgb2 & GMASK) >>GSHIFT) + 0.5f) * t + g1 * (1.0 - t);
-	float b2 = (float)(((rgb2 & BMASK) >>BSHIFT) + 0.5f) * t + b1 * (1.0 - t);
+	float r2 = float((float)(((rgb2 & RMASK) >>RSHIFT) + 0.5f) * t + r1 * (1.0 - t));
+	float g2 = float((float)(((rgb2 & GMASK) >>GSHIFT) + 0.5f) * t + g1 * (1.0 - t));
+	float b2 = float((float)(((rgb2 & BMASK) >>BSHIFT) + 0.5f) * t + b1 * (1.0 - t));
 	return (unsigned char)(((int)r2 <<RSHIFT) | ((int)g2 <<GSHIFT) | ((int)b2 <<BSHIFT));
 }
 void SortPaletteCube(PALETTEENTRY *pe){
@@ -559,7 +559,12 @@ int Quantizer::GetCompressedPalette(PALETTEENTRY *pe, int NumCols){//, int level
 //the convex hulls (worst-case cube hulls in my simpler implementation) of
 //the colors entered into the inverse palette.
 //
-InversePal::InversePal(){
+InversePal::InversePal() :
+	r_center(0), r_quant(0), r_skip1(0), r_skip2(0), red_max(0), red_pow2(0),
+	g_center(0), g_quant(0), g_skip1(0), g_skip2(0), green_max(0), green_pow2(0),
+	b_center(0), b_quant(0), b_skip1(0), b_skip2(0), blue_max(0), blue_pow2(0),
+	cur_color(0)
+{
 	inv_pal = NULL;
 }
 InversePal::InversePal(int rbits, int gbits, int bbits){

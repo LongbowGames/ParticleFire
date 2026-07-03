@@ -154,7 +154,7 @@ private:
 protected:
 	unsigned char *data;
 	int width, height, pitch, bpp;	//bpp currently must be 8 or 24/32!
-	int pixelpitch, colorbytes, alphaskip;
+	int pixelpitch = 0, colorbytes = 0, alphaskip = 0;
 	PALETTEENTRY *ppe;
 	unsigned char *premap;
 public:
@@ -353,17 +353,20 @@ public:
 	};
 	int InitSet(int n){	//Ok, now InitSet does NOT harm the original bitmap!!
 		FreeSet();
-		if(n == 1) return TRUE;
-		if(n > 1){
-			if((bmp = new(nothrow) Bitmap[n - 1])){
+		if(n == 1) {
+			return TRUE;
+		} else if(n > 1){
+			auto allocSize = size_t(n) - 1;
+			if((bmp = new(nothrow) Bitmap[allocSize])){
 				nBitmaps = n;
-				for(int i = 0; i < (n - 1); i++){
+				for(size_t  i = 0; i < allocSize; i++){
 					bmp[i].ppe = pe;
 					bmp[i].premap = remap;
 				}
 				return TRUE;
 			}
 		}
+		
 		return FALSE;
 	};
 	int InitBitmaps(int x, int y, int bpp){

@@ -96,7 +96,7 @@ void ParticleRegistry::LoadOpts()
 	// First Time Use
 	parent->screen.FirstUseTime = 0;
 	if(REG.ReadDword("Time", (ULONG*)&parent->screen.FirstUseTime) == FALSE && parent->screen.FirstUseTime <= 0){	//Write first-use-time.
-		parent->screen.FirstUseTime = time(NULL);
+		parent->screen.FirstUseTime = long(time(NULL));
 		REG.WriteDword("Time", parent->screen.FirstUseTime);
 	}
 	parent->screen.TotalSecs = 0;

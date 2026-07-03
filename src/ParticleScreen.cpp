@@ -121,7 +121,7 @@ void ParticleScreen::InitScreen (HWND hwnd)
 		Preview = FALSE;
 	}
 	//
-	SecsStart = time(NULL);
+	SecsStart = long(time(NULL));
 	//
 	srand((unsigned)time(NULL));
 	//
@@ -179,16 +179,16 @@ void ParticleScreen::Draw ()
 	//Lock buffer.
 	if(dib.Data()){
 		//Draw particles.
-		unsigned char *data, *data2;
+		unsigned char *data;//, *data2;
 		int pitch;
-		int d, e, dir, x, y, dx, dy;
+		int /*d, e, dir,*/ x, y;//, dx, dy;
 		data = (unsigned char*)dib.Data();//bdesc.data;
 		pitch = dib.Pitch();//bdesc.pitch;
 		unsigned char *bdescdata = dib.Data();
 		int bdescpitch = dib.Pitch();
 		int bdescwidth = dib.Width();
 		int bdescheight = dib.Height();
-		float adx, ady, dist, dist2, ang, angd;
+		//float adx, ady, dist, dist2, ang, angd;
 
 		int pitchBit = dib.Pitch() / dib.Width();	// Use for bit depth
 	
@@ -634,7 +634,7 @@ void ParticleScreen::LoadText ()
 			while (!feof (fp)) {
 				fgets (buff, 512, fp);
 
-				for (int i = 0; i < strlen (buff); i++) {
+				for (unsigned int i = 0; i < strlen (buff); i++) {
 					if (buff[i] == '\n') buff[i] = '\0';
 				}
 
@@ -682,11 +682,11 @@ void ParticleScreen::UnsetupFont()
 void ParticleScreen::HandleText ()
 {
 	//
-	int iseconds = time(NULL) - FirstUseTime;	//Installed seconds.
+	int iseconds = int(time(NULL) - FirstUseTime);	//Installed seconds.
 	int iminutes = iseconds / 60;
 	int ihours = iminutes / 60;
 	int idays = ihours / 24;
-	int sseconds = (time(NULL) - SecsStart);	//Session Seconds.
+	int sseconds = int(time(NULL) - SecsStart);	//Session Seconds.
 	int bseconds = sseconds + TotalSecs;	//Blanked seconds.
 	int bminutes = bseconds / 60;
 	int bhours = bminutes / 60;

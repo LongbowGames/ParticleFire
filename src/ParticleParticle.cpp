@@ -378,7 +378,7 @@ void ParticleParticle::Do_Popcorn ()
 
 		for(int n = rand() % 15 + 5; n; n--)
 		{
-			float velocity = fabs(frand(6.0f)) + 1.0f;
+			float velocity = float(fabs(frand(6.0f))) + 1.0f;
 			float ex, ey;
 			int sunburst = rand() & 1;
 			int pnt = rand() % nParticles;
@@ -399,11 +399,11 @@ void ParticleParticle::Do_Popcorn ()
 				}
 				else
 				{
-					pvel = fabs(frand(velocity));
+					pvel = float(fabs(frand(velocity)));
 				}
 				angle = frand(3.14159f);
-				parent->p[i].dx = cos(angle) * pvel;
-				parent->p[i].dy = sin(angle) * pvel;
+				parent->p[i].dx = float(cos(angle) * pvel);
+				parent->p[i].dy = float(sin(angle) * pvel);
 				if(AltColor) parent->p[i].color = rand() % 84 + 170;
 				//
 				parent->p[i].SetTrueColor(parent->pe);
@@ -421,10 +421,10 @@ void ParticleParticle::Do_InnerRing ()
 	{
 		firstInit = 1;	// Do this at least once
 
-		float velocity = fabs(frand(10.0f)) + 2.0f;
+		float velocity = float(fabs(frand(10.0f)) + 2.0f);
 		float pvel, angle;
 		int exprob = (rand() % 3) + 1;
-		float size = fabs(frand(0.5f)) + 0.4f;
+		float size = float(fabs(frand(0.5f)) + 0.4f);
 		float w2 = (float)parent->screen.WIDTH * size * 0.5f;
 		float h2 = (float)parent->screen.HEIGHT * size * 0.5f;
 		int sunburst = rand() & 1;
@@ -436,22 +436,22 @@ void ParticleParticle::Do_InnerRing ()
 			if(i % exprob == 0)
 			{
 				angle = frand(3.14159f);
-				parent->p[i].x = rx + sin(angle) * h2;
-				parent->p[i].y = ry - cos(angle) * h2;
+				parent->p[i].x = float(rx + sin(angle) * h2);
+				parent->p[i].y = float(ry - cos(angle) * h2);
 				if(sunburst)
 				{
 					pvel = velocity * 0.5f;
 				}
 				else
 				{
-					pvel = fabs(frand(velocity));
+					pvel = float(fabs(frand(velocity)));
 				}
 
 				if(rot == 1) pvel = 0.0f;	//Frozen ring.
 				if(rot == 2) angle += 3.14159f * 0.5f;	//0 produces no rotation.
 				if(rot == 3) angle -= 3.14159f * 0.5f;
-				parent->p[i].dx = -sin(angle) * pvel;
-				parent->p[i].dy = cos(angle) * pvel;
+				parent->p[i].dx = float(-sin(angle) * pvel);
+				parent->p[i].dy = float(cos(angle) * pvel);
 				if(AltColor) parent->p[i].color = rand() % 84 + 170;
 				//
 				parent->p[i].SetTrueColor(parent->pe);
@@ -489,7 +489,7 @@ void ParticleParticle::Do_Explode ()
 	{
 		firstInit = 1;	// Do this at least once
 
-		float velocity = fabs(frand(9.0f)) + 3.0f;
+		float velocity = float(fabs(frand(9.0f)) + 3.0f);
 		float ex, ey;
 		int sunburst = rand() & 1;
 		if(ExplodeX == 0 || ExplodeY == 0)
@@ -517,11 +517,11 @@ void ParticleParticle::Do_Explode ()
 				}
 				else
 				{
-					pvel = fabs(frand(velocity));
+					pvel = float(fabs(frand(velocity)));
 				}
 				angle = frand(3.14159f);
-				parent->p[i].dx = cos(angle) * pvel;
-				parent->p[i].dy = sin(angle) * pvel;
+				parent->p[i].dx = float(cos(angle) * pvel);
+				parent->p[i].dy = float(sin(angle) * pvel);
 				if(AltColor) parent->p[i].color = rand() % 84 + 170;
 				//
 				parent->p[i].SetTrueColor(parent->pe);
@@ -533,7 +533,7 @@ void ParticleParticle::Do_Explode ()
 
 void ParticleParticle::Do_Comet ()
 {
-	float velocity = fabs(frand(8.0f));
+	float velocity = float(fabs(frand(8.0f)));
 	float ex = (float)(XOFF + rand() % (parent->screen.WIDTH - XOFF * 2));
 	float ey = (float)(YOFF + rand() % (parent->screen.HEIGHT - YOFF * 2));
 	float angle = frand(3.14159f);
@@ -541,8 +541,8 @@ void ParticleParticle::Do_Comet ()
 	{
 		parent->p[i].x = ex + frand(1.0f);
 		parent->p[i].y = ey + frand(1.0f);
-		parent->p[i].dx = cos(angle) * velocity;
-		parent->p[i].dy = sin(angle) * velocity;
+		parent->p[i].dx = float(cos(angle) * velocity);
+		parent->p[i].dy = float(sin(angle) * velocity);
 		if(AltColor) parent->p[i].color = rand() % 84 + 170;
 		//
 		parent->p[i].SetTrueColor(parent->pe);
@@ -575,8 +575,8 @@ void ParticleParticle::Do_Emit ()
 				parent->p[i].y = (float)(parent->screen.HEIGHT / 2);
 				if(EmitRotate != 0)
 				{
-					parent->p[i].dx = sin((float)i * angscale) * 4.0f;
-					parent->p[i].dy = -cos((float)i * angscale) * 4.0f;
+					parent->p[i].dx = float(sin((float)i * angscale) * 4.0f);
+					parent->p[i].dy = float(-cos((float)i * angscale) * 4.0f);
 				}
 				else
 				{
@@ -663,7 +663,7 @@ void ParticleParticle::Do_RainbowHole (int initNow)
 	if (!init || initNow || (ParticleStyle == STYLE_RAINBOWHOLE && rand()%1000 == 0) )
 	{
 		// Create velocity
-		velocity = fabs(frand(6.0f));
+		velocity = float(fabs(frand(6.0f)));
 		velocity = __max (velocity, 1.0f);
 
 		// Randomly pick new magnet point
@@ -678,11 +678,11 @@ void ParticleParticle::Do_RainbowHole (int initNow)
 		for(int i = 0; i < nParticles; i++)
 		{
 			// Randomly place the particles on the screen
-			parent->p[i].x = rand() % parent->screen.WIDTH;
-			parent->p[i].y = rand() % parent->screen.HEIGHT;
+			parent->p[i].x = float(rand() % parent->screen.WIDTH);
+			parent->p[i].y = float(rand() % parent->screen.HEIGHT);
 
 			// Point to the movement direction at the Magnet point
-			float dist = Distance (parent->p[i].x, parent->p[i].y, MagnetX, MagnetY);
+			float dist = Distance (parent->p[i].x, parent->p[i].y, float(MagnetX), float(MagnetY));
 			parent->p[i].dx = ( (float) (MagnetX - parent->p[i].x) / dist) * velocity;
 			parent->p[i].dy = ( (float) (MagnetY - parent->p[i].y) / dist) * velocity;
 
@@ -708,7 +708,7 @@ void ParticleParticle::Do_RainbowHole (int initNow)
 			for(int i = 0; i < nParticles; i++)
 			{
 				// Point to the movement direction at the Magnet point
-				float dist = Distance (parent->p[i].x, parent->p[i].y, MagnetX, MagnetY);
+				float dist = Distance (parent->p[i].x, parent->p[i].y, float(MagnetX), float(MagnetY));
 				parent->p[i].dx = ( (float) (MagnetX - parent->p[i].x) / dist) * velocity;
 				parent->p[i].dy = ( (float) (MagnetY - parent->p[i].y) / dist) * velocity;
 
@@ -736,8 +736,8 @@ void ParticleParticle::Do_SquigglyWiggly (int init)
 		for (int i=0; i < nParticles; i++)
 		{
 			// Random position of the particle
-			parent->p[i].x = rand () % (parent->screen.WIDTH-20) + 10;
-			parent->p[i].y = rand () % (parent->screen.HEIGHT-20) + 10;
+			parent->p[i].x = float(rand () % (parent->screen.WIDTH-20) + 10);
+			parent->p[i].y = float(rand () % (parent->screen.HEIGHT-20) + 10);
 			//
 			if(AltColor) parent->p[i].color = rand() % 84 + 170;
 			//
@@ -746,7 +746,7 @@ void ParticleParticle::Do_SquigglyWiggly (int init)
 	}
 
 	// Create velocity
-	velocity = fabs(frand(6.0f));
+	velocity = float(fabs(frand(6.0f)));
 	velocity = __max (velocity, 1.0f);
 
 	for (int i=0; i < nParticles; i++) {
@@ -774,8 +774,8 @@ void ParticleParticle::Do_SquigglyWiggly (int init)
 
 			// Set circular delta
 			angle = frand(3.14159f);
-			parent->p[i].dx = cos(angle) * velocity;
-			parent->p[i].dy = sin(angle) * velocity;
+			parent->p[i].dx = float(cos(angle) * velocity);
+			parent->p[i].dy = float(sin(angle) * velocity);
 			//
 			if(AltColor) parent->p[i].color = rand() % 84 + 170;
 			//
@@ -795,7 +795,7 @@ void ParticleParticle::Do_GalacticStorm (int init)
 	int leaderPartition = 25;		// Partition between leaders (number of followers to leaders)
 
 	// Create velocity
-	velocity = fabs(frand(6.0f));
+	velocity = float(fabs(frand(6.0f)));
 	velocity = __max (velocity, 1.0f);
 
 	// Init the particles, either the first time we start the routine, or when we are told to
@@ -808,8 +808,8 @@ void ParticleParticle::Do_GalacticStorm (int init)
 			if (i % leaderPartition == 0) 
 			{
 				// Random position of the particle
-				parent->p[i].x = rand () % (parent->screen.WIDTH-20) + 10;
-				parent->p[i].y = rand () % (parent->screen.HEIGHT-20) + 10;
+				parent->p[i].x = float(rand () % (parent->screen.WIDTH-20) + 10);
+				parent->p[i].y = float(rand () % (parent->screen.HEIGHT-20) + 10);
 
 				// Random directions
 				parent->p[i].dx = frand (1.0f) * velocity;
@@ -852,8 +852,8 @@ void ParticleParticle::Do_GalacticStorm (int init)
 			// Set circular delta
 			angle = frand(3.14159f);
 //			parent->p[i].dx = cos(angle) * velocity;
-			parent->p[i].dx = sin(angle) * velocity;
-			parent->p[i].dy = sin(angle) * velocity;
+			parent->p[i].dx = float(sin(angle) * velocity);
+			parent->p[i].dy = float(sin(angle) * velocity);
 			//
 			if(AltColor) parent->p[i].color = rand() % 84 + 170;
 			//
@@ -875,7 +875,7 @@ void ParticleParticle::Do_PixieDust (int init)
 	float buffer, bufferRand;
 
 	// Create velocity
-	velocity = fabs(frand(10.0f));
+	velocity = float(fabs(frand(10.0f)));
 	velocity = __max (velocity, 1.0f);
 
 	// Init the particles, either the first time we start the routine, or when we are told to
@@ -890,8 +890,8 @@ void ParticleParticle::Do_PixieDust (int init)
 				lastLeader = i;
 
 				// Random position of the particle
-				parent->p[i].x = rand () % (parent->screen.WIDTH-20) + 10;
-				parent->p[i].y = rand () % (parent->screen.HEIGHT-20) + 10;
+				parent->p[i].x = float(rand () % (parent->screen.WIDTH-20) + 10);
+				parent->p[i].y = float(rand () % (parent->screen.HEIGHT-20) + 10);
 
 				// Random directions
 				parent->p[i].dx = frand (1.0f) * velocity;
@@ -992,7 +992,7 @@ void ParticleParticle::Do_Geoff (int init)
 	float buffer, bufferRand;
 
 	// Create velocity
-	velocity = fabs(frand(10.0f));
+	velocity = float(fabs(frand(10.0f)));
 	velocity = __max (velocity, 1.0f);
 
 	// Init the particles, either the first time we start the routine, or when we are told to
@@ -1007,8 +1007,8 @@ void ParticleParticle::Do_Geoff (int init)
 				lastLeader = i;
 
 				// Random position of the particle
-				parent->p[i].x = rand () % (parent->screen.WIDTH-20) + 10;
-				parent->p[i].y = rand () % (parent->screen.HEIGHT-20) + 10;
+				parent->p[i].x = float(rand () % (parent->screen.WIDTH-20) + 10);
+				parent->p[i].y = float(rand () % (parent->screen.HEIGHT-20) + 10);
 
 				// Random directions
 				parent->p[i].dx = frand (1.0f) * velocity;
