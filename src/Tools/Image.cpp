@@ -1021,15 +1021,15 @@ int ImageSet::LoadSet(const char *n){
 }
 #define IMAGESETVERSION 1
 int ImageSet::LoadSet(FILE *f){
-	char buf[1024];
+	wchar_t buf[1024];
 	memset(buf, 0, sizeof(buf));
 	if(f){
 		fread(buf, 4, 1, f);
 		buf[4] = 0;
-		if(strncmp("IMST", buf, 4) == 0){
+		if(wcsncmp(L"IMST", buf, 4) == 0){
 			int Version = ReadLong(f);
 			if(Version > IMAGESETVERSION){
-				OutputDebugString("Bad ImageSet version!\n");
+				OutputDebugString(L"Bad ImageSet version!\n");
 				return 0;
 			}
 			int nImg = ReadLong(f);

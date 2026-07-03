@@ -207,7 +207,7 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			BlankedSecs = int(time(NULL) - SecsStart);
 			partFire.screen.TotalSecs += BlankedSecs;
 // GH-CHANGED
-			partFire.registry.RegistryWrite ("SecondsBlanked", partFire.screen.TotalSecs);
+			partFire.registry.RegistryWrite (L"SecondsBlanked", partFire.screen.TotalSecs);
 //			REG.WriteDword("SecondsBlanked", partFire.screen.TotalSecs);
 
 			//
@@ -259,8 +259,8 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 bool BrowseForFile ()
 {
 	OPENFILENAME ofn;       // common dialog box structure
-	char szFile[260];       // buffer for file name
-	strcpy (szFile, "\0");
+	wchar_t szFile[260];       // buffer for file name
+	wcscpy (szFile, L"\0");
 
 	// Initialize OPENFILENAME
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -269,7 +269,7 @@ bool BrowseForFile ()
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
 //	ofn.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
-	ofn.lpstrFilter = "Text\0*.TXT\0";
+	ofn.lpstrFilter = L"Text\0*.TXT\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
@@ -281,7 +281,7 @@ bool BrowseForFile ()
 	int RESULT;
 	RESULT = GetOpenFileName(&ofn);
 	if (RESULT == TRUE)
-		strcpy (partFire.QuoteFilename, ofn.lpstrFile);
+		wcscpy (partFire.QuoteFilename, ofn.lpstrFile);
 
 /*	if (GetOpenFileName(&ofn)==TRUE) 
 		hf = CreateFile(ofn.lpstrFile, GENERIC_READ,
@@ -410,7 +410,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 				//	EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
 					return TRUE;
 				case IDC_BUTTONLDA :
-					ShellExecute(NULL, "open", "http://www.longbowgames.com/", NULL, NULL, NULL);
+					ShellExecute(NULL, L"open", L"http://www.longbowgames.com/", NULL, NULL, NULL);
 					break;
 				case IDOK :
 					partFire.registry.SaveOpts();

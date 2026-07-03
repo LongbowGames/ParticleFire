@@ -31,7 +31,7 @@ public:
 	void LoadOpts();
 	void SaveOpts();
 
-	void RegistryWrite (char *buff, int num);
+	void RegistryWrite (wchar_t *buff, int num);
 
 public:
 	ParticleContainer *parent;

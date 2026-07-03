@@ -58,9 +58,9 @@ public:
 
 	int SetupFont(int height);
 	void UnsetupFont();
-	int DrawFont(const char *text, int mode=0);
-	int DrawCenteredFont(const char *text, int lines=1, int lineNum=0, int col_r=255, int col_g=255, int col_b=255);
-	int DrawXYFont(const char *text, int x, int y, int col_r=255, int col_g=255, int col_b=255);
+	int DrawFont(const wchar_t *text, int mode=0);
+	int DrawCenteredFont(const wchar_t *text, int lines=1, int lineNum=0, int col_r=255, int col_g=255, int col_b=255);
+	int DrawXYFont(const wchar_t *text, int x, int y, int col_r=255, int col_g=255, int col_b=255);
 
 public:
 	ParticleContainer *parent;
@@ -110,7 +110,7 @@ public:
 //	char RegText[REGLINES][100];
 
 	// Text
-	char *RealQuotes;
+	wchar_t *RealQuotes;
 	int RealQuoteLines;
 
 	int QuoteSecs;

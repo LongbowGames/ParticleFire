@@ -44,33 +44,33 @@ inline int Max(int a, int b) {return a < b ? b : a;}
 inline int Min(int a, int b) {return a > b ? b : a;}
 
 class CStr{
-	char	*pData;
+	wchar_t	*pData;
 	int		nLength;
-	const static char Dummy;
-	static char Playground[];
+	const static wchar_t Dummy;
+	static wchar_t Playground[];
 	void InitialInit();
 	//For pointing to if mallocs fail.
 	//Leave pData NULL when they fail, but return pointer to Dummy when
 	//someone asks for a const char *.
 public:
 	CStr();
-	CStr(const char *s);
+	CStr(const wchar_t *s);
 	CStr(const CStr &str);
-	CStr(const char *s, const char *ins, int pos);
+	CStr(const wchar_t *s, const wchar_t *ins, int pos);
 	~CStr();
 
-	const char	*get() const {return pData ? pData : &Dummy;}
+	const wchar_t	*get() const {return pData ? pData : &Dummy;}
 	int		len() const {return pData ? nLength : 0;}
 	int		alloc(int size);	//Allocates size _uninitialized_ bytes not counting ending null, ready to be filled.  Err, how, there's no non-const way to get at pData...  Sigh.
-	void	cpy(const char *s);
-	void	cat(const char *s);
-	int		cmp(const char *s) const;
+	void	cpy(const wchar_t  *s);
+	void	cat(const wchar_t *s);
+	int		cmp(const wchar_t *s) const;
 
-	char	chr(unsigned int pos) const {
+	wchar_t	chr(unsigned int pos) const {
 		if(pos < (unsigned int)nLength) return pData[pos];
 		return 0;
 	};
-	char &operator[](int n){
+	wchar_t &operator[](int n){
 		if((unsigned int)n < (unsigned int)nLength) return pData[n];
 		Playground[0] = '\0';
 		return Playground[0];	//This will give any writes a safe place to play.
@@ -109,37 +109,37 @@ public:
 		if(&source != this) cpy(source.get());	//Handle identity copy.
 		return *this;
 	}
-	CStr& operator=(const char *s) {
+	CStr& operator=(const wchar_t *s) {
 		if(s != pData) cpy(s);
 		return *this;
 	}
 
-	operator const char*() const {return get();}
+	operator const wchar_t*() const {return get();}
 
 //	char operator[](int idx) const;
 	//Implement later.
 };
 
 CStr operator+(const CStr &str1, const CStr &str2);
-CStr operator+(const CStr &str, const char *s);
-CStr operator+(const char *s, const CStr &str);
+CStr operator+(const CStr &str, const wchar_t *s);
+CStr operator+(const wchar_t *s, const CStr &str);
 
-inline int operator==(const CStr &str1, const CStr &str2){
+inline bool operator==(const CStr &str1, const CStr &str2){
 	return str1.cmp(str2.get());
 };
-inline int operator==(const CStr &str1, const char *s){
+inline bool operator==(const CStr &str1, const wchar_t *s){
 	return str1.cmp(s);
 };
-inline int operator==(const char *s, const CStr &str2){
+inline bool operator==(const wchar_t *s, const CStr &str2){
 	return str2.cmp(s);
 };
-inline int operator!=(const CStr &str1, const CStr &str2){
+inline bool operator!=(const CStr &str1, const CStr &str2){
 	return !str1.cmp(str2.get());
 };
-inline int operator!=(const CStr &str1, const char *s){
+inline bool operator!=(const CStr &str1, const wchar_t *s){
 	return !str1.cmp(s);
 };
-inline int operator!=(const char *s, const CStr &str2){
+inline bool operator!=(const wchar_t *s, const CStr &str2){
 	return !str2.cmp(s);
 };
 
@@ -150,22 +150,22 @@ inline CStr Left(const CStr &str, int num) {return Mid(str, 0, num);}
 inline CStr Right(const CStr &str, int num) {return Mid(str, Max(str.len() - num, 0));}
 int Instr(const CStr &str, const CStr &fnd, int pos = 0);
 inline CStr Insert(const CStr &str, const CStr &ins, int pos) {CStr nstr(str, ins, pos); return nstr;}
-CStr Lower(const char *str);
-CStr Upper(const char *str);
+CStr Lower(const wchar_t *str);
+CStr Upper(const wchar_t *str);
 CStr String(const double a);
 CStr String(const int a);
 CStr String(const char c);
 
-CStr FileExtension(const char *n);	//Returns only aspects after period ".".
-CStr FileNoExtension(const char *n);	//Returns file path/name with .foo extension removed.
-CStr FilePathOnly(const char *n);	//Returns path (with trailing path char) without name.
-CStr FileNameOnly(const char *n);	//Returns name without any path.
-int FileInPath(const char *n, const char *path);	//Returns true if string n starts with string path.  Only works with fully qualified drive:\dir pathnames.
-CStr FileMinusPath(const char *n, const char *path);	//Removes path string from name, or if no match returns FileNameOnly().
-CStr FileNameSafe(const char *n);	//Kills path chars and anything not a letter, number, space, or underscore.
+CStr FileExtension(const wchar_t *n);	//Returns only aspects after period ".".
+CStr FileNoExtension(const wchar_t *n);	//Returns file path/name with .foo extension removed.
+CStr FilePathOnly(const wchar_t *n);	//Returns path (with trailing path char) without name.
+CStr FileNameOnly(const wchar_t *n);	//Returns name without any path.
+int FileInPath(const wchar_t *n, const wchar_t *path);	//Returns true if string n starts with string path.  Only works with fully qualified drive:\dir pathnames.
+CStr FileMinusPath(const wchar_t *n, const wchar_t *path);	//Removes path string from name, or if no match returns FileNameOnly().
+CStr FileNameSafe(const wchar_t *n);	//Kills path chars and anything not a letter, number, space, or underscore.
 
-int CmpLower(const char *s1, const char *s2);
+int CmpLower(const wchar_t *s1, const wchar_t *s2);
 
-CStr PadString(const char *str, int padlen, char padchar = ' ', char clip = TRUE);
+CStr PadString(const wchar_t *str, int padlen, wchar_t padchar = L' ', bool clip = TRUE);
 
 #endif

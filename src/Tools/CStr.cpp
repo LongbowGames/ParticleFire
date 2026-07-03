@@ -34,9 +34,9 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-const char CStr::Dummy = '\0';
+const wchar_t CStr::Dummy = L'\0';
 
-char CStr::Playground[] = "\0\0";
+wchar_t CStr::Playground[] = L"\0\0";
 
 #define GRANULARITY 32
 //Minimum memory alloc.
@@ -44,7 +44,7 @@ char CStr::Playground[] = "\0\0";
 #define GRAN(a) (((a) + (GRANULARITY - 1)) & (~(GRANULARITY - 1)))
 
 void CStr::InitialInit(){
-	pData = (char*) malloc(GRANULARITY);
+	pData = (wchar_t*) malloc(GRANULARITY);
 	nLength = 0;
 	if(pData) pData[0] = '\0';
 	return;
@@ -59,44 +59,44 @@ CStr::CStr(){
 //	nLength = 0;
 	InitialInit();
 }
-CStr::CStr(const char *s){
+CStr::CStr(const wchar_t *s){
 	if(!s){
 		InitialInit();
 		return;
 	}
-	nLength = strlen(s);
-	pData = (char*) malloc(GRAN(nLength + 1));
+	nLength = wcslen(s);
+	pData = (wchar_t*) malloc(GRAN(nLength + 1));
 	if(!pData){
 		nLength = 0;
 		return;
 	}
-	strcpy(pData, s);
+	wcscpy(pData, s);
 //	nLength = strlen(s);
 }
 CStr::CStr(const CStr &s){
 	nLength = s.len();
-	pData = (char*) malloc(GRAN(nLength + 1));
+	pData = (wchar_t*) malloc(GRAN(nLength + 1));
 	if(!pData){
 		nLength = 0;
 		return;
 	}
-	strcpy(pData, s.get());
+	wcscpy(pData, s.get());
 }
-CStr::CStr(const char *s, const char *ins, int pos){
+CStr::CStr(const wchar_t *s, const wchar_t *ins, int pos){
 	if(!s || !ins){
 		InitialInit();
 		return;
 	}
-	nLength = strlen(s) + strlen(ins);
-	pData = (char*) malloc(GRAN(nLength + 1));
+	nLength = wcslen(s) + wcslen(ins);
+	pData = (wchar_t*) malloc(GRAN(nLength + 1));
 	if(!pData){
 		nLength = 0;
 		return;
 	}
-	pos = Range(pos, 0, strlen(s));
+	pos = Range(pos, 0, wcslen(s));
 	if(pos > 0) memcpy(pData, s, pos);
-	strcpy(pData + pos, ins);
-	strcpy(pData + pos + strlen(ins), s + pos);
+	wcscpy(pData + pos, ins);
+	wcscpy(pData + pos + wcslen(ins), s + pos);
 }
 
 CStr::~CStr(){
@@ -107,7 +107,7 @@ int CStr::alloc(int size){
 	if(size > 0){
 		if(GRAN(nLength + 1) != GRAN(size + 1) || pData == NULL){
 			if(pData) free(pData);
-			pData = (char*)malloc(GRAN(size + 1));
+			pData = (wchar_t*)malloc(GRAN(size + 1));
 		}
 		if(pData){
 			pData[size] = 0;	//Set null, to be safe.
@@ -120,44 +120,44 @@ int CStr::alloc(int size){
 	return 0;
 }
 
-void CStr::cpy(const char *s){
+void CStr::cpy(const wchar_t *s){
 	if(s && s != pData){
-		int n = strlen(s);
+		int n = wcslen(s);
 		if(GRAN(nLength + 1) != GRAN(n + 1)){
 			if(pData)
 				free(pData);
-			pData = (char*) malloc(GRAN(n + 1));
+			pData = (wchar_t*) malloc(GRAN(n + 1));
 			if(!pData){
 				nLength = 0;
 				return;
 			}
 			nLength = n;
 		}
-		strcpy(pData, s);
+		wcscpy(pData, s);
 		nLength = n;
 	}
 }
 
-void CStr::cat(const char *s){
+void CStr::cat(const wchar_t *s){
 	if(s){
-		int n = strlen(s);
+		int n = wcslen(s);
 		if(n <= 0) return;
 		if(GRAN(nLength + 1) != GRAN(nLength + n + 1)){
-			char *pTemp;
-			pTemp = (char*) malloc(GRAN(n + nLength + 1));
+			wchar_t *pTemp;
+			pTemp = (wchar_t*) malloc(GRAN(n + nLength + 1));
 			if(!pTemp) return;
-			if(pData) strcpy(pTemp, pData);
-			strcat(pTemp, s);
+			if(pData) wcscpy(pTemp, pData);
+			wcscat(pTemp, s);
 			if(pData) free(pData);
 			pData = pTemp;
 		}else{
-			strcat(pData, s);
+			wcscat(pData, s);
 		}
 		nLength += n;
 	}
 }
 
-int CStr::cmp(const char *s) const{
+int CStr::cmp(const wchar_t *s) const{
 	if(!pData || !s) return FALSE;	//NULL pData means there's been a malloc problem
 //	if((int)strlen(s) != nLength) return FALSE;	//Strict checking here
 //	if(0 == memcmp(pData, s, nLength)) return TRUE;
@@ -173,13 +173,13 @@ CStr operator+(const CStr &str1, const CStr &str2){
 	return new_string;
 }
 
-CStr operator+(const CStr &str, const char *s){
+CStr operator+(const CStr &str, const wchar_t *s){
 	CStr new_string(str);
 	new_string.cat(s);
 	return new_string;
 }
 
-CStr operator+(const char *s, const CStr &str){
+CStr operator+(const wchar_t *s, const CStr &str){
 	CStr new_string(s);
 	new_string.cat(str.get());
 	return new_string;
@@ -191,13 +191,13 @@ CStr operator+(const char *s, const CStr &str){
 CStr Mid(const CStr &str, int pos, int num){
 	CStr nstr;
 	if(num == 0) return nstr;
-	char *tmp;
+	wchar_t *tmp;
 	int L = str.len();
 	if(L == 0 || pos >= L || pos < 0)
 		return nstr;
 	if(num < 0) num = L;
 	num = Range(num, 0, L - pos);
-	tmp = (char*) malloc(num + 1);
+	tmp = (wchar_t*) malloc(num + 1);
 	if(!tmp)
 		return nstr;
 	memcpy(tmp, str.get() + pos, num);
@@ -210,34 +210,34 @@ CStr Mid(const CStr &str, int pos, int num){
 //Returns position of fnd in str starting at 0, searching from pos, or -1 if
 //string isn't found.
 int Instr(const CStr &str, const CStr &fnd, int pos){
-	const char *pstr = str.get();
-	const char *pfnd = fnd.get();
-	const char *result;
+	const wchar_t *pstr = str.get();
+	const wchar_t *pfnd = fnd.get();
+	const wchar_t *result;
 	int lstr = str.len();
 	int lfnd = fnd.len();
 	pos = Range(pos, 0, lstr);
 	if(!pstr || !pfnd || !lstr || !lfnd || pos + lfnd > lstr) return -1;
-	result = strstr(pstr + pos, pfnd);
+	result = wcsstr(pstr + pos, pfnd);
 	if(result != NULL) return (int)(result - pstr);
 	return -1;
 }
 
-CStr Lower(const char *str){
+CStr Lower(const wchar_t *str){
 	if(str){
 		CStr out = str;
 		for(int i = 0; i < out.len(); i++){
-			char c = out[i];
+			wchar_t c = out[i];
 			out[i] = LOWER(c);
 		}
 		return out;
 	}
 	return CStr();
 }
-CStr Upper(const char *str){
+CStr Upper(const wchar_t *str){
 	if(str){
 		CStr out = str;
 		for(int i = 0; i < out.len(); i++){
-			char c = out[i];
+			wchar_t c = out[i];
 			out[i] = UPPER(c);
 		}
 		return out;
@@ -247,70 +247,70 @@ CStr Upper(const char *str){
 
 //Returns a CStr with the input number in human readable ASCII string form.
 CStr String(const double a){
-	char Buf[100];
-	sprintf(Buf, "%f", a);
+	wchar_t Buf[100];
+	swprintf(Buf, 100, L"%f", a);
 	CStr str(Buf);
 	return str;
 }
 //Returns a CStr with the input number in human readable ASCII string form.
 CStr String(const int a){
-	char Buf[100];
-	sprintf(Buf, "%i", a);
+	wchar_t Buf[100];
+	swprintf(Buf, 100, L"%i", a);
 	CStr str(Buf);
 	return str;
 }
 
 //Returns a CStr containing the input single char and a terminating null.
 CStr String(const char c){
-	char Buf[2];
+	wchar_t Buf[2];
 	Buf[0] = c;
 	Buf[1] = '\0';
 	CStr str(&Buf[0]);
 	return str;
 }
 
-CStr FileExtension(const char *n){
+CStr FileExtension(const wchar_t *n){
 	CStr str;
 	if(n){
-		for(int i = strlen(n) - 1; i >= 0; i--){
+		for(int i = wcslen(n) - 1; i >= 0; i--){
 			if(n[i] == '.'){ str.cpy(&n[i + 1]); break; }
 			if(n[i] == '/' || n[i] == '\\' || n[i] == ':') break;
 		}
 	}
 	return str;
 }
-CStr FileNoExtension(const char *n){
+CStr FileNoExtension(const wchar_t *n){
 	CStr str(n);
 	if(n){
-		for(int i = strlen(n) - 1; i >= 0; i--){
+		for(int i = wcslen(n) - 1; i >= 0; i--){
 			if(n[i] == '.'){ str = Left(str, i); break; }
 			if(n[i] == '/' || n[i] == '\\' || n[i] == ':') break;
 		}
 	}
 	return str;
 }
-CStr FilePathOnly(const char *n){
+CStr FilePathOnly(const wchar_t *n){
 	CStr str(n);
 	if(n){
-		for(int i = strlen(n) - 1; i >= 0; i--){
+		for(int i = wcslen(n) - 1; i >= 0; i--){
 			if(n[i] == '/' || n[i] == '\\' || n[i] == ':'){ str = Left(str, i + 1); break; }
-			if(i == 0) str = "";
+			if(i == 0) str = L"";
 		}
 	}
 	return str;
 }
-CStr FileNameOnly(const char *n){
+CStr FileNameOnly(const wchar_t *n){
 	CStr str(n);
 	if(n){
-		for(int i = strlen(n) - 1; i >= 0; i--){
+		for(int i = wcslen(n) - 1; i >= 0; i--){
 			if(n[i] == '/' || n[i] == '\\' || n[i] == ':'){ str.cpy(&n[i + 1]); break; }
 		}
 	}
 	return str;
 }
-int FileInPath(const char *n, const char *path){
-	if(n && path && strlen(path) < strlen(n)){
-		for(int i = 0; i < (int)strlen(path); i++){
+int FileInPath(const wchar_t *n, const wchar_t *path){
+	if(n && path && wcslen(path) < wcslen(n)){
+		for(int i = 0; i < (int)wcslen(path); i++){
 			if(tolower(n[i]) == tolower(path[i]) ||
 				(n[i] == '/' && path[i] == '\\') ||
 				(n[i] == '\\' && path[i] == '/')){	//Handle mixed up slashes, and mixed case.
@@ -324,19 +324,19 @@ int FileInPath(const char *n, const char *path){
 	}
 	return FALSE;
 }
-CStr FileMinusPath(const char *n, const char *path){
+CStr FileMinusPath(const wchar_t *n, const wchar_t *path){
 	CStr str;
 	if(FileInPath(n, path)){
-		str = Mid(n, strlen(path));
+		str = Mid(n, wcslen(path));
 	}
 	return str;
 }
 
-CStr FileNameSafe(const char *n){	//Kills path chars and anything not a letter, number, space, or underscore.
+CStr FileNameSafe(const wchar_t *n){	//Kills path chars and anything not a letter, number, space, or underscore.
 	CStr str;
-	char buf[1024];
+	wchar_t buf[1024];
 	if(n){
-		char c;
+		wchar_t c;
 		int i = 0;
 		while(i < 1024 && (c = n[i]) != 0){
 			if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
@@ -353,7 +353,7 @@ CStr FileNameSafe(const char *n){	//Kills path chars and anything not a letter, 
 	return str;
 }
 
-int CmpLower(const char *s1, const char *s2){
+int CmpLower(const wchar_t *s1, const wchar_t *s2){
 	if(s1 && s2){
 		int n = 0;
 		while(s1[n] && s2[n] && LOWER(s1[n]) == LOWER(s2[n])) n++;
@@ -364,10 +364,10 @@ int CmpLower(const char *s1, const char *s2){
 	return FALSE;
 }
 
-CStr PadString(const char *str, int padlen, char padchar, char clip){
-	static char padbuf[1024];
+CStr PadString(const wchar_t *str, int padlen, wchar_t padchar, bool clip){
+	static wchar_t padbuf[1024];
 	if(str && padlen > 0){
-		int len = strlen(str);
+		int len = wcslen(str);
 		len = __min(1023, len);
 		padlen = __min(1023, padlen);
 		memset(padbuf, padchar, padlen);
@@ -376,6 +376,6 @@ CStr PadString(const char *str, int padlen, char padchar, char clip){
 		else padbuf[len] = 0;
 		return padbuf;
 	}
-	return "";
+	return L"";
 }
 

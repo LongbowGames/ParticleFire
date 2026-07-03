@@ -572,14 +572,14 @@ public:
 		}
 		return CStr();
 	};
-	int SetName(int n, const char *s){
+	int SetName(int n, const wchar_t *s){
 		if(names && s && n >= 0 && n < nImages){
 			names[n] = s;
 			return TRUE;
 		}
 		return FALSE;
 	};
-	Image *FindImage(const char *s){
+	Image *FindImage(const wchar_t *s){
 		if(names){
 			for(int n = 0; n < nImages; n++){
 				if(CmpLower(s, names[n])) return &(*this)[n];
@@ -587,7 +587,7 @@ public:
 		}
 		return NULL;
 	};
-	int FindImageIndex(const char *s){
+	int FindImageIndex(const wchar_t *s){
 		if(names){
 			for(int n = 0; n < nImages; n++){
 				if(CmpLower(s, names[n])) return n;

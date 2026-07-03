@@ -38,26 +38,26 @@
 
 class Registry{
 private:
-	char sKey[1024];
-	char sPrefix[1024];
+	wchar_t sKey[1024];
+	wchar_t sPrefix[1024];
 	HKEY hKey;
 	int LocalMachine;
 public:
-	Registry(const char *company, const char *title, int global = FALSE);	//Set global to TRUE to use HKEY_LOCAL_MACHINE instead of HKEY_CURRENT_USER.
+	Registry(const wchar_t *company, const wchar_t *title, int global = FALSE);	//Set global to TRUE to use HKEY_LOCAL_MACHINE instead of HKEY_CURRENT_USER.
 	~Registry();
 	int OpenKey();
 	int CloseKey();
-	int SetPrefix(const char *prefix);	//Sets a prefix which is prepended to all keys read or written, so you can easily create fake-subdirectories of keys.
-	int WriteDword(const char *name, unsigned long val);
-	int ReadDword(const char *name, unsigned long *val);
-	int ReadDword(const char *name, int *val){ return ReadDword(name, (unsigned long*)val); };
-	int WriteFloat(const char *name, float val);
-	int ReadFloat(const char *name, float *val);
-	int WriteString(const char *name, const char *val);
-	int ReadString(const char *name, char *val, int maxlen);
-	int ReadString(const char *name, CStr *str);
-	int SaveWindowPos(HWND hwnd, const char *name, int Size = FALSE, int Max = FALSE);	//Restore and save Widht and Height too?  (Not for Dialogs!!!)
-	int RestoreWindowPos(HWND hwnd, const char *name, int Size = FALSE, int Max = FALSE);	//Set MAx to TRUE to save/restore window's maximised state.
+	int SetPrefix(const wchar_t *prefix);	//Sets a prefix which is prepended to all keys read or written, so you can easily create fake-subdirectories of keys.
+	int WriteDword(const wchar_t *name, unsigned long val);
+	int ReadDword(const wchar_t *name, unsigned long *val);
+	int ReadDword(const wchar_t *name, int *val){ return ReadDword(name, (unsigned long*)val); };
+	int WriteFloat(const wchar_t *name, float val);
+	int ReadFloat(const wchar_t *name, float *val);
+	int WriteString(const wchar_t *name, const wchar_t *val);
+	int ReadString(const wchar_t *name, wchar_t *val, int maxlen);
+	int ReadString(const wchar_t *name, CStr *str);
+	int SaveWindowPos(HWND hwnd, const wchar_t *name, bool Size = FALSE, bool Max = FALSE);	//Restore and save Widht and Height too?  (Not for Dialogs!!!)
+	int RestoreWindowPos(HWND hwnd, const wchar_t *name, bool Size = FALSE, bool Max = FALSE);	//Set MAx to TRUE to save/restore window's maximised state.
 };
 
 #endif

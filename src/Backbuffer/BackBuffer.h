@@ -84,7 +84,7 @@ class BackBuffer{
 public:
 	BackBuffer();
 	~BackBuffer();
-	int InitWindow(int w, int h, const char *Name, HINSTANCE hInst, HWND *phWnd, LRESULT (CALLBACK *WProc)(HWND, UINT, WPARAM, LPARAM), DWORD Icon = NULL);
+	int InitWindow(int w, int h, const wchar_t *Name, HINSTANCE hInst, HWND *phWnd, LRESULT (CALLBACK *WProc)(HWND, UINT, WPARAM, LPARAM), DWORD Icon = NULL);
 		//Creates the main window and the DirectDraw object.  Requires a width, height,
 		//name, hInstance, and a pointer to a WindowProcedure function.
 		//Set icon to NULL to use standard, or to a resource identifier to load that
@@ -150,23 +150,23 @@ private:	//Helper functions.
 	int InitDIB(int w, int h, int bpp);
 	int FreeDIB();
 private:	//Private data members.
-	BOOL	m_InitInitial;
+	BOOL	m_InitInitial = false;
 	BOOL	m_InitDIB;	//Keep track of what's been initialized properly.
 	BOOL	m_InitDDRaw;
 	BOOL	m_fullscreen2;	//True if DirectDraw SetDisplayMode is in effect.
-	WNDCLASSEX			m_wc;
+	WNDCLASSEX			m_wc = {0};
 	HWND				m_hwnd;
 	CreateDib			m_DIB;
 	PALETTEENTRY		m_pe[256];
-	TrueColorFormat		m_tcf;
+	TrueColorFormat		m_tcf = {0};
 	BufferDesc			m_BufDesc;
 	int					m_Locks;	//Number of concurrent Lock()s.
 	int m_x, m_y, m_w, m_h;		//Window position and size variables.
 	int m_realw, m_realh;		//The width and height needed to generate a w,h client area.
-	DDSURFACEDESC	ddsd;	//Temporary member variables.
-	HRESULT			ddreturn;
+	DDSURFACEDESC	ddsd = {0};	//Temporary member variables.
+	HRESULT			ddreturn = 0;
 	int centering, pointer;
-	DirtyRect dirty[MAX_DIRTY];
+	DirtyRect dirty[MAX_DIRTY] = {0};
 	int ndirty;
 };
 

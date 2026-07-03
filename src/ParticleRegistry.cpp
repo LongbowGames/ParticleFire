@@ -36,7 +36,7 @@ extern void error_print (char *buff);
 //#define MAX_PART 10000
 
 // ? GH-CHANGE
-Registry REG("Longbow Digital Arts", "Particle Fire 2");
+Registry REG(L"Longbow Digital Arts", L"Particle Fire 2");
 
 
 ParticleRegistry::ParticleRegistry ()
@@ -60,29 +60,29 @@ void ParticleRegistry::LoadOpts()
 	sprintf (buff, "%x\n%x", *((ULONG*)&parent->screen.CustomPE1), *((ULONG*)&parent->screen.CustomPE2) );
 //	error_print (buff);
 
-	REG.ReadDword("RandomTime", (ULONG*)&parent->particle.RANDEFFECT);
-	REG.ReadDword("GravityTime", (ULONG*)&parent->particle.GRAV_TIME);
-	REG.ReadDword("RandomColor", (ULONG*)&parent->screen.RandomColor);
-	REG.ReadDword("ColorScheme", (ULONG*)&parent->screen.ColorScheme);
-	REG.ReadDword("Particles", (ULONG*)&parent->particle.nParticles);
-	REG.ReadDword("CustomScheme", (ULONG*)&parent->screen.CustomScheme);
-	REG.ReadDword("CustomColor1", (ULONG*)&parent->screen.CustomPE1);
-	REG.ReadDword("CustomColor2", (ULONG*)&parent->screen.CustomPE2);
-	REG.ReadDword("ParticleStyle", (ULONG*)&parent->particle.ParticleStyle);
-	REG.ReadDword("WallStyle", (ULONG*)&parent->particle.WallStyle);
-	REG.ReadDword("BurnFade", (ULONG*)&parent->screen.BURNFADE);
-	REG.ReadDword("DisableText", (ULONG*)&parent->screen.DisableText);
-	REG.ReadDword("DisableFire", (ULONG*)&parent->screen.DisableFire);	// Using WallStyle now to do this
-	REG.ReadDword("CycleColors", (ULONG*)&parent->screen.CycleColors);
-	REG.ReadDword("UseTrueColor", (ULONG*)&parent->screen.UseTrueColor);
-	REG.ReadDword("QuoteTextSpeed", (ULONG*)&parent->screen.QuoteSecs);
+	REG.ReadDword(L"RandomTime", (ULONG*)&parent->particle.RANDEFFECT);
+	REG.ReadDword(L"GravityTime", (ULONG*)&parent->particle.GRAV_TIME);
+	REG.ReadDword(L"RandomColor", (ULONG*)&parent->screen.RandomColor);
+	REG.ReadDword(L"ColorScheme", (ULONG*)&parent->screen.ColorScheme);
+	REG.ReadDword(L"Particles", (ULONG*)&parent->particle.nParticles);
+	REG.ReadDword(L"CustomScheme", (ULONG*)&parent->screen.CustomScheme);
+	REG.ReadDword(L"CustomColor1", (ULONG*)&parent->screen.CustomPE1);
+	REG.ReadDword(L"CustomColor2", (ULONG*)&parent->screen.CustomPE2);
+	REG.ReadDword(L"ParticleStyle", (ULONG*)&parent->particle.ParticleStyle);
+	REG.ReadDword(L"WallStyle", (ULONG*)&parent->particle.WallStyle);
+	REG.ReadDword(L"BurnFade", (ULONG*)&parent->screen.BURNFADE);
+	REG.ReadDword(L"DisableText", (ULONG*)&parent->screen.DisableText);
+	REG.ReadDword(L"DisableFire", (ULONG*)&parent->screen.DisableFire);	// Using WallStyle now to do this
+	REG.ReadDword(L"CycleColors", (ULONG*)&parent->screen.CycleColors);
+	REG.ReadDword(L"UseTrueColor", (ULONG*)&parent->screen.UseTrueColor);
+	REG.ReadDword(L"QuoteTextSpeed", (ULONG*)&parent->screen.QuoteSecs);
 
 	sprintf (buff, "%x\n%x", *((ULONG*)&parent->screen.CustomPE1), *((ULONG*)&parent->screen.CustomPE2) );
 //	error_print (buff);
 
 	// Get the Quote String
-	CStr string;	REG.ReadString("QuoteFileName", &string);
-	strcpy (parent->QuoteFilename, string.get() );
+	CStr str;	REG.ReadString(L"QuoteFileName", &str);
+	wcscpy (parent->QuoteFilename, str.get() );
 	
 	parent->particle.RANDEFFECT = __max(parent->particle.RANDEFFECT, 1);
 	parent->particle.GRAV_TIME = __max(parent->particle.GRAV_TIME, 1);
@@ -95,12 +95,12 @@ void ParticleRegistry::LoadOpts()
 	//
 	// First Time Use
 	parent->screen.FirstUseTime = 0;
-	if(REG.ReadDword("Time", (ULONG*)&parent->screen.FirstUseTime) == FALSE && parent->screen.FirstUseTime <= 0){	//Write first-use-time.
+	if(REG.ReadDword(L"Time", (ULONG*)&parent->screen.FirstUseTime) == FALSE && parent->screen.FirstUseTime <= 0){	//Write first-use-time.
 		parent->screen.FirstUseTime = long(time(NULL));
-		REG.WriteDword("Time", parent->screen.FirstUseTime);
+		REG.WriteDword(L"Time", parent->screen.FirstUseTime);
 	}
 	parent->screen.TotalSecs = 0;
-	REG.ReadDword("SecondsBlanked", (ULONG*)&parent->screen.TotalSecs);	//Total seconds of use.
+	REG.ReadDword(L"SecondsBlanked", (ULONG*)&parent->screen.TotalSecs);	//Total seconds of use.
 }
 
 void ParticleRegistry::SaveOpts()
@@ -110,31 +110,31 @@ void ParticleRegistry::SaveOpts()
 //	error_print (buff);
 	}*/
 
-	REG.WriteDword("RandomTime", parent->particle.RANDEFFECT);
-	REG.WriteDword("GravityTime", parent->particle.GRAV_TIME);
-	REG.WriteDword("RandomColor", parent->screen.RandomColor);
-	REG.WriteDword("ColorScheme", parent->screen.ColorScheme);
-	REG.WriteDword("Particles", parent->particle.nParticles);
-	REG.WriteDword("CustomScheme", parent->screen.CustomScheme);
-	REG.WriteDword("CustomColor1", *((ULONG*)&parent->screen.CustomPE1));
-	REG.WriteDword("CustomColor2", *((ULONG*)&parent->screen.CustomPE2));
-	REG.WriteDword("ParticleStyle", parent->particle.ParticleStyle);
-	REG.WriteDword("WallStyle", parent->particle.WallStyle);
-	REG.WriteDword("BurnFade", parent->screen.BURNFADE);
-	REG.WriteDword("DisableText", parent->screen.DisableText);
-	REG.WriteDword("DisableFire", parent->screen.DisableFire);	// Using WallStyle now to disable Wall Fire
-	REG.WriteDword("CycleColors", parent->screen.CycleColors);
-	REG.WriteDword("UseTrueColor", parent->screen.UseTrueColor);
-	REG.WriteDword("QuoteTextSpeed", parent->screen.QuoteSecs);
+	REG.WriteDword(L"RandomTime", parent->particle.RANDEFFECT);
+	REG.WriteDword(L"GravityTime", parent->particle.GRAV_TIME);
+	REG.WriteDword(L"RandomColor", parent->screen.RandomColor);
+	REG.WriteDword(L"ColorScheme", parent->screen.ColorScheme);
+	REG.WriteDword(L"Particles", parent->particle.nParticles);
+	REG.WriteDword(L"CustomScheme", parent->screen.CustomScheme);
+	REG.WriteDword(L"CustomColor1", *((ULONG*)&parent->screen.CustomPE1));
+	REG.WriteDword(L"CustomColor2", *((ULONG*)&parent->screen.CustomPE2));
+	REG.WriteDword(L"ParticleStyle", parent->particle.ParticleStyle);
+	REG.WriteDword(L"WallStyle", parent->particle.WallStyle);
+	REG.WriteDword(L"BurnFade", parent->screen.BURNFADE);
+	REG.WriteDword(L"DisableText", parent->screen.DisableText);
+	REG.WriteDword(L"DisableFire", parent->screen.DisableFire);	// Using WallStyle now to disable Wall Fire
+	REG.WriteDword(L"CycleColors", parent->screen.CycleColors);
+	REG.WriteDword(L"UseTrueColor", parent->screen.UseTrueColor);
+	REG.WriteDword(L"QuoteTextSpeed", parent->screen.QuoteSecs);
 
-	REG.WriteString("QuoteFileName", parent->QuoteFilename);
+	REG.WriteString(L"QuoteFileName", parent->QuoteFilename);
 
 //	char buff[255];
 //	sprintf (buff, "%x\n%x", *((ULONG*)&parent->screen.CustomPE1), *((ULONG*)&parent->screen.CustomPE2) );
 //	error_print (buff);
 }
 
-void ParticleRegistry::RegistryWrite (char *buff, int num)
+void ParticleRegistry::RegistryWrite (wchar_t *buff, int num)
 {
 	REG.WriteDword(buff, num);
 }
