@@ -40,6 +40,7 @@
 #define IDC_SLIDER_EVENT_SPEED          1023
 #define IDC_SLIDER_GRAVITY_SPEED        1024
 #define IDC_SLIDER_PARTICLE_NUM         1025
+#define IDC_RESETDEFAULTS				1026
 #define IDD_DIALOG1                     2003
 
 // Next default values for new objects

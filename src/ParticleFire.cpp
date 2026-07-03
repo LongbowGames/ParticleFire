@@ -291,6 +291,68 @@ bool BrowseForFile ()
 	return true;
 }
 
+static void PopulateSettingsDialogFromState(HWND dlgwnd) {
+	SendDlgItemMessage(dlgwnd, IDC_CHECKRANDCOL, BM_SETCHECK, (partFire.screen.RandomColor ? BM_SETCHECK : FALSE), 0);
+
+	for (int i = 0; i < NUMSCHEMES + 1; i++) {
+		if (i == 0) SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LPARAM)(L"Custom"));
+		else SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LPARAM)&ColorName[i - 1][0]);
+	}
+	SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_SETCURSEL, partFire.screen.CustomScheme ? 0 : partFire.screen.ColorScheme + 1, 0);
+	EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
+	//
+//			SetDlgItemInt(dlgwnd, IDC_EDITBURNFADE, partFire.screen.BURNFADE, FALSE);
+	SendDlgItemMessage(dlgwnd, IDC_CHECKCYCLE, BM_SETCHECK, (partFire.screen.CycleColors ? BM_SETCHECK : FALSE), 0);
+	SendDlgItemMessage(dlgwnd, IDC_CHECKTEXT, BM_SETCHECK, (partFire.screen.DisableText ? BM_SETCHECK : FALSE), 0);
+	//
+	for (int i = 0; i < NUMSTYLES; i++) {
+		SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_ADDSTRING, 0, (LPARAM)&StyleName[i][0]);
+	}
+	SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_SETCURSEL, partFire.particle.ParticleStyle, 0);
+	//
+	for (int i = 0; i < NUMSTYLEWALLS; i++) {
+		SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_ADDSTRING, 0, (LPARAM)&StyleWallName[i][0]);
+	}
+	SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_SETCURSEL, partFire.particle.WallStyle, 0);
+	//
+	SendDlgItemMessage(dlgwnd, IDC_CHECKMULTI, BM_SETCHECK, (partFire.screen.UseTrueColor ? BM_SETCHECK : FALSE), 0);
+	//
+	SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM)partFire.QuoteFilename);
+	//
+	//
+	{	// Quote Text speed
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.screen.QuoteSecs / 2;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETPOS, TRUE, (LPARAM)slider_position);
+	}
+	{	// Burn Fade speed
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.screen.BURNFADE;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETPOS, TRUE, (LPARAM)slider_position);
+	}
+	{	// Number of particles
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.particle.nParticles / 500;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETPOS, TRUE, (LPARAM)slider_position);
+	}
+	{	// Event Change speed
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.particle.RANDEFFECT / 5;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETPOS, TRUE, (LPARAM)slider_position);
+	}
+	{	// Gravity Change speed
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETRANGE, TRUE, MAKELONG(1, 20));
+		int slider_position = partFire.particle.GRAV_TIME / 10;
+		SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETPOS, TRUE, (LPARAM)slider_position);
+	}
+
+	//redraw custom color buttons
+	HWND hBtn1 = GetDlgItem(dlgwnd, IDC_BUTTONCOLOR1);
+	HWND hBtn2 = GetDlgItem(dlgwnd, IDC_BUTTONCOLOR2);
+	RedrawWindow(hBtn1, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW);
+	RedrawWindow(hBtn2, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW);
+}
+
 BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, LPARAM lParam){
 	HWND ctrl;
 	LPDRAWITEMSTRUCT lpdis;
@@ -304,59 +366,8 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 
 			//
 			partFire.registry.LoadOpts();
-			SendDlgItemMessage(dlgwnd, IDC_CHECKRANDCOL, BM_SETCHECK, (partFire.screen.RandomColor ? BM_SETCHECK : FALSE), 0);
-
-			for(i = 0; i < NUMSCHEMES + 1; i++){
-				if(i == 0) SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LPARAM)(L"Custom"));
-				else SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_ADDSTRING, 0, (LPARAM)&ColorName[i - 1][0]);
-			}
-			SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_SETCURSEL, partFire.screen.CustomScheme ? 0 : partFire.screen.ColorScheme + 1, 0);
-			EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
-			//
-//			SetDlgItemInt(dlgwnd, IDC_EDITBURNFADE, partFire.screen.BURNFADE, FALSE);
-			SendDlgItemMessage(dlgwnd, IDC_CHECKCYCLE, BM_SETCHECK, (partFire.screen.CycleColors ? BM_SETCHECK : FALSE), 0);
-			SendDlgItemMessage(dlgwnd, IDC_CHECKTEXT, BM_SETCHECK, (partFire.screen.DisableText ? BM_SETCHECK : FALSE), 0);
-			//
-			for(i = 0; i < NUMSTYLES; i++){
-				SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_ADDSTRING, 0, (LPARAM)&StyleName[i][0]);
-			}
-			SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_SETCURSEL, partFire.particle.ParticleStyle, 0);
-			//
-			for(i = 0; i < NUMSTYLEWALLS; i++){
-				SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_ADDSTRING, 0, (LPARAM)&StyleWallName[i][0]);
-			}
-			SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_SETCURSEL, partFire.particle.WallStyle, 0);
-			//
-			SendDlgItemMessage(dlgwnd, IDC_CHECKMULTI, BM_SETCHECK, (partFire.screen.UseTrueColor ? BM_SETCHECK : FALSE), 0);
-			//
-			SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM) partFire.QuoteFilename);
-			//
-			//
-			{	// Quote Text speed
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.screen.QuoteSecs / 2;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_TEXT_SPEED, TBM_SETPOS, TRUE, (LPARAM) slider_position);
-			}
-			{	// Burn Fade speed
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.screen.BURNFADE;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_FADE_SPEED, TBM_SETPOS, TRUE, (LPARAM) slider_position);
-			}
-			{	// Number of particles
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.particle.nParticles / 500;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_PARTICLE_NUM, TBM_SETPOS, TRUE, (LPARAM) slider_position);
-			}
-			{	// Event Change speed
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.particle.RANDEFFECT / 5;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_EVENT_SPEED, TBM_SETPOS, TRUE, (LPARAM) slider_position);
-			}
-			{	// Gravity Change speed
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETRANGE, TRUE, MAKELONG (1,20));
-			int slider_position = partFire.particle.GRAV_TIME / 10;
-			SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_SETPOS, TRUE, (LPARAM) slider_position);
-			}
+			PopulateSettingsDialogFromState(dlgwnd);
+			
 			return TRUE;
 		case WM_HSCROLL:
 			ctrl = (HWND) lParam;
@@ -424,6 +435,13 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 //					strcpy (partFire.QuoteFilename, "Filename Here");
 					BrowseForFile ();
 					SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM) partFire.QuoteFilename);
+					return TRUE;
+				case IDC_RESETDEFAULTS:
+					//
+					partFire.registry.SaveOpts(true);
+
+					PopulateSettingsDialogFromState(dlgwnd);
+
 					return TRUE;
 				}
 			}

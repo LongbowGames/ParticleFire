@@ -29,7 +29,7 @@ public:
 	void Init ();
 
 	void LoadOpts();
-	void SaveOpts();
+	void SaveOpts(bool resetOptions = false);
 
 	void RegistryWrite (wchar_t *buff, int num);
 

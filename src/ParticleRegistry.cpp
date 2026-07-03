@@ -103,12 +103,39 @@ void ParticleRegistry::LoadOpts()
 	REG.ReadDword(L"SecondsBlanked", (ULONG*)&parent->screen.TotalSecs);	//Total seconds of use.
 }
 
-void ParticleRegistry::SaveOpts()
+void ParticleRegistry::SaveOpts(bool resetOptions)
 {
-/*	{char buff[255];
-//	sprintf (buff, "%x\n%x", *((ULONG*)&parent->screen.CustomPE1), *((ULONG*)&parent->screen.CustomPE2) );
-//	error_print (buff);
-	}*/
+	if (resetOptions)
+	{
+		parent->particle.RANDEFFECT = 75;
+		parent->particle.GRAV_TIME = 50;
+		parent->screen.RandomColor = 1;
+		parent->screen.ColorScheme = 0;
+		parent->particle.nParticles = 2000;
+		parent->screen.CustomScheme = 0;
+
+		parent->screen.CustomPE1.peRed = 220;
+		parent->screen.CustomPE1.peGreen = 220;
+		parent->screen.CustomPE1.peBlue = 255;
+		parent->screen.CustomPE1.peFlags = 0;
+
+		parent->screen.CustomPE2.peRed = 255;
+		parent->screen.CustomPE2.peGreen = 255;
+		parent->screen.CustomPE2.peBlue = 255;
+		parent->screen.CustomPE2.peFlags = 0;
+
+		parent->particle.ParticleStyle = 0;
+		parent->particle.WallStyle = 0;
+		parent->screen.BURNFADE = 3;
+		parent->screen.DisableText = 1;
+		parent->screen.DisableFire = 0; // Using WallStyle now to disable Wall Fire 
+		parent->screen.CycleColors = 1;
+		parent->screen.UseTrueColor = 1;
+		parent->screen.QuoteSecs = 26;
+
+		//best way?
+		wcscpy(parent->QuoteFilename, L"\0");
+	}
 
 	REG.WriteDword(L"RandomTime", parent->particle.RANDEFFECT);
 	REG.WriteDword(L"GravityTime", parent->particle.GRAV_TIME);
