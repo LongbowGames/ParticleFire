@@ -74,7 +74,7 @@ bool Registry::ReadDword(const std::wstring& name, unsigned long& val){
 		}
 	}
 	CloseKey();
-	return FALSE;
+	return false;
 }
 
 bool Registry::WriteFloat(const std::wstring& name, float val){
@@ -95,7 +95,7 @@ bool Registry::ReadFloat(const std::wstring& name, float& val){
 		}
 	}
 	CloseKey();
-	return FALSE;
+	return false;
 }
 
 bool Registry::WriteString(const std::wstring& name, const std::wstring& val){
@@ -147,22 +147,22 @@ bool Registry::RestoreWindowPos(HWND hwnd, const std::wstring& name, bool Size, 
 		bool PosOK = false, SizeOK = false, StateOK = false, state;
 		if(ReadDword(name + L'X', rc.left)) {
 			if (ReadDword(name + L'Y', rc.top)) {
-				PosOK = TRUE;
+				PosOK = true;
 			}
 		}
 		if(Size){
 			if (ReadDword(name + L'W', rc.right)) {
 				if (ReadDword(name + L'H', rc.bottom)) {
-					SizeOK = TRUE;
+					SizeOK = true;
 				}
 			}
 		}
 		if(Max){
 			if(ReadDword(name+L'S', (DWORD&)state))
-				StateOK = TRUE;
+				StateOK = true;
 		}
 		if(PosOK){
-			if(SizeOK == FALSE){	//Don't want size read anyway, or size not present.
+			if(SizeOK == false){	//Don't want size read anyway, or size not present.
 				GetWindowRect(hwnd, &wrc);
 				rc.right = wrc.right - wrc.left;	//Compute current width and height of window and throw those into rc for MoveWindow call.
 				rc.bottom = wrc.bottom - wrc.top;

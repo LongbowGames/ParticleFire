@@ -39,16 +39,16 @@ private:
 	void red_init();
 	void green_init();
 	void blue_init();
-	int red_loop(int *dbuf, unsigned char *cbuf, int center, int dist);
-	int green_loop(int *dbuf, unsigned char *cbuf, int center, int dist);
-	int blue_loop(int *dbuf, unsigned char *cbuf, int center, int dist);
+	bool red_loop(int *dbuf, unsigned char *cbuf, int center, int dist);
+	bool green_loop(int *dbuf, unsigned char *cbuf, int center, int dist);
+	bool blue_loop(int *dbuf, unsigned char *cbuf, int center, int dist);
 public:
 	PALETTEENTRY pe[256];
 	InversePal();
 	InversePal(int rbits, int gbits, int bbits);
 	~InversePal();
-	int Init(int rbits, int gbits, int bbits);
-	int Make(PALETTEENTRY *pe, int ncols = 256);
+	bool Init(int rbits, int gbits, int bbits);
+	bool Make(PALETTEENTRY *pe, int ncols = 256);
 	void Free();
 	unsigned char Lookup(unsigned char r, unsigned char g, unsigned char b) const{
 		if(inv_pal){
@@ -92,7 +92,7 @@ public:
 	unsigned char Add(unsigned char src, unsigned char dst){ return Add1[src][dst]; };	//Saturation arithmetic addition and subtraction.
 	unsigned char Sub(unsigned char src, unsigned char dst){ return Sub1[src][dst]; };
 	unsigned char Light(unsigned char src, unsigned char shade){ return Light1[shade][src]; };	//Assumes you will usually light a whole area to one shade, better cache coherency.
-	int MakeLookup(PALETTEENTRY *pe, int disk = FALSE);
+	bool MakeLookup(PALETTEENTRY *pe, bool disk = false);
 	void BestColorInit(PALETTEENTRY *pe);
 	UCHAR BestColor(PALETTEENTRY *pe, UCHAR r, UCHAR g, UCHAR b);
 		//Set disk to TRUE to load in old table (if palette matches) and save out table.
@@ -129,7 +129,7 @@ public:
 	ColorOctree *Add(PALETTEENTRY col);	//Adds color col to tree.  If split and col match, becomes leaf node, otherwise passes on to children or makes new kids.
 	int CountLeaves();	//Recursively counts the color leaves in the tree, NOT all the total nodes.
 	int Reduce(int cols);	//Only call on root node, reduces tree to only cols leaves.
-	int GetPalette(PALETTEENTRY *pe, int cols = 256);
+	bool GetPalette(PALETTEENTRY *pe, int cols = 256);
 	int LookupIndex(PALETTEENTRY pe);	//You can only look up exact colors that were put in the tree previously!
 };
 
@@ -146,10 +146,9 @@ private:
 public:
 	Quantizer();
 	~Quantizer();
-	int ClearPalette();
-	int AddPalette(PALETTEENTRY *pe, int NumCols, int NumShades = 0);
-	int GetCompressedPalette(PALETTEENTRY *pe, int NumCols);//, int level);
-//	int RemapRawBMP(RawBMP *bmp, PALETTEENTRY *pe);
+	bool ClearPalette();
+	bool AddPalette(PALETTEENTRY *pe, int NumCols, int NumShades = 0);
+	bool GetCompressedPalette(PALETTEENTRY *pe, int NumCols);
 };
 
 #endif

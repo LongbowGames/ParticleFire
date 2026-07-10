@@ -165,11 +165,11 @@ inline UCHAR MixTable::BestColor(PALETTEENTRY *pe, UCHAR r, UCHAR g, UCHAR b){
 	return col;
 	*/
 }
-int MixTable::MakeLookup(PALETTEENTRY *pe, int disk){
-	if(NULL == pe) return FALSE;
+bool MixTable::MakeLookup(PALETTEENTRY *pe, bool disk){
+	if(NULL == pe) return false;
 
 	//*** WARNING!  TEMPORARY!
-	disk = FALSE;
+	disk = false;
 	//*** New Inverse Palette should make things fast enough to not need this...
 
 	int r, g, b, c, i;//, k, diff, col, t,
@@ -196,7 +196,7 @@ int MixTable::MakeLookup(PALETTEENTRY *pe, int disk){
 			}
 			if(OK == 1 && fread(Mix4, 1, tablesize, f) == tablesize){
 				fclose(f);
-				return 1;
+				return true;
 			}
 			fclose(f);
 		}
@@ -266,7 +266,7 @@ int MixTable::MakeLookup(PALETTEENTRY *pe, int disk){
 			fclose(f);
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -420,6 +420,7 @@ int ColorOctree::Reduce(int cols){
 	}
 	return ColorCount;
 }
+
 void ColorOctree::GetPalette(int index){	//Privy recursive.
 	if(Count && ColorCount > 0){	//Ve izt a nude!
 		Rt /= Count;
@@ -435,16 +436,18 @@ void ColorOctree::GetPalette(int index){	//Privy recursive.
 	Index = index;
 	for(int o = 0; o < 8; o++) if(Next[o]) Next[o]->GetPalette(index);
 }
-int ColorOctree::GetPalette(PALETTEENTRY *pe, int cols){	//Public, root only.
+
+bool ColorOctree::GetPalette(PALETTEENTRY *pe, int cols){	//Public, root only.
 	if(pe && cols > 0){
 		pep = pe;
 		ColorCount = cols;	//Now ColorCount holds how many pe entries we are to dig out.
 		ColorIndex = 0;
 		GetPalette(-1);	//Start diving with an index of -1, so all nodes that were never leaves will get -1, and be skipped on palette lookup.
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
+
 int ColorOctree::LookupIndex(PALETTEENTRY pe){
 	if(Index >= 0 && pe.peRed == Split.peRed && pe.peGreen == Split.peGreen && pe.peBlue == Split.peBlue){	//We have a weiner!
 		return Index;	//Only hit if Index is 0 or more, if it's -1 this is a real parent node and we should continue.
@@ -472,29 +475,23 @@ int __cdecl PeCompare(const void *c1, const void *c2){
 }
 
 Quantizer::Quantizer(){
-//	pal1 = realpal1;	//Points pointers at real palette arrays, so pointers can be swapped.
-//	pal2 = realpal2;
 	ClearPalette();
 }
+
 Quantizer::~Quantizer(){
 }
-int Quantizer::ClearPalette(){
-//	for(int c = 0; c < MAXCOLS; c++){
-//		pal1[c].peRed = pal1[c].peGreen = pal1[c].peBlue = 0;
-//		pal2[c].peRed = pal2[c].peGreen = pal2[c].peBlue = 0;
-//	}
-//	npal1 = npal2 = 0;
+
+bool Quantizer::ClearPalette(){
 	octree.DeleteTree();
-	return TRUE;
+	return true;
 }
-int Quantizer::AddPalette(PALETTEENTRY *pe, int NumCols, int NumShades){
-	if(NumShades < 0 || pe == NULL) return FALSE;
-//	int Top = NumShades * 2;
-//	int Bottom = NumShades;
+
+bool Quantizer::AddPalette(PALETTEENTRY *pe, int NumCols, int NumShades){
+	if(NumShades < 0 || pe == NULL) return false;
 	int Top = NumShades + 1;	//Not half intensity anymore.
 	int Bottom = 1;
 	int Shade = 0;
-	int c = 0;//, found = 0, c2 = 0, r, g, b;
+	int c = 0;
 	if(NumShades == 0){
 		Top = 1;
 		Bottom = 1;
@@ -504,40 +501,19 @@ int Quantizer::AddPalette(PALETTEENTRY *pe, int NumCols, int NumShades){
 	//for input palette, plus the full-bright input palette.
 	for(Shade = Top; Shade >= Bottom; Shade--){
 		for(c = 0; c < NumCols; c++){
-//			if(npal1 >= MAXCOLS) return FALSE;
-			//Get shaded version of color in input palette.
-		//	r = (pe[c].peRed * Shade) / Top;
-		//	g = (pe[c].peGreen * Shade) / Top;
-		//	b = (pe[c].peBlue * Shade) / Top;
 
 			//Use new ColorOctree.
 			col.peRed = (pe[c].peRed * Shade) / Top;
 			col.peGreen = (pe[c].peGreen * Shade) / Top;
 			col.peBlue = (pe[c].peBlue * Shade) / Top;
 			octree.Add(col);
-			//Check for color already existing in palette.
-/*			found = 0;
-			for(c2 = 0; c2 < npal1; c2++){
-				if(r == pal1[c2].peRed && g == pal1[c2].peGreen && b == pal1[c2].peBlue){
-					found = 1;
-					break;
-				}
-			}
-			//Add color to global palette.
-			if(found == 0 || npal1 <= 0){
-				pal1[npal1].peRed = r;
-				pal1[npal1].peGreen = g;
-				pal1[npal1].peBlue = b;
-				npal1++;
-			}
-*/		//	pal1[npal1++] = pe[c];
 		}
 	}
-	return TRUE;
+	return true;
 }
-int Quantizer::GetCompressedPalette(PALETTEENTRY *pe, int NumCols){//, int level){
-//	if(NumCols <= 0 || npal1 <= 0 || pe == 0) return FALSE;
-	if(NumCols <= 0 || pe == NULL) return FALSE;
+
+bool Quantizer::GetCompressedPalette(PALETTEENTRY *pe, int NumCols){
+	if(NumCols <= 0 || pe == NULL) return false;
 
 	octree.Reduce(NumCols);
 	octree.GetPalette(pe, NumCols);
@@ -547,7 +523,7 @@ int Quantizer::GetCompressedPalette(PALETTEENTRY *pe, int NumCols){//, int level
 	qsort(pe, NumCols, sizeof(PALETTEENTRY), PeCompare);
 #endif
 
-	return TRUE;
+	return true;
 }
 
 
@@ -564,20 +540,24 @@ InversePal::InversePal() :
 {
 	inv_pal = NULL;
 }
+
 InversePal::InversePal(int rbits, int gbits, int bbits){
 	inv_pal = NULL;
 	Init(rbits, gbits, bbits);
 }
+
 InversePal::~InversePal(){
 	Free();
 }
+
 void InversePal::Free(){
 	if(inv_pal) free(inv_pal);
 	inv_pal = NULL;
 }
-int InversePal::Init(int rbits, int gbits, int bbits){
+
+bool InversePal::Init(int rbits, int gbits, int bbits){
 	Free();
-	if(rbits < 0 || rbits > 8 || gbits < 0 || gbits > 8 || bbits < 0 || bbits > 8) return FALSE;
+	if(rbits < 0 || rbits > 8 || gbits < 0 || gbits > 8 || bbits < 0 || bbits > 8) return false;
 	red_max = 1 <<rbits;
 	green_max = 1 <<gbits;
 	blue_max = 1 <<bbits;
@@ -585,17 +565,17 @@ int InversePal::Init(int rbits, int gbits, int bbits){
 	green_pow2 = gbits;
 	blue_pow2 = bbits;
 	gb_pow2 = green_pow2 + blue_pow2;
-//	gb_size = green_max * blue_max;	//Green+Blue entries in each Red slice.
 	r_quant = 8 - rbits;
 	g_quant = 8 - gbits;	//Amount to shift 888 color down to get inv pal color.
 	b_quant = 8 - bbits;
-	if(NULL == (inv_pal = (unsigned char*)malloc(red_max * green_max * blue_max))) return FALSE;
-	return TRUE;
+	if(NULL == (inv_pal = (unsigned char*)malloc(red_max * green_max * blue_max))) return false;
+	return true;
 }
-int InversePal::Make(PALETTEENTRY *npe, int ncols){
-	if(!inv_pal || npe == NULL || ncols <= 0 || ncols > 256) return FALSE;
+
+bool InversePal::Make(PALETTEENTRY *npe, int ncols){
+	if(!inv_pal || npe == NULL || ncols <= 0 || ncols > 256) return false;
 	int *inv_pal_dist;
-	if(NULL == (inv_pal_dist = (int*)malloc(red_max * green_max * blue_max * sizeof(int)))) return FALSE;
+	if(NULL == (inv_pal_dist = (int*)malloc(red_max * green_max * blue_max * sizeof(int)))) return false;
 	int i, j;
 	for(i = red_max * green_max * blue_max - 1; i >= 0; i--){
 		inv_pal_dist[i] = 0x10000000;
@@ -614,14 +594,14 @@ int InversePal::Make(PALETTEENTRY *npe, int ncols){
 	for(i = 0; i < ncols; i++){
 		pe[i] = npe[i];
 		cur_color = shuffle[i];
-		r_center = (npe[cur_color].peRed >>r_quant);// + (1 <<r_quant) / 2;
-		g_center = (npe[cur_color].peGreen >>g_quant);// + (1 <<g_quant) / 2;
-		b_center = (npe[cur_color].peBlue >>b_quant);// + (1 <<b_quant) / 2;
+		r_center = (npe[cur_color].peRed >> r_quant);
+		g_center = (npe[cur_color].peGreen >> g_quant);
+		b_center = (npe[cur_color].peBlue >> b_quant);
 		red_init();
 		red_loop(inv_pal_dist, inv_pal, r_center, 0);
 	}
 	free(inv_pal_dist);
-	return TRUE;
+	return true;
 }
 //Distances aren't being computed quite as correctly as they should be.  Dist
 //is currently in inverse palette space, but it should be in 888 space.
@@ -629,95 +609,97 @@ int InversePal::Make(PALETTEENTRY *npe, int ncols){
 inline void InversePal::blue_init(){
 	b_skip1 = b_skip2 = 0;
 }
-inline int InversePal::blue_loop(int *dbuf, unsigned char *cbuf, int center, int dist){
-	int n, d, diter, b_found1, b_found2;
-	b_found1 = 0;
+
+inline bool InversePal::blue_loop(int *dbuf, unsigned char *cbuf, int center, int dist){
+	int n, d, diter;
+	bool b_found1, b_found2;
+	b_found1 = false;
 	d = dist + (diter = 0);
 	if(!b_skip1){
 		for(n = center; n < blue_max; n++){
 			if(dbuf[n] > d){
 				cbuf[n] = cur_color;
 				dbuf[n] = d;
-				b_found1 = 1;
+				b_found1 = true;
 			}else if(b_found1) break;
 			d += diter + (++diter);
 		}
 		if(!b_found1) b_skip1 = 1;
 	}
-	b_found2 = 0;
+	b_found2 = false;
 	d = dist + (diter = 1);
 	if(!b_skip2){
 		for(n = center - 1; n >= 0; n--){
 			if(dbuf[n] > d){
 				cbuf[n] = cur_color;
 				dbuf[n] = d;
-				b_found2 = 1;
+				b_found2 = true;
 			}else if(b_found2) break;
 			d += diter + (++diter);
 		}
 		if(!b_found2) b_skip2 = 1;
 	}
-	return b_found1 | b_found2;
+	return b_found1 || b_found2;
 }
+
 inline void InversePal::green_init(){
 	g_skip1 = g_skip2 = 0;
 }
-inline int InversePal::green_loop(int *dbuf, unsigned char *cbuf, int center, int dist){
-	int n, d, diter, g_found1, g_found2;
+
+inline bool InversePal::green_loop(int *dbuf, unsigned char *cbuf, int center, int dist){
+	int n, d, diter;
+	bool g_found1, g_found2;
 	blue_init();
-	g_found1 = 0;
+	g_found1 = false;
 	d = dist + (diter = 0);
 	if(!g_skip1){
 		for(n = center; n < green_max; n++){
 			if(blue_loop(dbuf + (n <<blue_pow2), cbuf + (n <<blue_pow2), b_center, d)){
-				g_found1 = 1;
+				g_found1 = true;
 			}else if(g_found1) break;
 			d += diter + (++diter);
 		}
 		if(!g_found1) g_skip1 = 1;
 	}
 	blue_init();
-	g_found2 = 0;
+	g_found2 = false;
 	d = dist + (diter = 1);
 	if(!g_skip2){
 		for(n = center - 1; n >= 0; n--){
 			if(blue_loop(dbuf + (n <<blue_pow2), cbuf + (n <<blue_pow2), b_center, d)){
-				g_found2 = 1;
+				g_found2 = true;
 			}else if(g_found2) break;
 			d += diter + (++diter);
 		}
 		if(!g_found2) g_skip2 = 1;
 	}
-	return g_found1 | g_found2;
+	return g_found1 || g_found2;
 }
+
 inline void InversePal::red_init(){
 }
-inline int InversePal::red_loop(int *dbuf, unsigned char *cbuf, int center, int dist){
-	int n, d, diter, r_found1, r_found2;
+
+inline bool InversePal::red_loop(int *dbuf, unsigned char *cbuf, int center, int dist){
+	int n, d, diter;
+	bool r_found1, r_found2;
 	green_init();
-	r_found1 = 0;
+	r_found1 = false;
 	d = dist + (diter = 0);
-//	if(!r_skip1){
 		for(n = center; n < red_max; n++){
 			if(green_loop(dbuf + (n <<gb_pow2), cbuf + (n <<gb_pow2), g_center, d)){
-				r_found1 = 1;
+				r_found1 = true;
 			}else if(r_found1) break;
 			d += diter + (++diter);
 		}
-//		if(!r_found1) r_skip1 = 1;
-//	}
 	green_init();
-	r_found2 = 0;
+	r_found2 = false;
 	d = dist + (diter = 1);
-//	if(!r_skip2){
 		for(n = center - 1; n >= 0; n--){
 			if(green_loop(dbuf + (n <<gb_pow2), cbuf + (n <<gb_pow2), g_center, d)){
-				r_found2 = 1;
+				r_found2 = true;
 			}else if(r_found2) break;
 			d += diter + (++diter);
 		}
-//		if(!r_found2) r_skip2 = 1;
-//	}
-	return r_found1 | r_found2;
+	return r_found1 || r_found2;
 }
 

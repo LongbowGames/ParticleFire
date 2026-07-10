@@ -89,7 +89,7 @@ void ParticleRegistry::LoadOpts()
 	//
 	// First Time Use
 	parent->screen.FirstUseTime = 0;
-	if(REG.ReadDword(L"Time", parent->screen.FirstUseTime) == FALSE && parent->screen.FirstUseTime <= 0){	//Write first-use-time.
+	if(REG.ReadDword(L"Time", parent->screen.FirstUseTime) == false && parent->screen.FirstUseTime <= 0){	//Write first-use-time.
 		parent->screen.FirstUseTime = long(time(NULL));
 		REG.WriteDword(L"Time", parent->screen.FirstUseTime);
 	}

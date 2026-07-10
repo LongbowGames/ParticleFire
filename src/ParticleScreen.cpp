@@ -95,7 +95,7 @@ void ParticleScreen::Init ()
 	CustomScheme = 0;
 //Color palette.
 	ColorScheme = 0;
-	RandomColor = TRUE;
+	RandomColor = true;
 
 	CycleColors = 1;
 	
@@ -104,7 +104,7 @@ void ParticleScreen::Init ()
 
 	iDstX = iDstY = 0;
 	WIDTH = HEIGHT = 0;
-	m_hWnd = NULL;
+	m_hWnd = nullptr;
 }
 
 void ParticleScreen::InitScreen (HWND hwnd)
@@ -490,7 +490,7 @@ void ParticleScreen::ResetScreenmode ()
 #endif
 }
 
-int ParticleScreen::PickColor(HWND dlg, PALETTEENTRY *pe)
+bool ParticleScreen::PickColor(HWND dlg, PALETTEENTRY *pe)
 {
 	static COLORREF crCustCol[16];
 	static int initialized = 0;
@@ -513,9 +513,9 @@ int ParticleScreen::PickColor(HWND dlg, PALETTEENTRY *pe)
 		pe->peRed = GetRValue(cc.rgbResult);
 		pe->peGreen = GetGValue(cc.rgbResult);
 		pe->peBlue = GetBValue(cc.rgbResult);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 void ParticleScreen::SpreadPal(PALETTEENTRY *pe1, PALETTEENTRY *pe2, PALETTEENTRY *dst)
@@ -633,7 +633,7 @@ void ParticleScreen::LoadText ()
 
 }
 
-int ParticleScreen::SetupFont(int height)
+bool ParticleScreen::SetupFont(int height)
 {
 	memset(&lf, 0, sizeof(lf));
 	lf.lfHeight = -(int)height;
@@ -644,9 +644,9 @@ int ParticleScreen::SetupFont(int height)
 	lf.lfStrikeOut = 0;//(flags & FONT_STRIKEOUT) != 0;
 	wcscpy(lf.lfFaceName, L"Arial");
 	if(hfont = CreateFontIndirect(&lf)){	//Make font once...
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 void ParticleScreen::UnsetupFont()
@@ -698,7 +698,7 @@ void ParticleScreen::HandleText ()
 	}
 }
 
-int ParticleScreen::DrawFont(const wchar_t *text, int mode)
+void ParticleScreen::DrawFont(const wchar_t *text, int mode)
 {
 	size_t lineLen = 37;
 	int numLine = 0;
@@ -756,11 +756,9 @@ int ParticleScreen::DrawFont(const wchar_t *text, int mode)
 	}
 	else
 		DrawCenteredFont (text, 1, 0, col_r, col_g, col_b);
-
-	return TRUE;
 }
 
-int ParticleScreen::DrawCenteredFont(const wchar_t *text, int lines, int lineNum, int col_r, int col_g, int col_b)
+bool ParticleScreen::DrawCenteredFont(const wchar_t *text, int lines, int lineNum, int col_r, int col_g, int col_b)
 {
 	int x, y;
 
@@ -791,12 +789,12 @@ int ParticleScreen::DrawCenteredFont(const wchar_t *text, int lines, int lineNum
 		SelectObject(fontdc, holdfont);
 		SelectObject(fontdc, holdbitmap);
 		DeleteDC(fontdc);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-int ParticleScreen::DrawXYFont(const wchar_t *text, int x, int y, int col_r, int col_g, int col_b)
+bool ParticleScreen::DrawXYFont(const wchar_t *text, int x, int y, int col_r, int col_g, int col_b)
 {
 	if(text && (fontdc = CreateCompatibleDC(NULL))){
 		holdfont = (HFONT)SelectObject(fontdc, hfont);
@@ -817,9 +815,9 @@ int ParticleScreen::DrawXYFont(const wchar_t *text, int x, int y, int col_r, int
 		SelectObject(fontdc, holdfont);
 		SelectObject(fontdc, holdbitmap);
 		DeleteDC(fontdc);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 void ParticleScreen::DrawParticles ()

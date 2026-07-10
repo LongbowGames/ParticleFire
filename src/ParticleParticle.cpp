@@ -61,20 +61,21 @@ void ParticleParticle::Init ()
 	GRAV_TIME = 50;//60;
 //One in X chance of an effect happening every second.
 	RANDEFFECT = 75;//8;
-	AltColor = FALSE;
+	AltColor = false;
 
-	NoiseBurn = FALSE; Follow = TRUE; MultipleFollow = TRUE; UseGravity = TRUE;
-	fullscreen = FALSE; Stretch = FALSE; Explode = FALSE; Cube3D = TRUE; Attract = TRUE;
-	SwitchMode = FALSE; ShakeUp = FALSE; Freeze = FALSE; UseRandom = TRUE;
-	Comet = FALSE; Emit = FALSE; FollowMouse = FALSE; IsMinimized =  FALSE;
+	NoiseBurn = 0;
+	Follow = true; MultipleFollow = true; UseGravity = true;
+	fullscreen = true; Stretch = true; Explode = true; Attract = true;
+	SwitchMode = false; ShakeUp = false; Freeze = false; UseRandom = true;
+	Comet = false; Emit = false; FollowMouse = false; IsMinimized = false;
 	EmitCount = 0; ExplodeX = 0; ExplodeY = 0;//, MouseX, MouseY;
-	InnerRing = FALSE, Popcorn = FALSE;
+	InnerRing = false, Popcorn = false;
 
 	EmitRotate = 0;					// GH-Wasnt set
 	xgrav = 0.0f; ygrav = 0.0f;		// GH-Wasnt set
-	BurnDown = FALSE;
+	BurnDown = false;
 
-	SquigglyWiggly = FALSE; GalacticStorm = FALSE; PixieDust = FALSE;
+	SquigglyWiggly = false; GalacticStorm = false; PixieDust = false;
 
 }
 
@@ -100,7 +101,7 @@ void ParticleParticle::ClearMode (int mode)
 	switch (mode)
 	{
 	case 0:	// Clear everything
-		PixieDust = RainbowHole = SquigglyWiggly = GalacticStorm = Explode = InnerRing = Emit = Popcorn = FALSE;
+		PixieDust = RainbowHole = SquigglyWiggly = GalacticStorm = Explode = InnerRing = Emit = Popcorn = false;
 		break;
 	}
 }
@@ -113,15 +114,15 @@ void ParticleParticle::SetMode (int mode)
 
 	switch (mode)
 	{
-	case STYLE_EXPLOSIVE:		Explode = TRUE;			break;
-	case STYLE_RINGS:			InnerRing = TRUE;		break;
-	case STYLE_SPIRALS:			Emit = TRUE;	EmitRotate = (rand() % 3) - 1;
+	case STYLE_EXPLOSIVE:		Explode = true;			break;
+	case STYLE_RINGS:			InnerRing = true;		break;
+	case STYLE_SPIRALS:			Emit = true;	EmitRotate = (rand() % 3) - 1;
 														break;
-	case STYLE_POPCORN:			Popcorn = TRUE;			break;
-	case STYLE_RAINBOWHOLE:		RainbowHole = TRUE;		break;
-	case STYLE_WORMS:			SquigglyWiggly = TRUE;	break;
-	case STYLE_GALATIC_STORM:	GalacticStorm = TRUE;	break;
-	case STYLE_PIXIE_DUST:		PixieDust = TRUE;		break;
+	case STYLE_POPCORN:			Popcorn = true;			break;
+	case STYLE_RAINBOWHOLE:		RainbowHole = true;		break;
+	case STYLE_WORMS:			SquigglyWiggly = true;	break;
+	case STYLE_GALATIC_STORM:	GalacticStorm = true;	break;
+	case STYLE_PIXIE_DUST:		PixieDust = true;		break;
 	case STYLE_GEOFF:									break;
 	}
 }
@@ -190,9 +191,9 @@ void ParticleParticle::Frame_Gravity ()
 	// Gravity direction, based on time.
 	switch(((parent->Time - parent->TimeStart) / GRAV_TIME) % 4)
 	{
-		case 0 :  xgrav = 0.0f;  ygrav = GRAVITY;  BurnDown = FALSE;  break;
+		case 0 :  xgrav = 0.0f;  ygrav = GRAVITY;  BurnDown = false;  break;
 		case 1 :  xgrav = -GRAVITY;  ygrav = 0.0f;  break;
-		case 2 :  xgrav = 0.0f;  ygrav = -GRAVITY;  BurnDown = TRUE;  break;
+		case 2 :  xgrav = 0.0f;  ygrav = -GRAVITY;  BurnDown = true;  break;
 		case 3 :  xgrav = GRAVITY;  ygrav = 0.0f;  break;
 	}
 
@@ -206,9 +207,9 @@ void ParticleParticle::Frame_Gravity ()
 //			switch((rand() >>3) % 17)
 			switch(rand() % 7)
 			{
-				case 0 : ShakeUp = TRUE;					break;	// Modifier
-				case 1 : Freeze = TRUE;						break;	// Modifier
-				case 2 : Comet = TRUE;						break;
+				case 0 : ShakeUp = true;					break;	// Modifier
+				case 1 : Freeze = true;						break;	// Modifier
+				case 2 : Comet = true;						break;
 				case 3 : Follow = !Follow;					break;	// Modifier
 				case 4 : MultipleFollow = !MultipleFollow;	break;	// Modifier
 				case 5 : NoiseBurn = rand()%3 - 1;			break;	// Modifier
@@ -284,13 +285,13 @@ void ParticleParticle::Frame_Gravity ()
 	}
 
 	// Check Following the mouse
-	if(Follow == FALSE && (rand() % 4) == 0){
-		FollowMouse = TRUE;
+	if(Follow == false && (rand() % 4) == 0){
+		FollowMouse = true;
 		parent->XMouse = rand() % parent->screen.WIDTH;
 		parent->YMouse = rand() % parent->screen.HEIGHT;
 	}
 	else{
-		FollowMouse = FALSE;
+		FollowMouse = false;
 	}
 
 	// Handle the Gravity stuff
@@ -343,19 +344,10 @@ void ParticleParticle::Handle_Gravity ()
 		Do_PixieDust ();
 	}
 
-//	char buff[255];
-//	sprintf (buff, "%d %d %d %d %d %d %d %d %d %d %d", Popcorn, InnerRing, ShakeUp, Freeze, Explode, Comet, Emit, RainbowHole, SquigglyWiggly, GalacticStorm, PixieDust);
-//	error_print (buff);
-
 	// Test Particle
 	if (ParticleStyle == STYLE_GEOFF) {
 		Do_Geoff ();
 	}
-
-//	static float cubex, cubey, cubez, cubesize = 100;
-//	static int cppe = 10;
-//	if(Cube3D){
-//	}
 
 
 	// Attract or Follow the Mouse (left over from Particle Toy?)
@@ -411,7 +403,7 @@ void ParticleParticle::Do_Popcorn ()
 				parent->p[i].SetTrueColor(parent->pe);
 			}
 		}
-		Popcorn = FALSE;
+		Popcorn = false;
 	}
 }
 
@@ -459,7 +451,7 @@ void ParticleParticle::Do_InnerRing ()
 				parent->p[i].SetTrueColor(parent->pe);
 			}
 		}
-		InnerRing = FALSE;
+		InnerRing = false;
 	}
 }
 
@@ -470,7 +462,7 @@ void ParticleParticle::Do_ShakeUp ()
 		parent->p[i].dx -= xgrav * 40;
 		parent->p[i].dy -= ygrav * 40;
 	}
-	ShakeUp = FALSE;
+	ShakeUp = false;
 }
 
 void ParticleParticle::Do_Freeze ()
@@ -480,7 +472,7 @@ void ParticleParticle::Do_Freeze ()
 		parent->p[i].dx = 0.0f;
 		parent->p[i].dy = 0.0f;
 	}
-	Freeze = FALSE;
+	Freeze = false;
 }
 
 void ParticleParticle::Do_Explode ()
@@ -529,7 +521,7 @@ void ParticleParticle::Do_Explode ()
 				parent->p[i].SetTrueColor(parent->pe);
 			}
 		}
-		Explode = FALSE;
+		Explode = false;
 	}
 }
 
@@ -549,7 +541,7 @@ void ParticleParticle::Do_Comet ()
 		//
 		parent->p[i].SetTrueColor(parent->pe);
 	}
-	Comet = FALSE;
+	Comet = false;
 }
 
 void ParticleParticle::Do_Emit ()
@@ -589,7 +581,7 @@ void ParticleParticle::Do_Emit ()
 				//
 				parent->p[i].SetTrueColor(parent->pe);
 			}
-			Emit = FALSE;
+			Emit = false;
 		}
 
 	}

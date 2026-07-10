@@ -74,23 +74,24 @@ public:
 	int nParticles;
 	int GRAV_TIME;
 	int RANDEFFECT;
-	int AltColor;
+	bool AltColor;
 
 	// Particle
-	BOOL			NoiseBurn, Follow, MultipleFollow, UseGravity;
-	BOOL			fullscreen, Stretch, Explode, Cube3D, Attract;
-	BOOL			SwitchMode, ShakeUp, Freeze, UseRandom;
-	BOOL			Comet, Emit, FollowMouse, IsMinimized;
+	int				NoiseBurn;
+	bool			Follow, MultipleFollow, UseGravity;
+	bool			fullscreen, Stretch, Explode, Attract;
+	bool			SwitchMode, ShakeUp, Freeze, UseRandom;
+	bool			Comet, Emit, FollowMouse, IsMinimized;
 	int				EmitCount, ExplodeX, ExplodeY;//, MouseX, MouseY;
-	int InnerRing, Popcorn;
+	bool InnerRing, Popcorn;
 	int EmitRotate;
 	float			xgrav, ygrav;
-	int BurnDown;
+	bool BurnDown;
 
 	// GH-New vars
 	int MagnetX, MagnetY;
 
-	int RainbowHole, SquigglyWiggly, GalacticStorm, PixieDust;
+	bool RainbowHole, SquigglyWiggly, GalacticStorm, PixieDust;
 
 };
 

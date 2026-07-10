@@ -34,9 +34,9 @@ class TrueColorFormat{
 public:
 	void SetMasks(unsigned int bpp, unsigned int rm, unsigned int gm, unsigned int bm);
 		//Sets all values based on supplied masks.
-	int MakeLookup(unsigned int *table, PALETTEENTRY *pe, int numcols = 256);
+	bool MakeLookup(unsigned int *table, PALETTEENTRY *pe, int numcols = 256);
 		//Creates a lookup table of true color pixels for a palette.
-	int MakeLookup(unsigned short *table, PALETTEENTRY *pe, int numcols = 256);
+	bool MakeLookup(unsigned short *table, PALETTEENTRY *pe, int numcols = 256);
 		//Creates a lookup table of true color pixels for a palette.
 	inline unsigned int PackColor(unsigned char r, unsigned char g, unsigned char b){
 		return ((r >> RedQuant) << RedMaskOff) |
@@ -85,42 +85,42 @@ class BackBuffer{
 public:
 	BackBuffer();
 	~BackBuffer();
-	int InitWindow(int w, int h, const wchar_t *Name, HINSTANCE hInst, HWND *phWnd, LRESULT (CALLBACK *WProc)(HWND, UINT, WPARAM, LPARAM), DWORD Icon = NULL);
+	bool InitWindow(int w, int h, const wchar_t *Name, HINSTANCE hInst, HWND *phWnd, LRESULT (CALLBACK *WProc)(HWND, UINT, WPARAM, LPARAM), DWORD Icon = NULL);
 		//Creates the main window and the DirectDraw object.  Requires a width, height,
 		//name, hInstance, and a pointer to a WindowProcedure function.
 		//Set icon to NULL to use standard, or to a resource identifier to load that
 		//icon from your project.
-	int SetBufferMode(int w, int h, int bpp, BOOL fscreen, TrueColorFormat *tcf);
+	bool SetBufferMode(int w, int h, int bpp, bool fscreen, TrueColorFormat *tcf);
 		//Call this function at any time OUTSIDE of a Lock/Unlock pair to set or
 		//reset the buffer to a new display mode.  Only 8 and 16 bpp is supported,
 		//and in windowed mode a 16bit buffer will first be converted to 24bit for
 		//display through Windows.
-	int SetWindowPos(int x, int y);
+	bool SetWindowPos(int x, int y);
 		//In a windowed mode, sets the top/left position of the window, does nothing
 		//in a fullscreen mode.
-	int SetWindowSize(int w, int h);
+	bool SetWindowSize(int w, int h);
 		//In a windowed mode, sets the display size of the window (including the
 		//title bar at the top, in Win32), does nothing in full screen mode.
 		//
 		//Now automatically centers the window on the desktop, calling SetWindowPos.
 		//To set custom size and position, first size, then move.
 		//
-	int SetPalette(PALETTEENTRY *pe);
+	bool SetPalette(PALETTEENTRY *pe);
 		//Sets the BackBuffer to the entered 256 color palette.  MUST be done for
 		//both Windowed and FullScreen BackBuffer objects.  Passing a NULL pointer
 		//will use the last-set palette internal to the BackBuffer object.
-	int GetPalette(PALETTEENTRY *pe);
+	bool GetPalette(PALETTEENTRY *pe);
 		//Fills the passed in array with the buffer's current palette.
-	int RealizePalette();
+	bool RealizePalette();
 		//Only required for Windowed modes, but harmless otherwise, this function
 		//causes the Windows palette manager to accept and realize your palette.
 		//Call after SetPalette and in the appropriate Windows palette messages.
-	int AddDirtyRect(int x, int y, int w, int h);
-	int AddDirtyRect(DirtyRect *dr);
+	bool AddDirtyRect(int x, int y, int w, int h);
+	bool AddDirtyRect(DirtyRect *dr);
 		//Adds a dirty rectangle to the internal list of rectangles to be updated.
 	void ClearDirtyRects();
 		//Nullifies all previously added dirty rectangles.
-	int UpdateFrontBuffer(int flags = NULL);
+	bool UpdateFrontBuffer(int flags = NULL);
 		//In fullscreen mode, blits the backbuffer data to the physical display
 		//screen, perhaps copying first to an offscreen VRAM surface and page-
 		//flipping.  In windowed mode, asks Windows to copy the backbuffer to the
@@ -128,33 +128,35 @@ public:
 		//first be manually converted to 24bit true color first, if the backbuffer
 		//is in 16 bits per pixel mode.
 		//Set flags to UFB_STRETCH to stretch data to fit window size.
-	int Lock(BufferDesc *bufdesc);
+	bool Lock(BufferDesc *bufdesc);
 		//Locks the backbuffer pixel data and returns a BufferDesc structure with
 		//info on properly accessing the data directly.
-	int Unlock();
+	bool Unlock();
 		//Unlocks the backbuffer data.  Any previously acquired BufferDesc structures
 		//are invalid after this call.
-	int Destroy(int killwindow = FALSE);
+	bool Destroy(bool killwindow = false);
 		//Destroys all data and resources allocated by the BackBuffer object,
 		//including the DirectDraw object, the Window, and all GDI and DDraw buffers.
 		//Only call when your program is about to exit, and even then it is best to
 		//just delete the object, which will call Destroy to clean up.
-	int Centering(int flag);
+	bool Centering(bool flag);
 		//Enables or disables automatic window centering on mode switches etc.
-	int Pointer(int flag);
+	bool Pointer(bool flag);
 		//Enables mouse pointer in full screen (normally disabled).
-	int CooperateYaGit();
+	bool CooperateYaGit();
 		//If fullscreen, forces DDSCL_NORMAL cooperation mode.
-	int CooperateNot();
+	bool CooperateNot();
 		//Goes back to DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN if in fullscreen.
+
 private:	//Helper functions.
-	int InitDIB(int w, int h, int bpp);
-	int FreeDIB();
+	void InitDIB(int w, int h, int bpp);
+	void FreeDIB();
+
 private:	//Private data members.
-	BOOL	m_InitInitial = false;
-	BOOL	m_InitDIB;	//Keep track of what's been initialized properly.
-	BOOL	m_InitDDRaw;
-	BOOL	m_fullscreen2;	//True if DirectDraw SetDisplayMode is in effect.
+	bool	m_InitInitial = false;
+	bool	m_InitDIB;	//Keep track of what's been initialized properly.
+	bool	m_InitDDRaw;
+	bool	m_fullscreen2;	//True if DirectDraw SetDisplayMode is in effect.
 	WNDCLASSEX			m_wc = {0};
 	HWND				m_hwnd;
 	CreateDib			m_DIB;
@@ -166,7 +168,7 @@ private:	//Private data members.
 	int m_realw, m_realh;		//The width and height needed to generate a w,h client area.
 	DDSURFACEDESC	ddsd = {0};	//Temporary member variables.
 	HRESULT			ddreturn = 0;
-	int centering, pointer;
+	bool centering, pointer;
 	DirtyRect dirty[MAX_DIRTY] = {0};
 	int ndirty;
 };

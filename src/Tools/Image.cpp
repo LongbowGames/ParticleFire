@@ -37,27 +37,28 @@ extern "C" {
 inline size_t WriteLong(int n, FILE *f){ return fwrite(&n, sizeof(int), 1, f); }
 inline size_t ReadLong(FILE *f){ int n = 0; fread(&n, sizeof(int), 1, f); return n; }
 
-int BGRAfromPE(ARGB *argb, PALETTEENTRY *pe, unsigned char alpha){
+bool BGRAfromPE(ARGB *argb, PALETTEENTRY *pe, unsigned char alpha){
 	if(argb && pe){
 		for(int i = 0; i < 256; i++){
 			argb[i].argb = (unsigned long)((pe[i].peRed <<16) | (pe[i].peGreen <<8) | pe[i].peBlue | (alpha <<24));
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
-int RGBAfromPE(ARGB *argb, PALETTEENTRY *pe, unsigned char alpha){
+
+bool RGBAfromPE(ARGB *argb, PALETTEENTRY *pe, unsigned char alpha){
 	if(argb && pe){
 		for(int i = 0; i < 256; i++){
 			argb[i].argb = (unsigned long)((pe[i].peRed) | (pe[i].peGreen <<8) | (pe[i].peBlue <<16) | (alpha <<24));
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-int MakeRemapTable(unsigned char *Remap, const PALETTEENTRY *oldpe, const PALETTEENTRY *pe){
-	if(Remap == NULL || oldpe == NULL || pe == NULL) return FALSE;
+bool MakeRemapTable(unsigned char *Remap, const PALETTEENTRY *oldpe, const PALETTEENTRY *pe){
+	if(Remap == NULL || oldpe == NULL || pe == NULL) return false;
 
 	int r, g, b, c, k, diff, t;
 	UCHAR col;
@@ -78,54 +79,56 @@ int MakeRemapTable(unsigned char *Remap, const PALETTEENTRY *oldpe, const PALETT
 		}
 		Remap[c] = col;
 	}
-	return TRUE;
+	return true;
 }
-int MakeRemapTable(unsigned char *Remap, const PALETTEENTRY *oldpe, const InversePal *inv){
-	if(Remap == NULL || oldpe == NULL || inv == NULL) return FALSE;
+
+bool MakeRemapTable(unsigned char *Remap, const PALETTEENTRY *oldpe, const InversePal *inv){
+	if(Remap == NULL || oldpe == NULL || inv == NULL) return false;
 	int c;
 	for(c = 0; c < 256; c++){
 		Remap[c] = inv->Lookup(oldpe[c].peRed, oldpe[c].peGreen, oldpe[c].peBlue);
 	}
-	return TRUE;
+	return true;
 }
 
 //Load and save functions now work if pe pointer is NULL.
 
-int LoadBMP(const char *name, Bitmap *bmp, PALETTEENTRY *pe){
+bool LoadBMP(const char *name, Bitmap *bmp, PALETTEENTRY *pe){
 	FILE *f;
 	if(f = fopen(name, "rb")){
 		int t = LoadBMP(f, bmp, pe);
 		fclose(f);
 		return t;
 	}
-	return 0;
+	return false;
 }
-int LoadBMP(FILE *file, Bitmap *bmp, PALETTEENTRY *pe){
+
+bool LoadBMP(FILE *file, Bitmap *bmp, PALETTEENTRY *pe){
 	BITMAPFILEHEADER    BMPFileHead;
 	BITMAPINFOHEADER    BMPFileInfo;
 	RGBQUAD             Palette[256];
 	int NumCols, BPP;
 
-	if(file == NULL || bmp == NULL) return FALSE;
+	if(file == NULL || bmp == NULL) return false;
 
 	long startpos = ftell(file);
 
 	// Read the BMP header and info structures
-	if(NULL == fread(&BMPFileHead, sizeof(BMPFileHead), 1, file)) return FALSE;
-	if(NULL == fread(&BMPFileInfo, sizeof(BMPFileInfo), 1, file)) return FALSE;
+	if(NULL == fread(&BMPFileHead, sizeof(BMPFileHead), 1, file)) return false;
+	if(NULL == fread(&BMPFileInfo, sizeof(BMPFileInfo), 1, file)) return false;
 	
 	//Make sure the BMP is 8-bit color
 	//Nope, can handle 24 and 32 bits now...
 	memset(Palette, 0, sizeof(Palette));
-	if((BPP = BMPFileInfo.biBitCount) == 8){// return FALSE;
+	if((BPP = BMPFileInfo.biBitCount) == 8){
 		NumCols = BMPFileInfo.biClrUsed;	//Check the actual number of palette entries.
 		if(NumCols == 0) NumCols = 256;
 	
 		//get the BMP palette
-		if(NULL == fread(Palette, sizeof(RGBQUAD), NumCols, file)) return FALSE;
+		if(NULL == fread(Palette, sizeof(RGBQUAD), NumCols, file)) return false;
 	}
 	//Allocate memory for image data
-	if(!bmp->Init(BMPFileInfo.biWidth, abs(BMPFileInfo.biHeight), BPP)) return FALSE;
+	if(!bmp->Init(BMPFileInfo.biWidth, abs(BMPFileInfo.biHeight), BPP)) return false;
 
 	//read BMP into memory
 	fseek(file, startpos, SEEK_SET);
@@ -142,15 +145,16 @@ int LoadBMP(FILE *file, Bitmap *bmp, PALETTEENTRY *pe){
 			pe[i].peBlue = Palette[i].rgbBlue;
 		}
 	}
-	return TRUE;
+	return true;
 }
-int LoadPackedBMP(void *bmi, Bitmap *bmp, PALETTEENTRY *pe){
+
+bool LoadPackedBMP(void *bmi, Bitmap *bmp, PALETTEENTRY *pe){
 //	BITMAPFILEHEADER    BMPFileHead;
 	BITMAPINFOHEADER	*BMPFileInfo;
 	RGBQUAD             Palette[256];
 	int NumCols, BPP;
 
-	if(bmi == NULL || bmp == NULL) return FALSE;
+	if(bmi == NULL || bmp == NULL) return false;
 
 	// Read the BMP header and info structures
 	BMPFileInfo = (BITMAPINFOHEADER*)bmi;
@@ -159,14 +163,14 @@ int LoadPackedBMP(void *bmi, Bitmap *bmp, PALETTEENTRY *pe){
 	//Nope, can handle 24 and 32 bits now...
 	NumCols = 0;
 	memset(Palette, 0, sizeof(Palette));
-	if((BPP = BMPFileInfo->biBitCount) == 8){// return FALSE;
+	if((BPP = BMPFileInfo->biBitCount) == 8){
 		NumCols = BMPFileInfo->biClrUsed;	//Check the actual number of palette entries.
 		if(NumCols == 0) NumCols = 256;
 		//get the BMP palette
 		memcpy(Palette, (char*)bmi + BMPFileInfo->biSize, sizeof(RGBQUAD) * NumCols);
 	}
 	//Allocate memory for image data
-	if(!bmp->Init(BMPFileInfo->biWidth, abs(BMPFileInfo->biHeight), BPP)) return FALSE;
+	if(!bmp->Init(BMPFileInfo->biWidth, abs(BMPFileInfo->biHeight), BPP)) return false;
 
 	//read BMP into memory
 	int sy = 0;
@@ -183,25 +187,27 @@ int LoadPackedBMP(void *bmi, Bitmap *bmp, PALETTEENTRY *pe){
 			pe[i].peBlue = Palette[i].rgbBlue;
 		}
 	}
-	return TRUE;
+	return true;
 }
-int SaveBMP(const char *name, Bitmap *bmp, PALETTEENTRY *pe, int noflip){
+
+bool SaveBMP(const char *name, Bitmap *bmp, PALETTEENTRY *pe, int noflip){
 	FILE *f;
 	if(f = fopen(name, "wb")){
 		int t = SaveBMP(f, bmp, pe, noflip);
 		fclose(f);
 		return t;
 	}
-	return 0;
+	return false;
 }
-int SaveBMP(FILE *file, Bitmap *bmp, PALETTEENTRY *pe, int noflip){
+
+bool SaveBMP(FILE *file, Bitmap *bmp, PALETTEENTRY *pe, int noflip){
 	BITMAPFILEHEADER    BMPFileHead;
 	BITMAPINFOHEADER    BMPFileInfo;
 	RGBQUAD             Palette[256];
 
 	if(file == NULL || bmp == NULL || bmp->Data() == NULL ||
 		bmp->Width() <= 0 || bmp->Height() <= 0 || bmp->Pitch() <= 0){
-		return FALSE;
+		return false;
 	}
 
 	BMPFileHead.bfType = 'B' | ('M' << 8);
@@ -227,8 +233,8 @@ int SaveBMP(FILE *file, Bitmap *bmp, PALETTEENTRY *pe, int noflip){
 	BMPFileInfo.biClrUsed = 0;
 	BMPFileInfo.biClrImportant = 0;
 
-	if(NULL == fwrite(&BMPFileHead, sizeof(BMPFileHead), 1, file)) return FALSE;
-	if(NULL == fwrite(&BMPFileInfo, sizeof(BMPFileInfo), 1, file)) return FALSE;
+	if(NULL == fwrite(&BMPFileHead, sizeof(BMPFileHead), 1, file)) return false;
+	if(NULL == fwrite(&BMPFileInfo, sizeof(BMPFileInfo), 1, file)) return false;
 	
 	if(bmp->BPP() == 8){
 		for(int i = 0; i < 256; i++){
@@ -240,7 +246,7 @@ int SaveBMP(FILE *file, Bitmap *bmp, PALETTEENTRY *pe, int noflip){
 				Palette[i].rgbRed = Palette[i].rgbGreen = Palette[i].rgbBlue = 0;
 			}
 		}
-		if(NULL == fwrite(Palette, sizeof(Palette), 1, file)) return FALSE;
+		if(NULL == fwrite(Palette, sizeof(Palette), 1, file)) return false;
 	}
 	
 	if(noflip){
@@ -252,20 +258,14 @@ int SaveBMP(FILE *file, Bitmap *bmp, PALETTEENTRY *pe, int noflip){
 			fwrite(bmp->Data() + y * bmp->Pitch(), sizeof(unsigned char), bmp->Pitch(), file);
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 Bitmap::Bitmap() : data(NULL), LineLeft(NULL), LineRight(NULL), ppe(NULL), premap(NULL),
 					width(0), height(0), pitch(0), bpp(0), xhot(0), yhot(0), id(0), flags(0), nLines(0) {
-//	data = NULL;
-//	LineLeft = LineRight = NULL;
-//	width = height = pitch = xhot = yhot = nLines = 0;
 }
 Bitmap::Bitmap(const Bitmap &bmp) : data(NULL), LineLeft(NULL), LineRight(NULL), ppe(NULL), premap(NULL),
 					width(0), height(0), pitch(0), bpp(0), xhot(0), yhot(0), id(0), flags(0), nLines(0) {
-//	data = NULL;
-//	LineLeft = LineRight = NULL;
-//	width = height = pitch = xhot = yhot = nLines = 0;
 	if(bmp.data){
 		if(Init(bmp.width, bmp.height, bmp.bpp)){
 			Suck(bmp.data, bmp.width, bmp.height, bmp.pitch);
@@ -278,17 +278,17 @@ Bitmap::Bitmap(const Bitmap &bmp) : data(NULL), LineLeft(NULL), LineRight(NULL),
 		}
 	}
 }
+
 Bitmap::~Bitmap(){
 	Free();
 }
+
 Bitmap& Bitmap::operator=(const Bitmap &bmp){
 	if(&bmp == this) return *this;	//Identity copy check.  (x = x;)
 	Free();
 	if(bmp.data){
 		if(Init(bmp.width, bmp.height, bmp.bpp)){
 			Suck(bmp.data, bmp.width, bmp.height, bmp.pitch);
-		//	ppe = bmp.ppe;	//Don't do that, only copy image data.
-		//	premap = bmp.premap;
 			if(bmp.nLines > 0){
 				if(InitAnalyze()){
 					memcpy(LineLeft, bmp.LineLeft, sizeof(int) * nLines);
@@ -299,23 +299,13 @@ Bitmap& Bitmap::operator=(const Bitmap &bmp){
 	}
 	return *this;
 }
-/*
-void Bitmap::MakeMasks(){
-	xshift = HiBit(width);
-	xmask = (1 << xshift) - 1;
-	yshift = HiBit(height);
-	ymask = (1 << yshift) - 1;
-}
-*/
-int Bitmap::Init(int w, int h, int b){	//Creates an empty bitmap.
+
+
+bool Bitmap::Init(int w, int h, int b){	//Creates an empty bitmap.
 	Free();
 	if(w > 0 && h > 0 && (b == 8 || b == 16 || b == 24 || b == 32)){
 		width = w;
 		height = h;
-	//	bpp = b;
-	//	pixelpitch = bpp / 8;
-	//	alphaskip = pixelpitch - 3;
-	//	colorbytes = (pixelpitch > 3 ? 3 : pixelpitch);
 		SetBPP(b);
 		pitch = CalcPitch(w, b);//(w + 3) & (~3);
 		if(NULL == (data = (unsigned char*)malloc(CalcLength(w, h, b)))){
@@ -323,12 +313,11 @@ int Bitmap::Init(int w, int h, int b){	//Creates an empty bitmap.
 			return 0;
 		}
 		memset(data, 0, CalcLength(w, h, b));
-	//	MakeMasks();
-//		memset(pe, 0, sizeof(pe));
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
+
 void Bitmap::Free(){
 	FreeAnalyze();
 	if(data) free(data);
@@ -337,19 +326,20 @@ void Bitmap::Free(){
 	width = height = pitch = bpp = xhot = yhot = nLines = 0;
 	pixelpitch = colorbytes = alphaskip = 0;
 	id = flags = 0;
-//	xmask = ymask = xshift = yshift = 0;
 }
-int Bitmap::Clear(unsigned char color){
+
+bool Bitmap::Clear(unsigned char color){
 	if(data && width > 0 && height > 0){
 		for(int y = 0; y < height; y++){
 			memset(data + y * pitch, color, width * (bpp >>3));
 		}
 		flags |= BFLAG_CLEARED;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
-int Bitmap::ColorCorrect(float rgain, float ggain, float bgain, float again,
+
+bool Bitmap::ColorCorrect(float rgain, float ggain, float bgain, float again,
 					float rbias, float gbias, float bbias, float abias,
 					float rscale, float gscale, float bscale, float ascale,
 					float rshift, float gshift, float bshift, float ashift){
@@ -398,12 +388,12 @@ int Bitmap::ColorCorrect(float rgain, float ggain, float bgain, float again,
 			}
 		}
 		flags |= BFLAG_COLORCORRECTED;
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-int Bitmap::To32Bit(PALETTEENTRY *pe){
+bool Bitmap::To32Bit(PALETTEENTRY *pe){
 	if(!pe) pe = ppe;	//Null param, try stored palette pointer.
 	if(bpp == 32) return 1;
 	if(data && width > 0 && height > 0 && (bpp == 8 || bpp == 24)){
@@ -438,13 +428,13 @@ int Bitmap::To32Bit(PALETTEENTRY *pe){
 			data = newdata;
 			pitch = NewPitch;
 			SetBPP(32);
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
-int Bitmap::RotateRight90(){	//NOTE:  Function only works with 8 BPP Bitmaps!
+bool Bitmap::RotateRight90(){	//NOTE:  Function only works with 8 BPP Bitmaps!
 	if(data && width > 0 && height > 0 && bpp == 8){
 		int NewWidth = height, NewHeight = width;
 		int NewPitch = (NewWidth + 3) & (~3);
@@ -463,12 +453,13 @@ int Bitmap::RotateRight90(){	//NOTE:  Function only works with 8 BPP Bitmaps!
 			height = NewHeight;
 			pitch = NewPitch;
 			flags |= BFLAG_ROTATED;
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
-int Bitmap::RotateLeft90(){	//NOTE:  Function only works with 8 BPP Bitmaps!
+
+bool Bitmap::RotateLeft90(){	//NOTE:  Function only works with 8 BPP Bitmaps!
 	if(data && width > 0 && height > 0 && bpp == 8){
 		int NewWidth = height, NewHeight = width;
 		int NewPitch = (NewWidth + 3) & (~3);
@@ -487,26 +478,27 @@ int Bitmap::RotateLeft90(){	//NOTE:  Function only works with 8 BPP Bitmaps!
 			height = NewHeight;
 			pitch = NewPitch;
 			flags |= BFLAG_ROTATED;
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
-int Bitmap::ScaleToPow2(){
+
+bool Bitmap::ScaleToPow2(){
 	if(data && width > 0 && height > 0){
 		int NewWidth = 1 << HiBit(width);
 		int NewHeight = 1 << HiBit(height);
-		//(NewWidth * height) / width;
-		if(NewWidth == width && NewHeight == height) return TRUE;	//Already correct.
+		if(NewWidth == width && NewHeight == height) return true;	//Already correct.
 		return Scale(NewWidth, NewHeight);
 	}
-	return FALSE;
+	return false;
 }
-int Bitmap::Scale(int NewWidth, int NewHeight, int lerp){
-	if(data && width > 0 && height > 0){// && bpp == 8){
-		int NewPitch = CalcPitch(NewWidth, bpp);//(NewWidth + 3) & (~3);
+
+bool Bitmap::Scale(int NewWidth, int NewHeight, bool lerp){
+	if(data && width > 0 && height > 0){
+		int NewPitch = CalcPitch(NewWidth, bpp);
 		unsigned char *newdata;
-		if(NewWidth > 0 && NewHeight > 0 && NewPitch > 0 && (newdata = (unsigned char*)malloc(CalcLength(NewWidth, NewHeight, bpp)))){//NewPitch * NewHeight))){
+		if(NewWidth > 0 && NewHeight > 0 && NewPitch > 0 && (newdata = (unsigned char*)malloc(CalcLength(NewWidth, NewHeight, bpp)))){
 			int Dx = (width <<16) / NewWidth;
 			int Dy = (height <<16) / NewHeight;
 			int SrcX = 0, SrcY = 0;
@@ -514,7 +506,6 @@ int Bitmap::Scale(int NewWidth, int NewHeight, int lerp){
 				for(int y = 0; y < NewHeight; y++){
 					SrcX = 0;
 					unsigned char *td = newdata + y * NewPitch;
-					//unsigned char *ts;
 					int bts = bpp / 8;
 					int h2 = ((SrcY + Dy) >>16) - (SrcY >>16);
 					h2 = __min(h2, height - (SrcY >>16));
@@ -539,11 +530,6 @@ int Bitmap::Scale(int NewWidth, int NewHeight, int lerp){
 								*td++ = accum[z] / pxls;
 							}
 						}
-					//	ts = data + (SrcX >>16) * bts + (SrcY >>16) * pitch;
-					//	for(int z = bts; z; z--){
-					//		*td++ = *ts++;
-					//	}
-					//	*(newdata + x + y * NewPitch) = *(data + (SrcX >>16) + (SrcY >>16) * pitch);
 						SrcX += Dx;
 					}
 					SrcY += Dy;
@@ -559,7 +545,6 @@ int Bitmap::Scale(int NewWidth, int NewHeight, int lerp){
 						for(int z = bts; z; z--){
 							*td++ = *ts++;
 						}
-					//	*(newdata + x + y * NewPitch) = *(data + (SrcX >>16) + (SrcY >>16) * pitch);
 						SrcX += Dx;
 					}
 					SrcY += Dy;
@@ -571,11 +556,12 @@ int Bitmap::Scale(int NewWidth, int NewHeight, int lerp){
 			height = NewHeight;
 			pitch = NewPitch;
 			flags |= BFLAG_SCALED;
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
+
 unsigned int Bitmap::GetPixel(int x, int y){
 	if(data && x >= 0 && x < width && y >= 0 && y < height){
 		if(bpp == 8) return (unsigned int)*(data + y * pitch + x);
@@ -588,7 +574,8 @@ unsigned int Bitmap::GetPixel(int x, int y){
 	}
 	return 0;
 }
-int Bitmap::PutPixel(int x, int y, unsigned int pixel){
+
+bool Bitmap::PutPixel(int x, int y, unsigned int pixel){
 	if(data && x >= 0 && x < width && y >= 0 && y < height){
 		switch(bpp){
 		case 8 : *(data + y * pitch + x) = (unsigned char)pixel; break;
@@ -599,12 +586,12 @@ int Bitmap::PutPixel(int x, int y, unsigned int pixel){
 			break;
 		case 32 : *((unsigned int*)(data + y * pitch + (x <<2))) = pixel; break;
 		}
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-int Bitmap::Suck(void *vsrc, int sw, int sh, int spitch, int sbpp){	//Works with 32bit, with proper pitches in bytes and widths in pixels.
+bool Bitmap::Suck(void *vsrc, int sw, int sh, int spitch, int sbpp){	//Works with 32bit, with proper pitches in bytes and widths in pixels.
 	unsigned char *src = (unsigned char*)vsrc;
 	if(sbpp <= 0) sbpp = bpp;	//Not entering value assumes identical bpps.
 	if(data && src && (sbpp == bpp || (sbpp >= 24 && bpp >= 24) || (bpp == 8 && sbpp >= 24))){	//Must be the same bpp, or both true color.  No mixing true and paletteded.
@@ -634,12 +621,13 @@ int Bitmap::Suck(void *vsrc, int sw, int sh, int spitch, int sbpp){	//Works with
 					}
 				}
 			}
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
-int Bitmap::SuckARGB(Bitmap *bmp, ARGB *argb){
+
+bool Bitmap::SuckARGB(Bitmap *bmp, ARGB *argb){
 	if(bmp && argb && bpp >= 16 && bmp->BPP() == 8 && data && bmp->Data()){
 		int sw = __min(bmp->Width(), width);
 		int sh = __min(bmp->Height(), height);
@@ -652,18 +640,19 @@ int Bitmap::SuckARGB(Bitmap *bmp, ARGB *argb){
 				for(int b = bytes; b > 0; b--) *dp++ = *ta++;
 			}
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 //Clipped blitter, assumes entire Bitmap as source.
 //Uses Bitmap's HotSpot.
 //This SHOULD WORK with true color bitmaps, though transparency isn't supported!
-int Bitmap::Blit(void *vdest, int dw, int dh, int dp, int dx, int dy, int trans){
+bool Bitmap::Blit(void *vdest, int dw, int dh, int dp, int dx, int dy, int trans){
 	return Blit(vdest, dw, dh, dp, dx, dy, 0, 0, width, height, trans);
 }
-int Bitmap::Blit(void *vdest, int dw, int dh, int dp, int dx, int dy,
+
+bool Bitmap::Blit(void *vdest, int dw, int dh, int dp, int dx, int dy,
 				 int sx, int sy, int sw, int sh, int trans){
 	unsigned char *dest = (unsigned char*)vdest;
 	if(data && dest && dw > 0 && dh > 0){
@@ -707,12 +696,13 @@ int Bitmap::Blit(void *vdest, int dw, int dh, int dp, int dx, int dy,
 		if(w > 0 && h > 0 && dx < dw && dy < dh){
 			BlitRaw(dest + dx * pixelpitch + dy * dp, dp, inx, iny, w, h, trans);
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
+
 //Unclipped blitter, allows partial area of Bitmap as source.
-int Bitmap::BlitRaw(void *vdest, int dpitch, int insetx, int insety, int w, int h, int trans){
+bool Bitmap::BlitRaw(void *vdest, int dpitch, int insetx, int insety, int w, int h, int trans){
 	unsigned char *dest = (unsigned char*)vdest;
 //	if(data && dest && w > 0 && h > 0 && insetx >= 0 && insety >= 0 && w + insetx <= width && h + insety <= height){
 	if(data && dest && w > 0 && h > 0 && insetx >= 0 && insety >= 0){
@@ -755,11 +745,12 @@ int Bitmap::BlitRaw(void *vdest, int dpitch, int insetx, int insety, int w, int 
 				source += pitch;
 			}
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
-int Bitmap::BlitRaw8to32(unsigned long *dest, int dpitch, int insetx, int insety, int w, int h, int trans, ARGB *argb){
+
+bool Bitmap::BlitRaw8to32(unsigned long *dest, int dpitch, int insetx, int insety, int w, int h, bool trans, ARGB *argb){
 	ARGB argb2[256];
 	if(!argb && ppe){
 		BGRAfromPE(argb2, ppe);
@@ -769,8 +760,6 @@ int Bitmap::BlitRaw8to32(unsigned long *dest, int dpitch, int insetx, int insety
 		int x, y;
 		unsigned char *source, *tsrc;
 		unsigned long *tdst;
-	//	ARGB argb[256];
-	//	ARGBfromPE(argb, pe);
 		source = data + insetx * (bpp >>3) + insety * pitch;
 		for(y = 0; y < h; y++){
 			tdst = dest;
@@ -783,11 +772,12 @@ int Bitmap::BlitRaw8to32(unsigned long *dest, int dpitch, int insetx, int insety
 			dest += (dpitch >>2);	//Flinking pointer arithmetic.
 			source += pitch;
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
-int Bitmap::Quantize32to8HighQuality(Bitmap *destb, PALETTEENTRY *pe){
+
+bool Bitmap::Quantize32to8HighQuality(Bitmap *destb, PALETTEENTRY *pe){
 	if(!destb) return 0;
 	if(!pe) pe = destb->ppe;
 	if((bpp == 24 || bpp == 32) && data && width > 0 && height > 0 && destb && pe){
@@ -834,12 +824,13 @@ int Bitmap::Quantize32to8HighQuality(Bitmap *destb, PALETTEENTRY *pe){
 			free(pic);
 			//
 			flags |= BFLAG_QUANTIZED;
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
-int Bitmap::Quantize32to8(Bitmap *destb, PALETTEENTRY *pe, int cols, int prequantize){
+
+bool Bitmap::Quantize32to8(Bitmap *destb, PALETTEENTRY *pe, int cols, int prequantize){
 	if(!destb) return 0;
 	if(!pe) pe = destb->ppe;
 	if((bpp == 24 || bpp == 32) && data && width > 0 && height > 0 && destb && pe && cols > 0 && cols <= 256){
@@ -904,17 +895,17 @@ int Bitmap::Quantize32to8(Bitmap *destb, PALETTEENTRY *pe, int cols, int prequan
 				}
 			}
 			flags |= BFLAG_QUANTIZED;
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
-int Bitmap::MakeMipMap(Bitmap *sbm, MixTable *Mix, int mixmode, int trans){	//8bit ONLY!
+bool Bitmap::MakeMipMap(Bitmap *sbm, MixTable *Mix, int mixmode, int trans){	//8bit ONLY!
 	if(sbm && sbm->data && Mix && sbm->bpp == 8){
 		if(Init(__max(sbm->width / 2, 1), __max(sbm->height / 2, 1), sbm->bpp)){
 			flags |= BFLAG_MIPMAP;
-			if(sbm->width <= 1 || sbm->height <= 1) return TRUE;	//Just abort on miniscule mipmaps for now.  Code below assumes at least 2x2 source bitmap.
+			if(sbm->width <= 1 || sbm->height <= 1) return true;	//Just abort on miniscule mipmaps for now.  Code below assumes at least 2x2 source bitmap.
 			unsigned char ul, ur, dl, dr, u, d, *ts, *td;
 			for(int y = 0; y < height; y++){
 				ts = sbm->data + (y <<1) * sbm->pitch;
@@ -954,13 +945,13 @@ int Bitmap::MakeMipMap(Bitmap *sbm, MixTable *Mix, int mixmode, int trans){	//8b
 					td++;
 				}
 			}
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
-int Bitmap::Remap(unsigned char *Remap){	//8bit ONLY!
+bool Bitmap::Remap(unsigned char *Remap){	//8bit ONLY!
 	if(!Remap) Remap = premap;
 	if(Remap && data && width > 0 && height > 0 && bpp == 8){
 		unsigned char *pdata;
@@ -971,12 +962,12 @@ int Bitmap::Remap(unsigned char *Remap){	//8bit ONLY!
 			}
 		}
 		flags |= BFLAG_REMAPPED;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-int Bitmap::InitAnalyze(){
+bool Bitmap::InitAnalyze(){
 	if(nLines != height){
 		FreeAnalyze();
 		nLines = height;
@@ -984,12 +975,13 @@ int Bitmap::InitAnalyze(){
 		LineRight = new int[nLines];
 		if(LineLeft != NULL && LineRight != NULL) return 1;
 		FreeAnalyze();
-		return 0;
+		return false;
 	}
-	if(nLines > 0) return 1;
-	return 0;
+	if(nLines > 0) return true;
+	return false;
 }
-int Bitmap::AnalyzeLines(){	//8bit ONLY at the moment!
+
+bool Bitmap::AnalyzeLines(){	//8bit ONLY at the moment!
 	int x, y;
 	if(data && height > 0 && InitAnalyze() && bpp == 8){
 		for(y = 0; y < nLines; y++){
@@ -1000,27 +992,29 @@ int Bitmap::AnalyzeLines(){	//8bit ONLY at the moment!
 			while(x < width && *((unsigned char*)data + width - 1 - x + y * pitch) == 0) x++;
 			LineRight[y] = x;
 		}
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
+
 void Bitmap::FreeAnalyze(){
 	nLines = 0;
 	if(LineLeft) delete [] LineLeft; LineLeft = NULL;
 	if(LineRight) delete [] LineRight; LineRight = NULL;
 }
 
-int ImageSet::LoadSet(const char *n){
+bool ImageSet::LoadSet(const char *n){
 	FILE *f;
 	if((f = fopen(n, "rb"))){
 		int ret = LoadSet(f);
 		fclose(f);
 		return ret;
 	}
-	return 0;
+	return false;
 }
+
 #define IMAGESETVERSION 1
-int ImageSet::LoadSet(FILE *f){
+bool ImageSet::LoadSet(FILE *f){
 	wchar_t buf[1024];
 	memset(buf, 0, sizeof(buf));
 	if(f){
@@ -1033,7 +1027,7 @@ int ImageSet::LoadSet(FILE *f){
 				return 0;
 			}
 			int nImg = int(ReadLong(f));
-			if(!InitSet(nImg)) return FALSE;
+			if(!InitSet(nImg)) return false;
 			int Cols = int(ReadLong(f));
 			PALETTEENTRY gpe[256];
 			memset(gpe, 0, sizeof(gpe));
@@ -1071,8 +1065,8 @@ int ImageSet::LoadSet(FILE *f){
 					}
 				}
 			}
-			return TRUE;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }

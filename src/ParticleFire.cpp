@@ -80,7 +80,6 @@ float CycleT = 1.1f;
 
 int				ActiveApp;
 time_t			TimeStart, Time, LastTime;
-int Hack8Bit = FALSE;
 int CycleFrameDelay = 10;
 
 // Make my Container Class - GH-CHANGE
@@ -96,7 +95,7 @@ BOOL WINAPI RegisterDialogClasses(HANDLE hInst){
 	return TRUE;
 }
 
-int Realized = FALSE;
+bool Realized = false;
 int BlankedSecs = 0;
 long int FirstUseTime = 0;
 long int SecsStart = 0;
@@ -186,10 +185,9 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			}
 			//
 			if(!Realized){
-			//	Palette(partFire.screen.CustomScheme ? -1 : partFire.screen.ColorScheme);
 				partFire.screen.Palette(partFire.screen.ColorScheme);
 				partFire.screen.dib.RealizePalette();
-				partFire.particle.Explode = TRUE;
+				partFire.particle.Explode = true;
 			}
 			//
 			DoFrame();
@@ -197,7 +195,7 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			if(!Realized){
 				partFire.screen.Palette(partFire.screen.ColorScheme);
 				partFire.screen.dib.RealizePalette();
-				partFire.particle.Explode = TRUE;
+				partFire.particle.Explode = true;
 			}
 			//
 			Frames++;
@@ -226,8 +224,9 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 				}
 			}
 			//
-			Realized = TRUE;
+			Realized = true;
 			return TRUE;
+
 		case WM_DESTROY :
 			//
 			BlankedSecs = int(time(NULL) - SecsStart);
@@ -272,7 +271,6 @@ bool BrowseForFile ()
 	ofn.hwndOwner = m_hWnd;//hwnd;
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
-//	ofn.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
 	ofn.lpstrFilter = L"Text\0*.TXT\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = NULL;
@@ -287,12 +285,6 @@ bool BrowseForFile ()
 	if (RESULT == TRUE)
 		partFire.QuoteFilename = ofn.lpstrFile;
 
-/*	if (GetOpenFileName(&ofn)==TRUE) 
-		hf = CreateFile(ofn.lpstrFile, GENERIC_READ,
-			0, (LPSECURITY_ATTRIBUTES) NULL,
-			OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-			(HANDLE) NULL);*/
-
 	return true;
 }
 
@@ -306,7 +298,6 @@ static void PopulateSettingsDialogFromState(HWND dlgwnd) {
 	SendDlgItemMessage(dlgwnd, IDC_COMBOCOLOR, CB_SETCURSEL, partFire.screen.CustomScheme ? 0 : partFire.screen.ColorScheme + 1, 0);
 	EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
 	//
-//			SetDlgItemInt(dlgwnd, IDC_EDITBURNFADE, partFire.screen.BURNFADE, FALSE);
 	SendDlgItemMessage(dlgwnd, IDC_CHECKCYCLE, BM_SETCHECK, (partFire.screen.CycleColors ? BM_SETCHECK : FALSE), 0);
 	SendDlgItemMessage(dlgwnd, IDC_CHECKTEXT, BM_SETCHECK, (partFire.screen.DisableText ? BM_SETCHECK : FALSE), 0);
 	//
@@ -374,6 +365,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 			PopulateSettingsDialogFromState(dlgwnd);
 			
 			return TRUE;
+
 		case WM_HSCROLL:
 			ctrl = (HWND) lParam;
 			id = LOWORD(wParam);
@@ -396,7 +388,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 			slider_position = int(SendDlgItemMessage(dlgwnd, IDC_SLIDER_GRAVITY_SPEED, TBM_GETPOS, 0, 0));
 			partFire.particle.GRAV_TIME = slider_position * 10;
 			return TRUE;
-			break;
+
 		case WM_COMMAND :
 			ctrl = (HWND) lParam;
 			id = LOWORD(wParam);
@@ -407,40 +399,50 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 					partFire.screen.PickColor(dlgwnd, &partFire.screen.CustomPE1);
 					InvalidateRect(ctrl, NULL, FALSE);
 					return TRUE;
+
 				case IDC_BUTTONCOLOR2 :
 					partFire.screen.PickColor(dlgwnd, &partFire.screen.CustomPE2);
 					InvalidateRect(ctrl, NULL, FALSE);
 					return TRUE;
+
 				case IDC_CHECKTEXT :
 					partFire.screen.DisableText = (SendMessage(ctrl, BM_GETCHECK, 0, 0) == BST_CHECKED);
 					return TRUE;
+
 				case IDC_CHECKCYCLE :
 					partFire.screen.CycleColors = (SendMessage(ctrl, BM_GETCHECK, 0, 0) == BST_CHECKED);
 					return TRUE;
+
 				case IDC_CHECKRANDCOL :
 					partFire.screen.RandomColor = (SendMessage(ctrl, BM_GETCHECK, 0, 0) == BST_CHECKED);
 					EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
 					return TRUE;
+
 				case IDC_CHECKMULTI :
 					partFire.screen.UseTrueColor = (SendMessage(ctrl, BM_GETCHECK, 0, 0) == BST_CHECKED);
 				//	EnableWindow(GetDlgItem(dlgwnd, IDC_COMBOCOLOR), !partFire.screen.RandomColor);
 					return TRUE;
+
 				case IDC_BUTTONLDA :
 					ShellExecute(NULL, L"open", L"http://www.longbowgames.com/", NULL, NULL, NULL);
 					break;
+
 				case IDOK :
 					partFire.registry.SaveOpts();
 					EndDialog(dlgwnd, TRUE);
 			//		DestroyWindow(dlgwnd);
 					return TRUE;
+
 				case IDCANCEL :
 					EndDialog(dlgwnd, FALSE);
 					return TRUE;
+
 				case IDC_BUTTON_FIND_QUOTE_FILENAME:
 //					strcpy (partFire.QuoteFilename, "Filename Here");
 					BrowseForFile ();
 					SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM) partFire.QuoteFilename.c_str());
 					return TRUE;
+
 				case IDC_RESETDEFAULTS:
 					//
 					partFire.registry.SaveOpts(true);
@@ -465,11 +467,13 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 					//	Palette(partFire.screen.ColorScheme);
 					}
 					return TRUE;
+
 				case IDC_COMBOSTYLE :
 					if(code == CBN_SELCHANGE){
 						partFire.particle.ParticleStyle = int(SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE, CB_GETCURSEL, 0, 0));
 					}
 					return TRUE;
+
 				case IDC_COMBOSTYLE2 :
 					if(code == CBN_SELCHANGE){
 						partFire.particle.WallStyle = int(SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_GETCURSEL, 0, 0));
@@ -493,6 +497,7 @@ sprintf (buff, "%x\n%x", *((ULONG*)&partFire.screen.CustomPE1), *((ULONG*)&partF
 //error_print (buff);
 }
 					return TRUE;
+
 				case IDC_BUTTONCOLOR2 :
 					brush = CreateSolidBrush(RGB(partFire.screen.CustomPE2.peRed, partFire.screen.CustomPE2.peGreen, partFire.screen.CustomPE2.peBlue));
 					FillRect(lpdis->hDC, &lpdis->rcItem, brush);
@@ -501,6 +506,7 @@ sprintf (buff, "%x\n%x", *((ULONG*)&partFire.screen.CustomPE1), *((ULONG*)&partF
 					return TRUE;
 			}
 			return TRUE;
+
 		case WM_CLOSE :
 			EndDialog(dlgwnd, FALSE);
 			return TRUE;
@@ -512,36 +518,6 @@ sprintf (buff, "%x\n%x", *((ULONG*)&partFire.screen.CustomPE1), *((ULONG*)&partF
 float frand(float range){
 	return ((float)((rand() % 10000) - 5000) * range) / 5000.0f;
 }
-/*
-void CubeSide(int firstparticle, int ppe,
-			  float a, double b, double c,
-			  float x1, double y1, double z1,
-			  float x2, double y2, double z2,
-			  float x3, double y3, double z3,
-			  float x4, double y4, double z4){
-	//TODO: Rotate points here.
-	int i, j, pt = firstparticle;
-	double jxoff = (x2 - x1) / ppe, jyoff = (y2 - y1) / ppe;
-	double ixoff = (x3 - x1) / ppe, iyoff = (y3 - y1) / ppe;
-	double xstart, ystart;
-	for(i = 0; i < ppe; i++){
-		xstart = x1 + i * ixoff;
-		ystart = y1 + i * iyoff;
-		for(j = 0; j < ppe; j++){
-			p[pt].ax = xstart + jxoff * j;
-			p[pt].ay = ystart + jyoff * j;
-			pt++;
-		}
-	}
-}
-*/
-
-// Include the Registration and Quotation text here, to make the file more readable
-//#include "textStuff.h"
-
-//int RegLine = 0;
-//int LastTextTime = 0;
-
 
 #define PRELINES 5
 

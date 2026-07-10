@@ -44,7 +44,7 @@ private:
 	HKEY hKey = nullptr;
 	bool LocalMachine = false;
 public:
-	Registry(std::wstring_view company, std::wstring_view title, bool global = false);	//Set global to TRUE to use HKEY_LOCAL_MACHINE instead of HKEY_CURRENT_USER.
+	Registry(std::wstring_view company, std::wstring_view title, bool global = false);	//Set global to true to use HKEY_LOCAL_MACHINE instead of HKEY_CURRENT_USER.
 	bool OpenKey();
 	bool CloseKey();
 	bool SetPrefix(std::wstring prefix);	//Sets a prefix which is prepended to all keys read or written, so you can easily create fake-subdirectories of keys.
@@ -58,7 +58,7 @@ public:
 	bool WriteString(const std::wstring& name, const std::wstring& val);
 	bool ReadString(const std::wstring& name, std::wstring& val);
 	bool SaveWindowPos(HWND hwnd, const std::wstring& name, bool Size = false, bool Max = false);	//Restore and save Widht and Height too?  (Not for Dialogs!!!)
-	bool RestoreWindowPos(HWND hwnd, const std::wstring& ame, bool Size = false, bool Max = false);	//Set MAx to TRUE to save/restore window's maximised state.
+	bool RestoreWindowPos(HWND hwnd, const std::wstring& ame, bool Size = false, bool Max = false);	//Set Max to true to save/restore window's maximised state.
 };
 
 #endif

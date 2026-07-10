@@ -33,8 +33,9 @@
 class Timer{
 private:
 	LARGE_INTEGER	tstart, tticks, tnow;
-	int Started;
+	bool Started;
 	int HighFreq;
+
 public:
 	Timer();
 	~Timer();

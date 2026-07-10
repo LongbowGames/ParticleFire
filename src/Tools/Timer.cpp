@@ -19,19 +19,22 @@
 
 Timer::Timer(){
 	HighFreq = QueryPerformanceFrequency(&tticks);
-	Started = FALSE;
+	Started = false;
 	Start();
 }
+
 Timer::~Timer(){
 }
+
 void Timer::Start(){
 	if(HighFreq){
 		QueryPerformanceCounter(&tstart);
 	}else{
 		tstart.LowPart = timeGetTime();
 	}
-	Started = TRUE;
+	Started = true;
 }
+
 int Timer::Check(int FracSec){
 	if(!Started) return 0;
 	if(HighFreq){

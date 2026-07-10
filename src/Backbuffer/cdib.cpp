@@ -77,12 +77,12 @@ CreateDib::~CreateDib(void)
 }
 
 //True Color support added by Seumas McNally.
-int CreateDib::CreateHBitmap(HWND hWnd, int width, int height, int bpp)
+bool CreateDib::CreateHBitmap(HWND hWnd, int width, int height, int bpp)
 {
 	DeleteHBitmap();
 
 	bpp &= (~7);	//Wipe out lower three bits.
-	if(bpp < 8 || bpp > 32 || width <= 0 || height <= 0) return FALSE;
+	if(bpp < 8 || bpp > 32 || width <= 0 || height <= 0) return false;
 
 	m_hWnd = hWnd;
 	HDC hdc = GetDC(m_hWnd);
@@ -125,8 +125,8 @@ int CreateDib::CreateHBitmap(HWND hWnd, int width, int height, int bpp)
 		NULL);
 
 	ReleaseDC(m_hWnd, hdc);
-	if(m_hBitmap && m_lpCDIBBits) return TRUE;
-	return FALSE;
+	if(m_hBitmap && m_lpCDIBBits) return true;
+	return false;
 }
 
 
@@ -203,20 +203,17 @@ void CreateDib::RealizePalette(void)
 	
 	HDC hdc = GetDC(m_hWnd);
 
-	HPALETTE oldPalette = SelectPalette(hdc, m_hPalette, FALSE);	//New  (fixes bad resource leak)
+	HPALETTE oldPalette = SelectPalette(hdc, m_hPalette, FALSE);
 	::RealizePalette(hdc);
-	SelectPalette(hdc, oldPalette, TRUE);	//New
+	SelectPalette(hdc, oldPalette, TRUE);
 	ReleaseDC(m_hWnd,hdc);
-
-//	InvalidateRect(m_hWnd,NULL,TRUE);
-	//You may want to call same externally when you realize the palette, but not doing it here gives more control.  SM
 }
 
 
 BYTE* CreateDib::Lock(void)
 {
 	if(!m_hBitmap)
-		return NULL;
+		return nullptr;
 
 	GdiFlush();
 
@@ -237,12 +234,12 @@ BYTE* CreateDib::Lock(void)
 }
 
 
-BOOL CreateDib::Blit(int destX, int destY, int sourceX, int sourceY, int sourceWidth, int sourceHeight)
+bool CreateDib::Blit(int destX, int destY, int sourceX, int sourceY, int sourceWidth, int sourceHeight)
 {
 	if(!m_hBitmap)
-		return FALSE;
+		return false;
 
-	BOOL result;
+	bool result;
 	HPALETTE oldPalette = SelectPalette(m_workingHdc, m_hPalette, FALSE);	//New
 	result = BitBlt(m_workingHdc, destX, destY, sourceWidth, sourceHeight,
 						m_sourceHdc, sourceX, sourceY, SRCCOPY);
@@ -253,12 +250,12 @@ BOOL CreateDib::Blit(int destX, int destY, int sourceX, int sourceY, int sourceW
 	return result;
 }
 //Function added by Seumas McNally.
-BOOL CreateDib::StretchBlit(int destX, int destY, int destWidth, int destHeight, int sourceX, int sourceY, int sourceWidth, int sourceHeight)
+bool CreateDib::StretchBlit(int destX, int destY, int destWidth, int destHeight, int sourceX, int sourceY, int sourceWidth, int sourceHeight)
 {
 	if(!m_hBitmap)
-		return FALSE;
+		return false;
 
-	BOOL result;
+	bool result;
 	HPALETTE oldPalette = SelectPalette(m_workingHdc, m_hPalette, FALSE);	//New
 	result = StretchBlt(m_workingHdc, destX, destY, destWidth, destHeight,
 							m_sourceHdc, sourceX, sourceY, sourceWidth, sourceHeight, SRCCOPY);
@@ -269,10 +266,10 @@ BOOL CreateDib::StretchBlit(int destX, int destY, int destWidth, int destHeight,
 	return result;
 }
 //Function added by Seumas McNally.
-BOOL CreateDib::StretchBlitToWnd(){
+bool CreateDib::StretchBlitToWnd(){
 	if(!m_hBitmap)
-		return FALSE;
-	BOOL result;
+		return false;
+	bool result;
 	RECT rc;
 	GetClientRect(m_hWnd, &rc);
 	HPALETTE oldPalette = SelectPalette(m_destHdc, m_hPalette, FALSE);	//New
@@ -286,10 +283,10 @@ BOOL CreateDib::StretchBlitToWnd(){
 }
 
 //Function added by Seumas McNally.
-BOOL CreateDib::WorkingToDst() {
+bool CreateDib::WorkingToDst() {
 	if (!m_hBitmap)
-		return FALSE;
-	BOOL result;
+		return false;
+	bool result;
 	RECT rc;
 	GetClientRect(m_hWnd, &rc);
 	HPALETTE oldPalette = SelectPalette(m_destHdc, m_hPalette, FALSE);	//New
@@ -300,15 +297,15 @@ BOOL CreateDib::WorkingToDst() {
 }
 
 //Function added by Seumas McNally.
-BOOL CreateDib::ScrollDib(int dx, int dy){
-	if(!m_hBitmap) return FALSE;
+bool CreateDib::ScrollDib(int dx, int dy){
+	if(!m_hBitmap) return false;
 	return ScrollDC(m_sourceHdc, dx, dy, NULL, NULL, NULL, NULL);
 }
 
-BOOL CreateDib::PaintBlit(HDC destHdc, int destX, int destY, int sourceX, int sourceY, int sourceWidth, int sourceHeight, int dW, int dH)
+bool CreateDib::PaintBlit(HDC destHdc, int destX, int destY, int sourceX, int sourceY, int sourceWidth, int sourceHeight, int dW, int dH)
 {
 	if(!m_hBitmap)
-		return FALSE;
+		return false;
 
 	GdiFlush();
 
@@ -317,7 +314,7 @@ BOOL CreateDib::PaintBlit(HDC destHdc, int destX, int destY, int sourceX, int so
 	SelectObject(sourceHdc, m_hBitmap);
 
 	// Blit
-	BOOL result;
+	bool result;
 	HPALETTE oldPalette = SelectPalette(m_destHdc, m_hPalette, FALSE);	//New
 	if(dW == 0 && dH == 0){
 		result = BitBlt(destHdc, destX, destY, sourceWidth, sourceHeight,
@@ -375,24 +372,24 @@ int CreateDib::BPP(){
 }
 
 //Helper function added by Seumas McNally.
-int SetClientSize(HWND hwnd, int w, int h){
+bool SetClientSize(HWND hwnd, int w, int h){
 	RECT rcw, rcc;
 	if(hwnd){
 		GetWindowRect(hwnd, &rcw);
 		GetClientRect(hwnd, &rcc);
 		MoveWindow(hwnd, rcw.left, rcw.top, rcw.right - rcw.left + (w - rcc.right), rcw.bottom - rcw.top + (h - rcc.bottom), TRUE);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 //Helper function added by Seumas McNally.
-int SetWindowPosition(HWND hwnd, int x, int y){
+bool SetWindowPosition(HWND hwnd, int x, int y){
 	RECT rcw;
 	if(hwnd){
 		GetWindowRect(hwnd, &rcw);
 		MoveWindow(hwnd, x, y, rcw.right - rcw.left, rcw.bottom - rcw.top, TRUE);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }

@@ -55,15 +55,15 @@ public:
 	void HandleText ();					// Handle the Text drawing
 	void LoadText ();					// Load the Text from a file
 	
-	int PickColor(HWND dlg, PALETTEENTRY *pe);
+	bool PickColor(HWND dlg, PALETTEENTRY *pe);
 	void SpreadPal(PALETTEENTRY *pe1, PALETTEENTRY *pe2, PALETTEENTRY *dst);
 	void Palette(int ColorScheme);
 
-	int SetupFont(int height);
+	bool SetupFont(int height);
 	void UnsetupFont();
-	int DrawFont(const wchar_t *text, int mode=0);
-	int DrawCenteredFont(const wchar_t *text, int lines=1, int lineNum=0, int col_r=255, int col_g=255, int col_b=255);
-	int DrawXYFont(const wchar_t *text, int x, int y, int col_r=255, int col_g=255, int col_b=255);
+	void DrawFont(const wchar_t *text, int mode=0);
+	bool DrawCenteredFont(const wchar_t *text, int lines=1, int lineNum=0, int col_r=255, int col_g=255, int col_b=255);
+	bool DrawXYFont(const wchar_t *text, int x, int y, int col_r=255, int col_g=255, int col_b=255);
 
 public:
 	ParticleContainer *parent;

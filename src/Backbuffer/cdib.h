@@ -37,7 +37,7 @@ class CreateDib
 		~CreateDib(void);
 
 		// Creation of hBitmap
-		int CreateHBitmap(HWND hWnd, int width, int height, int bpp = 8);
+		bool CreateHBitmap(HWND hWnd, int width, int height, int bpp = 8);
 		void DeleteHBitmap(void);
 
 		// Palette Manipulation
@@ -46,14 +46,14 @@ class CreateDib
 
 		// Blitting interface 'Make sure to: 1) Lock surface, 2)Blit, 3)Unlock surface'
 		BYTE* Lock(void);
-		BOOL Blit(int destX, int destY, int sourceX, int sourceY, int sourceWidth, int sourceHeight);
-		BOOL StretchBlit(int destX, int destY, int destWidth, int destHeight, int sourceX, int sourceY, int sourceWidth, int sourceHeight);
-		BOOL StretchBlitToWnd();	//Blits to the dimensions of the attached window.
-		BOOL ScrollDib(int dx, int dy);	//Wrap-around scrolls the contents of the bitmap.
+		bool Blit(int destX, int destY, int sourceX, int sourceY, int sourceWidth, int sourceHeight);
+		bool StretchBlit(int destX, int destY, int destWidth, int destHeight, int sourceX, int sourceY, int sourceWidth, int sourceHeight);
+		bool StretchBlitToWnd();	//Blits to the dimensions of the attached window.
+		bool ScrollDib(int dx, int dy);	//Wrap-around scrolls the contents of the bitmap.
 		void Unlock(void);
 
 		// Called from a WM_PAINT command (No locking required)
-		BOOL PaintBlit(HDC destHdc, int destX, int destY, int sourceX, int sourceY, int sourceWidth, int sourceHeight, int dW = 0, int dH = 0);
+		bool PaintBlit(HDC destHdc, int destX, int destY, int sourceX, int sourceY, int sourceWidth, int sourceHeight, int dW = 0, int dH = 0);
 
 		// Surface info
 		BYTE* GetSurface(void);
@@ -105,10 +105,10 @@ class CreateDib
 		HPALETTE m_hPalette;
 		HPALETTE m_hOldPalette;
 
-		BOOL WorkingToDst();
+		bool WorkingToDst();
 };
 
-int SetClientSize(HWND hwnd, int w, int h);
+bool SetClientSize(HWND hwnd, int w, int h);
 	//It sucks that Windows doesn't have a function
 	//to do this, so I wrote one.  -Seumas
 	//Sets Client Area size to that specified.
@@ -119,7 +119,7 @@ int SetClientSize(HWND hwnd, int w, int h);
 	//It also sucks that Windows doesn't have a function
 	//to merely set the position of a window without having
 	//to specify its size too!
-int SetWindowPosition(HWND hwnd, int x, int y);
+bool SetWindowPosition(HWND hwnd, int x, int y);
 	//Oops, I geuss it does, if you send the right flags to SetWindowPos().
 	//Oh well.
 
