@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
 #include <time.h>
 #include <math.h>
 

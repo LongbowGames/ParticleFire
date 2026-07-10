@@ -21,6 +21,8 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "cdib.h"
 
+#include <cmath>
+
 CreateDib::CreateDib(void)
 {
 	m_hWnd = NULL;
@@ -357,7 +359,7 @@ int CreateDib::GetWidth(void){
 int CreateDib::GetHeight(void){
 	if(!m_hBitmap)
 		return 0;
-	return abs(m_dibInfo.bmiHead.biHeight);
+	return std::abs(m_dibInfo.bmiHead.biHeight);
 }
 //Function added by Seumas McNally.
 int CreateDib::GetPitch(void){

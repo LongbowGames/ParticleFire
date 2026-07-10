@@ -42,10 +42,7 @@
 //
 
 #include "Basis.h"
-//#include <math.h>
 #include <cmath>
-
-//using namespace std;
 
 #define ONEDIV256 0.00390625
 

@@ -118,6 +118,9 @@
     <ClInclude Include="src\BackBuffer\cdib.h">
       <Filter>Backbuffer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Tools\Image.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\LDA.ico">

@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
 #include <time.h>
 #include <stdio.h>
 
@@ -161,7 +163,7 @@ void ParticleRegistry::SaveOpts(bool resetOptions)
 //	error_print (buff);
 }
 
-void ParticleRegistry::RegistryWrite (wchar_t *buff, int num)
+void ParticleRegistry::RegistryWrite (const wchar_t *buff, int num)
 {
 	REG.WriteDword(buff, num);
 }

@@ -25,6 +25,7 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef BACKBUFFER_H
 #define BACKBUFFER_H
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <ddraw.h>
 #include "cdib.h"

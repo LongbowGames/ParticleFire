@@ -39,23 +39,14 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef IMAGE_H
 #define IMAGE_H
 
-
-//Disable exceptions not enabled warnings.
-#pragma warning( disable : 4530 )
-
 #include <new>
 #include <iostream>
 
-#if(_MSC_VER >= 1200)
-using namespace std;
-#endif
 
 #define VC_EXTRALEAN
 #define WIN32_EXTRA_LEAN
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-//#include <stdio>//.h>
-//#include <math.h>
 #include <cmath>
 #include <Quantizer.h>
 //Need TrueColorFormat definiton.
@@ -357,7 +348,7 @@ public:
 			return TRUE;
 		} else if(n > 1){
 			auto allocSize = size_t(n) - 1;
-			if((bmp = new(nothrow) Bitmap[allocSize])){
+			if((bmp = new(std::nothrow) Bitmap[allocSize])){
 				nBitmaps = n;
 				for(size_t  i = 0; i < allocSize; i++){
 					bmp[i].ppe = pe;
@@ -554,10 +545,10 @@ public:
 	int InitSet(int n){	//Ok, now InitSet does NOT harm the original bitmap!!
 		FreeSet();
 		if(n > 0){
-			if(names = new(nothrow) CStr[n]){
+			if(names = new(std::nothrow) CStr[n]){
 				if(n == 1) return TRUE;
 				if(n > 1){
-					if((img = new(nothrow) Image[n - 1])){
+					if((img = new(std::nothrow) Image[n - 1])) {
 						nImages = n;
 						return TRUE;
 					}

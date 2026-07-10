@@ -32,8 +32,6 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "CStr.h"
 
-using namespace std;
-
 const wchar_t CStr::Dummy = L'\0';
 
 wchar_t CStr::Playground[] = L"\0\0";

@@ -47,9 +47,6 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include "Quantizer.h"
 
-#if(_MSC_VER >= 1200)
-using namespace std;
-#endif
 
 #define SQR(a) ((a) * (a))
 
@@ -375,7 +372,7 @@ ColorOctree *ColorOctree::Add(PALETTEENTRY col){
 	}else{	//Nope, gotta keep diving.
 		int octant = Octant(col);	//Find octant we should dive into.
 		if(Next[octant] == NULL){	//No node, so make one.
-			Next[octant] = new (nothrow) ColorOctree(this, SplitPlane(octant), Size >>1);
+			Next[octant] = new (std::nothrow) ColorOctree(this, SplitPlane(octant), Size >>1);
 		}
 		if(Next[octant]) return Next[octant]->Add(col);
 		return NULL;

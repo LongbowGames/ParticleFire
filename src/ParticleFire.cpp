@@ -56,9 +56,14 @@ ParticleFire - November 12th 1998.
 #include <math.h>
 #include <time.h>
 #include <stdio.h>
+
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <commctrl.h>
 #include <Cdib.h>
+#include <commdlg.h>
+#include <shellapi.h>
+
 #include "ParticleFire.h"
 #include <Timer.h>
 #include <Basis.h>

@@ -31,7 +31,7 @@ public:
 	void LoadOpts();
 	void SaveOpts(bool resetOptions = false);
 
-	void RegistryWrite (wchar_t *buff, int num);
+	void RegistryWrite (const wchar_t *buff, int num);
 
 public:
 	ParticleContainer *parent;

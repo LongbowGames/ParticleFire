@@ -22,6 +22,7 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CREATEDIB_H
 #define CREATEDIB_H
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 
