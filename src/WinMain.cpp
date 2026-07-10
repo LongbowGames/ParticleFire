@@ -63,6 +63,8 @@ static void RunPreview(HWND hwndParent)
     GetClientRect(hwndParent, &rc);
 
     // Get DPI scale
+    // This is annoying. The size of this preview depends on the scale of the monitor that the preview opened on,
+    // and which monitor is the default.
     float scale = 1.0f;
     HMONITOR hMon = MonitorFromWindow(hwndParent, MONITOR_DEFAULTTONEAREST);
     UINT dpiX, dpiY;
@@ -70,6 +72,8 @@ static void RunPreview(HWND hwndParent)
     {
         scale = dpiX / 96.0f;
     }
+    UINT parentDpi = GetDpiForWindow(hwndParent);
+    scale /= parentDpi / 96.0f;
 
     int width = (int)((rc.right - rc.left) / scale);
     int height = (int)((rc.bottom - rc.top) / scale);
