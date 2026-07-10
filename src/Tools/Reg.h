@@ -30,34 +30,35 @@
 #ifndef REG_H
 #define REG_H
 
+#include <string>
+
 #define VC_EXTRALEAN
 #define WIN32_EXTRA_LEAN
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <CStr.h>
 
 class Registry{
 private:
-	wchar_t sKey[1024];
-	wchar_t sPrefix[1024];
-	HKEY hKey;
-	int LocalMachine;
+	std::wstring sKey;
+	std::wstring sPrefix;
+	HKEY hKey = nullptr;
+	bool LocalMachine = false;
 public:
-	Registry(const wchar_t *company, const wchar_t *title, int global = FALSE);	//Set global to TRUE to use HKEY_LOCAL_MACHINE instead of HKEY_CURRENT_USER.
-	~Registry();
-	int OpenKey();
-	int CloseKey();
-	int SetPrefix(const wchar_t *prefix);	//Sets a prefix which is prepended to all keys read or written, so you can easily create fake-subdirectories of keys.
-	int WriteDword(const wchar_t *name, unsigned long val);
-	int ReadDword(const wchar_t *name, unsigned long *val);
-	int ReadDword(const wchar_t *name, int *val){ return ReadDword(name, (unsigned long*)val); };
-	int WriteFloat(const wchar_t *name, float val);
-	int ReadFloat(const wchar_t *name, float *val);
-	int WriteString(const wchar_t *name, const wchar_t *val);
-	int ReadString(const wchar_t *name, wchar_t *val, int maxlen);
-	int ReadString(const wchar_t *name, CStr *str);
-	int SaveWindowPos(HWND hwnd, const wchar_t *name, bool Size = FALSE, bool Max = FALSE);	//Restore and save Widht and Height too?  (Not for Dialogs!!!)
-	int RestoreWindowPos(HWND hwnd, const wchar_t *name, bool Size = FALSE, bool Max = FALSE);	//Set MAx to TRUE to save/restore window's maximised state.
+	Registry(std::wstring_view company, std::wstring_view title, bool global = false);	//Set global to TRUE to use HKEY_LOCAL_MACHINE instead of HKEY_CURRENT_USER.
+	bool OpenKey();
+	bool CloseKey();
+	bool SetPrefix(std::wstring prefix);	//Sets a prefix which is prepended to all keys read or written, so you can easily create fake-subdirectories of keys.
+	bool WriteDword(const std::wstring& name, unsigned long val);
+	bool ReadDword(const std::wstring& name, unsigned long& val);
+	bool ReadDword(const std::wstring& name, long& val) { unsigned long ulVal; auto rc = ReadDword(name, ulVal); val = ulVal; return rc; };
+	bool ReadDword(const std::wstring& name, int& val) { unsigned long ulVal; auto rc = ReadDword(name, ulVal); val = ulVal; return rc; };
+	bool ReadDword(const std::wstring& name, bool& val) { unsigned long ulVal; auto rc = ReadDword(name, ulVal); val = ulVal; return rc; };
+	bool WriteFloat(const std::wstring& name, float val);
+	bool ReadFloat(const std::wstring& name, float& val);
+	bool WriteString(const std::wstring& name, const std::wstring& val);
+	bool ReadString(const std::wstring& name, std::wstring& val);
+	bool SaveWindowPos(HWND hwnd, const std::wstring& name, bool Size = false, bool Max = false);	//Restore and save Widht and Height too?  (Not for Dialogs!!!)
+	bool RestoreWindowPos(HWND hwnd, const std::wstring& ame, bool Size = false, bool Max = false);	//Set MAx to TRUE to save/restore window's maximised state.
 };
 
 #endif

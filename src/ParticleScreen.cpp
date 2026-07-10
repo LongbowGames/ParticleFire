@@ -588,10 +588,10 @@ void ParticleScreen::Palette(int ColorScheme)
 void ParticleScreen::LoadText ()
 {
 	// If there is a filename
-	if (wcscmp (parent->QuoteFilename, L"\0") )
+	if (parent->QuoteFilename.empty() )
 	{
 		FILE *fp;
-		fp = _wfopen (parent->QuoteFilename, L"r+, ccs=UTF-8");
+		fp = _wfopen (parent->QuoteFilename.c_str(), L"r+, ccs=UTF-8");
 		if (fp != NULL)
 		{
 			wchar_t buff[512];
@@ -620,11 +620,11 @@ void ParticleScreen::LoadText ()
 			fclose (fp);
 		}
 		else
-			wcscpy (parent->QuoteFilename, L"\0");
+			parent->QuoteFilename.clear();
 	}
 
 	// If the Quote filename is blank
-	if (!wcscmp (parent->QuoteFilename, L"\0") )
+	if (!parent->QuoteFilename.empty() )
 	{
 		// Set to pre-made quotes
 		this->RealQuotes = (wchar_t*) Quotes;

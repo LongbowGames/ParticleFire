@@ -154,7 +154,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR lpCmdLine, int)
         // Force System DPI for config dialog
         SetProcessDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);
         SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
-        HWND parent = GetForegroundWindow();
+        HWND parent = nullptr;
 
         c_pos += 2;
 
@@ -182,7 +182,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR lpCmdLine, int)
 
             while (*p == L' ') ++p; // trim whitespace
 
-            ULONG_PTR value = wcstoull(p, nullptr, 10);
+            auto value = wcstoull(p, nullptr, 10);
             HWND hwndParent = (HWND)value;
 
             RunPreview(hwndParent);

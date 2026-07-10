@@ -56,6 +56,7 @@ ParticleFire - November 12th 1998.
 #include <math.h>
 #include <time.h>
 #include <stdio.h>
+#include <string>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -69,7 +70,6 @@ ParticleFire - November 12th 1998.
 #include <Basis.h>
 #include <Reg.h>
 #include "resource.h"
-#include <CStr.h>
 
 // GH-Compiled list of defines
 #include "defines.h"
@@ -285,7 +285,7 @@ bool BrowseForFile ()
 	int RESULT;
 	RESULT = GetOpenFileName(&ofn);
 	if (RESULT == TRUE)
-		wcscpy (partFire.QuoteFilename, ofn.lpstrFile);
+		partFire.QuoteFilename = ofn.lpstrFile;
 
 /*	if (GetOpenFileName(&ofn)==TRUE) 
 		hf = CreateFile(ofn.lpstrFile, GENERIC_READ,
@@ -322,7 +322,7 @@ static void PopulateSettingsDialogFromState(HWND dlgwnd) {
 	//
 	SendDlgItemMessage(dlgwnd, IDC_CHECKMULTI, BM_SETCHECK, (partFire.screen.UseTrueColor ? BM_SETCHECK : FALSE), 0);
 	//
-	SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM)partFire.QuoteFilename);
+	SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM)partFire.QuoteFilename.c_str());
 	//
 	//
 	{	// Quote Text speed
@@ -439,7 +439,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 				case IDC_BUTTON_FIND_QUOTE_FILENAME:
 //					strcpy (partFire.QuoteFilename, "Filename Here");
 					BrowseForFile ();
-					SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM) partFire.QuoteFilename);
+					SendDlgItemMessage(dlgwnd, IDC_QUOTEFILENAME, WM_SETTEXT, 0, (LPARAM) partFire.QuoteFilename.c_str());
 					return TRUE;
 				case IDC_RESETDEFAULTS:
 					//

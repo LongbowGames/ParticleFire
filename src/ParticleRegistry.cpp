@@ -58,33 +58,25 @@ void ParticleRegistry::Init ()
 
 void ParticleRegistry::LoadOpts()
 {
-	char buff[255];
-	sprintf (buff, "%x\n%x", *((ULONG*)&parent->screen.CustomPE1), *((ULONG*)&parent->screen.CustomPE2) );
-//	error_print (buff);
-
-	REG.ReadDword(L"RandomTime", (ULONG*)&parent->particle.RANDEFFECT);
-	REG.ReadDword(L"GravityTime", (ULONG*)&parent->particle.GRAV_TIME);
-	REG.ReadDword(L"RandomColor", (ULONG*)&parent->screen.RandomColor);
-	REG.ReadDword(L"ColorScheme", (ULONG*)&parent->screen.ColorScheme);
-	REG.ReadDword(L"Particles", (ULONG*)&parent->particle.nParticles);
-	REG.ReadDword(L"CustomScheme", (ULONG*)&parent->screen.CustomScheme);
-	REG.ReadDword(L"CustomColor1", (ULONG*)&parent->screen.CustomPE1);
-	REG.ReadDword(L"CustomColor2", (ULONG*)&parent->screen.CustomPE2);
-	REG.ReadDword(L"ParticleStyle", (ULONG*)&parent->particle.ParticleStyle);
-	REG.ReadDword(L"WallStyle", (ULONG*)&parent->particle.WallStyle);
-	REG.ReadDword(L"BurnFade", (ULONG*)&parent->screen.BURNFADE);
-	REG.ReadDword(L"DisableText", (ULONG*)&parent->screen.DisableText);
-	REG.ReadDword(L"DisableFire", (ULONG*)&parent->screen.DisableFire);	// Using WallStyle now to do this
-	REG.ReadDword(L"CycleColors", (ULONG*)&parent->screen.CycleColors);
-	REG.ReadDword(L"UseTrueColor", (ULONG*)&parent->screen.UseTrueColor);
-	REG.ReadDword(L"QuoteTextSpeed", (ULONG*)&parent->screen.QuoteSecs);
-
-	sprintf (buff, "%x\n%x", *((ULONG*)&parent->screen.CustomPE1), *((ULONG*)&parent->screen.CustomPE2) );
-//	error_print (buff);
+	REG.ReadDword(L"RandomTime", parent->particle.RANDEFFECT);
+	REG.ReadDword(L"GravityTime", parent->particle.GRAV_TIME);
+	REG.ReadDword(L"RandomColor", parent->screen.RandomColor);
+	REG.ReadDword(L"ColorScheme", parent->screen.ColorScheme);
+	REG.ReadDword(L"Particles", parent->particle.nParticles);
+	REG.ReadDword(L"CustomScheme", parent->screen.CustomScheme);
+	REG.ReadDword(L"CustomColor1", (DWORD&)parent->screen.CustomPE1);
+	REG.ReadDword(L"CustomColor2", (DWORD&)parent->screen.CustomPE2);
+	REG.ReadDword(L"ParticleStyle", parent->particle.ParticleStyle);
+	REG.ReadDword(L"WallStyle", parent->particle.WallStyle);
+	REG.ReadDword(L"BurnFade", parent->screen.BURNFADE);
+	REG.ReadDword(L"DisableText", parent->screen.DisableText);
+	REG.ReadDword(L"DisableFire", parent->screen.DisableFire);	// Using WallStyle now to do this
+	REG.ReadDword(L"CycleColors", parent->screen.CycleColors);
+	REG.ReadDword(L"UseTrueColor", parent->screen.UseTrueColor);
+	REG.ReadDword(L"QuoteTextSpeed", parent->screen.QuoteSecs);
 
 	// Get the Quote String
-	CStr str;	REG.ReadString(L"QuoteFileName", &str);
-	wcscpy (parent->QuoteFilename, str.get() );
+	REG.ReadString(L"QuoteFileName", parent->QuoteFilename);
 	
 	parent->particle.RANDEFFECT = __max(parent->particle.RANDEFFECT, 1);
 	parent->particle.GRAV_TIME = __max(parent->particle.GRAV_TIME, 1);
@@ -97,12 +89,12 @@ void ParticleRegistry::LoadOpts()
 	//
 	// First Time Use
 	parent->screen.FirstUseTime = 0;
-	if(REG.ReadDword(L"Time", (ULONG*)&parent->screen.FirstUseTime) == FALSE && parent->screen.FirstUseTime <= 0){	//Write first-use-time.
+	if(REG.ReadDword(L"Time", parent->screen.FirstUseTime) == FALSE && parent->screen.FirstUseTime <= 0){	//Write first-use-time.
 		parent->screen.FirstUseTime = long(time(NULL));
 		REG.WriteDword(L"Time", parent->screen.FirstUseTime);
 	}
 	parent->screen.TotalSecs = 0;
-	REG.ReadDword(L"SecondsBlanked", (ULONG*)&parent->screen.TotalSecs);	//Total seconds of use.
+	REG.ReadDword(L"SecondsBlanked", parent->screen.TotalSecs);	//Total seconds of use.
 }
 
 void ParticleRegistry::SaveOpts(bool resetOptions)
@@ -135,8 +127,7 @@ void ParticleRegistry::SaveOpts(bool resetOptions)
 		parent->screen.UseTrueColor = 1;
 		parent->screen.QuoteSecs = 26;
 
-		//best way?
-		wcscpy(parent->QuoteFilename, L"\0");
+		parent->QuoteFilename.clear();
 	}
 
 	REG.WriteDword(L"RandomTime", parent->particle.RANDEFFECT);

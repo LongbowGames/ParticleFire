@@ -259,7 +259,6 @@
     <ClCompile Include="src\ParticleRegistry.cpp" />
     <ClCompile Include="src\ParticleScreen.cpp" />
     <ClCompile Include="src\Tools\Basis.cpp" />
-    <ClCompile Include="src\Tools\CStr.cpp" />
     <ClCompile Include="src\Tools\Image.cpp" />
     <ClCompile Include="src\Tools\neuquant.c" />
     <ClCompile Include="src\Tools\Quantizer.cpp" />
@@ -282,7 +281,6 @@
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\textStuff.h" />
     <ClInclude Include="src\Tools\Basis.h" />
-    <ClInclude Include="src\Tools\CStr.h" />
     <ClInclude Include="src\Tools\Image.h" />
     <ClInclude Include="src\Tools\neuquant.h" />
     <ClInclude Include="src\Tools\Reg.h" />

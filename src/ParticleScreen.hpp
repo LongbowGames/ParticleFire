@@ -18,6 +18,8 @@
 #ifndef PARTICLE_SCREEN_HPP
 #define PARTICLE_SCREEN_HPP
 
+#include <string>
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
@@ -28,7 +30,6 @@
 #include "Timer.h"
 #include "ParticleFire.h"
 #include "Basis.h"
-#include "CStr.h"
 
 #define MAX_PART 10000
 

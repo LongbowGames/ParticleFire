@@ -17,12 +17,12 @@
 
 #include <time.h>
 #include <math.h>
+#include <string>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>
 
-#include <CStr.h>
 #include "ParticleFire.h"
 #include <Timer.h>
 #include <Basis.h>
@@ -47,8 +47,6 @@ ParticleContainer::~ParticleContainer ()
 	
 void ParticleContainer::Init ()
 {
-	wcscpy (QuoteFilename, L"\0");
-
 	XMouse = 0;
 	YMouse = 0;
 

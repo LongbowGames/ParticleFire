@@ -39,8 +39,11 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <algorithm>
 #include <new>
 #include <iostream>
+#include <string>
+#include <vector>
 
 
 #define VC_EXTRALEAN
@@ -48,11 +51,10 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <cmath>
-#include <Quantizer.h>
+
+#include "Quantizer.h"
 //Need TrueColorFormat definiton.
-#include <BackBuffer.h>
-//Need dynamic strings too.
-#include <CStr.h>
+#include "BackBuffer.h"
 
 struct ARGB{
 	union{
@@ -504,142 +506,159 @@ public:
 //*******************************************************************
 class ImageSet : public Image {
 private:
-	Image *img;
-	CStr *names;
-	int nImages;
+	Image* img = nullptr;
+	std::vector<std::wstring> names;
+	size_t nImages = 1;
+
 public:
-	ImageSet(int n = 0) : img(NULL), names(NULL), nImages(1) {
+	ImageSet(size_t n = 0) {
 		if(n > 1) InitSet(n);
 	};
+
 	~ImageSet(){
 		Free();
 	};
-	ImageSet(const ImageSet &img) : img(NULL), names(NULL), nImages(1) {
+
+	ImageSet(const ImageSet &img) {
 		*this = img;
 	};
+
 	ImageSet &operator=(const ImageSet &img){
 		if(&img == this) return *this;
 		InitSet(img.Images());
-		for(int n = 0; n < img.Images(); n++) (*this)[n] = img[n];
-		if(names && img.names && nImages == img.Images()){
-			for(int n = 0; n < img.Images(); n++) names[n] = img.names[n];
-		}
+		for(size_t n = 0; n < img.Images(); n++) (*this)[n] = img[n];
+		names = img.names;
 		return *this;
 	};
-	Image &operator[](int n) const {
+
+	Image &operator[](size_t n) const {
 		if(n > 0 && n < nImages && img) return img[n - 1];
 		return *((Image*)this);
 	};
-	int Images() const { return nImages; };
+
+	size_t Images() const { return nImages; };
+
 	void FreeSet(){
 		if(img) delete [] img;
 		img = NULL;
-		if(names) delete [] names;
-		names = NULL;
+		names.clear();
 		nImages = 1;
 	};
+
 	void Free(){	//Argh, virtual is bad here!
 		FreeSet();
 		Image::Free();
 	};
-	int InitSet(int n){	//Ok, now InitSet does NOT harm the original bitmap!!
+
+	bool InitSet(size_t n){	//Ok, now InitSet does NOT harm the original bitmap!!
 		FreeSet();
 		if(n > 0){
-			if(names = new(std::nothrow) CStr[n]){
-				if(n == 1) return TRUE;
-				if(n > 1){
-					if((img = new(std::nothrow) Image[n - 1])) {
-						nImages = n;
-						return TRUE;
-					}
+			names.resize(n);
+			if(n == 1) return true;
+			if(n > 1){
+				if((img = new(std::nothrow) Image[n - 1])) {
+					nImages = n;
+					return true;
 				}
 			}
 		}
-		return FALSE;
+		return false;
 	};
-	CStr GetName(int n){
-		if(names && n >= 0 && n < nImages){
+
+	const std::wstring& GetName(size_t n){
+		if(n < names.size()){
 			return names[n];
 		}
-		return CStr();
+		return L"";
 	};
-	int SetName(int n, const wchar_t *s){
-		if(names && s && n >= 0 && n < nImages){
-			names[n] = s;
-			return TRUE;
+
+	bool SetName(size_t n, std::wstring s){
+		if(n < names.size()){
+			names[n] = std::move(s);
+			return true;
 		}
-		return FALSE;
+		return false;
 	};
-	Image *FindImage(const wchar_t *s){
-		if(names){
-			for(int n = 0; n < nImages; n++){
-				if(CmpLower(s, names[n])) return &(*this)[n];
-			}
+
+	Image* FindImage(std::wstring_view s){
+		for (size_t n = 0; n < nImages; n++) {
+			if(CmpLower(s, names[n]))
+				return &(*this)[n];
 		}
-		return NULL;
+
+		return nullptr;
 	};
-	int FindImageIndex(const wchar_t *s){
-		if(names){
-			for(int n = 0; n < nImages; n++){
-				if(CmpLower(s, names[n])) return n;
-			}
+
+	size_t FindImageIndex(const wchar_t *s){
+		for(size_t n = 0; n < nImages; n++){
+			if(CmpLower(s, names[n])) return n;
 		}
+
 		return -1;
 	};
+
 	int InitRemapTable(){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].InitRemapTable()) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].InitRemapTable()) return FALSE;
 		return TRUE;
 	};
 	int InitRemapTable(const PALETTEENTRY *newpe){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].InitRemapTable(newpe)) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].InitRemapTable(newpe)) return FALSE;
 		return TRUE;
 	};
 	int InitRemapTable(const InversePal *inv){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].InitRemapTable(inv)) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].InitRemapTable(inv)) return FALSE;
 		return TRUE;
 	};
 	int SetRemapTable(const unsigned char *rmp){	//rmp is 256 element array.
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].SetRemapTable(rmp)) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].SetRemapTable(rmp)) return FALSE;
 		return TRUE;
 	};
 	int Remap(const PALETTEENTRY *newpe = NULL){	//Remaps actual image bits of all contained Bitmaps.
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].Remap(newpe)) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].Remap(newpe)) return FALSE;
 		return TRUE;
 	};
 	int Remap(const InversePal *inv){	//Remaps actual image bits of all contained Bitmaps.
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].Remap(inv)) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].Remap(inv)) return FALSE;
 		return TRUE;
 	};
 	int RotateRight90(){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].RotateRight90()) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].RotateRight90()) return FALSE;
 		return TRUE;
 	};
 	int RotateLeft90(){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].RotateLeft90()) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].RotateLeft90()) return FALSE;
 		return TRUE;
 	};
 	int ScaleToPow2(){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].ScaleToPow2()) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].ScaleToPow2()) return FALSE;
 		return TRUE;
 	};
 	int AnalyzeLines(){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].AnalyzeLines()) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].AnalyzeLines()) return FALSE;
 		return TRUE;
 	};
 	int MakeMipMap(MixTable *Mix, int mixmode = MIX50, int trans = 0){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].MakeMipMap(Mix, mixmode, trans)) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].MakeMipMap(Mix, mixmode, trans)) return FALSE;
 		return TRUE;
 	};
 	int InitTCRemapTable(TrueColorFormat *tcf){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].InitTCRemapTable(tcf)) return FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].InitTCRemapTable(tcf)) return FALSE;
 		return TRUE;
 	};
 	int CacheTrueColor(TrueColorFormat *tcf){
-		for(int n = 0; n < nImages; n++) if(NULL == (*this)[n].CacheTrueColor(tcf)) return FALSE;//ret = FALSE;
+		for(size_t n = 0; n < nImages; n++) if(NULL == (*this)[n].CacheTrueColor(tcf)) return FALSE;//ret = FALSE;
 		return TRUE;
 	};
 	int LoadSet(FILE *f);
 	int LoadSet(const char *n);
+
+private:
+	bool CmpLower(std::wstring_view a, std::wstring_view b) {
+		return std::ranges::equal(a, b, {},
+			[](wchar_t c) { return std::tolower(c); },
+			[](wchar_t c) { return std::tolower(c); }
+		);
+	}
 };
 
 #endif

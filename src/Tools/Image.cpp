@@ -1048,7 +1048,7 @@ int ImageSet::LoadSet(FILE *f){
 			for(i = 0; i < nImg; i++){
 				pos = int(ReadLong(f));	//Size of name.
 				fread(buf, __min(sizeof(buf) - 1, pos), 1, f);
-				if(names && i < nImages) names[i] = buf;	//Set the name.
+				if(size_t(i) < names.size()) names[i] = buf;	//Set the name.
 				ip = &((*this)[i]);
 				w = int(ReadLong(f));
 				h = int(ReadLong(f));

@@ -41,7 +41,7 @@ public:
 	ParticleParticle particle;
 
 	// Local vars
-	wchar_t QuoteFilename[255];			// Quotes filename
+	std::wstring QuoteFilename;			// Quotes filename
 
 	// System
 	int XMouse;
