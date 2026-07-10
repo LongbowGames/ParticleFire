@@ -138,18 +138,32 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR lpCmdLine, int)
 
     RegisterClassW(&wc);
 
-    std::wstring cmd = lpCmdLine ? lpCmdLine : L"";
+    std::wstring cmd = lpCmdLine ? lpCmdLine : GetCommandLineW();
 
     // lowercase for simple parsing
     for (auto& c : cmd) c = towlower(c);
 
-    if (cmd.find(L"/c") != std::wstring::npos)
+    auto c_pos = cmd.find(L"/c");
+    if (c_pos != std::wstring::npos)
     {
         // Force System DPI for config dialog
         SetProcessDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);
         SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
-
         HWND parent = GetForegroundWindow();
+
+        c_pos += 2;
+
+        if (c_pos <= cmd.length() && cmd[c_pos] == L':') {
+            auto parentParam = cmd.substr(c_pos+1);
+
+            try {
+                parent = HWND(std::stoll(parentParam));
+            }
+            catch (...) {
+                // Ignore and default to foreground window
+            }
+        }
+
         RunConfig(parent);
         return 0;
     }
