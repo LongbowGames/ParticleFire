@@ -67,7 +67,8 @@ public:
 	float IdentityAngle;
 
 	// Particle style info
-	int ParticleStyle, WallStyle;
+	int ParticleStyle;
+	EWallStyle WallStyle;
 	int ZMoveSpeed;
 
 	// Particle style info
@@ -77,7 +78,7 @@ public:
 	bool AltColor;
 
 	// Particle
-	int				NoiseBurn;
+	EWallStyle		NoiseBurn;
 	bool			Follow, MultipleFollow, UseGravity;
 	bool			fullscreen, Stretch, Explode, Attract;
 	bool			SwitchMode, ShakeUp, Freeze, UseRandom;

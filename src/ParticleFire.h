@@ -43,14 +43,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 void DoFrame();
 
 #define NUMSCHEMES 6
-const wchar_t ColorName[NUMSCHEMES][100] = {
-	L"Fiery Orange",
-	L"Skyish Teal",
-	L"Velvet Blue",
-	L"Slimy Green",
-	L"Burning Pink",
-	L"Flaming Metal"
-};
+extern const wchar_t* ColorName[NUMSCHEMES];
 
 enum {
 	STYLE_NORMAL = 0,
@@ -63,7 +56,6 @@ enum {
 	STYLE_WORMS,
 	STYLE_GALATIC_STORM,
 	STYLE_PIXIE_DUST,
-//	STYLE_GEOFF,
 	NUMSTYLES,
 };
 
@@ -72,21 +64,9 @@ enum {
 	STYLE_GEOFF = 42000,
 };
 
-const wchar_t StyleName[NUMSTYLES][100] = {
-	L"Random",
-	L"StarField",
-	L"Explosive",
-	L"Rings",
-	L"Spirals",
-	L"Popcorn",
-	L"Rainbow Hole",
-	L"Worms",
-	L"Galactic Storm",
-	L"Pixie Dust"//,
-//	L"Geoff"
-};
+extern const wchar_t* StyleName[NUMSTYLES];
 
-enum {
+enum EWallStyle {
 	STYLE_WALL_NORMAL = 0,
 	STYLE_WALL_RAINBOW,
 	STYLE_WALL_SMOKE,
@@ -94,12 +74,7 @@ enum {
 	NUMSTYLEWALLS,
 };
 
-const wchar_t StyleWallName[NUMSTYLEWALLS][100] = {
-	L"Random",
-	L"Rainbow",
-	L"Smoke",
-	L"None"
-};
+extern const wchar_t* StyleWallName[NUMSTYLEWALLS];
 
 #endif
 

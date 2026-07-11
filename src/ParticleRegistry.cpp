@@ -67,7 +67,7 @@ void ParticleRegistry::LoadOpts()
 	REG.ReadDword(L"CustomColor1", (DWORD&)parent->screen.CustomPE1);
 	REG.ReadDword(L"CustomColor2", (DWORD&)parent->screen.CustomPE2);
 	REG.ReadDword(L"ParticleStyle", parent->particle.ParticleStyle);
-	REG.ReadDword(L"WallStyle", parent->particle.WallStyle);
+	REG.ReadDword(L"WallStyle", (int&)parent->particle.WallStyle);
 	REG.ReadDword(L"BurnFade", parent->screen.BURNFADE);
 	REG.ReadDword(L"DisableText", parent->screen.DisableText);
 	REG.ReadDword(L"DisableFire", parent->screen.DisableFire);	// Using WallStyle now to do this
@@ -84,9 +84,8 @@ void ParticleRegistry::LoadOpts()
 	parent->particle.nParticles = std::min(parent->particle.nParticles, MAX_PART);
 
 	// Bound the Wall Styles
-	parent->particle.WallStyle = std::min (parent->particle.WallStyle, int(NUMSTYLEWALLS));
-	parent->particle.WallStyle = std::max (parent->particle.WallStyle, 0);
-	//
+	parent->particle.WallStyle = EWallStyle(std::max(0, std::min(int(parent->particle.WallStyle), int(NUMSTYLEWALLS))));
+	
 	// First Time Use
 	parent->screen.FirstUseTime = 0;
 	if(REG.ReadDword(L"Time", parent->screen.FirstUseTime) == false && parent->screen.FirstUseTime <= 0){	//Write first-use-time.
@@ -119,7 +118,7 @@ void ParticleRegistry::SaveOpts(bool resetOptions)
 		parent->screen.CustomPE2.peFlags = 0;
 
 		parent->particle.ParticleStyle = 0;
-		parent->particle.WallStyle = 0;
+		parent->particle.WallStyle = STYLE_WALL_RAINBOW;
 		parent->screen.BURNFADE = 3;
 		parent->screen.DisableText = 1;
 		parent->screen.DisableFire = false; // Using WallStyle now to disable Wall Fire 

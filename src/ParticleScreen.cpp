@@ -151,7 +151,7 @@ void ParticleScreen::InitScreen (HWND hwnd)
 	//
 	parent->particle.Follow = rand() & 1;
 	parent->particle.MultipleFollow = rand() & 1;
-	parent->particle.NoiseBurn = rand() & 1;
+	parent->particle.NoiseBurn = EWallStyle(rand() % 3 + STYLE_WALL_RAINBOW);
 	parent->particle.UseGravity = rand() & 1;
 	//
 	SetupFont((35 * WIDTH) / 640);
@@ -995,7 +995,7 @@ void ParticleScreen::SeedWall ()
 	if(!DisableFire)
 	{
 		static float flamenoisey = 0.0f;
-		if((parent->particle.WallStyle == STYLE_WALL_NORMAL && parent->particle.NoiseBurn == 1) || parent->particle.WallStyle == STYLE_WALL_SMOKE)
+		if((parent->particle.WallStyle == STYLE_WALL_NORMAL && parent->particle.NoiseBurn == STYLE_WALL_SMOKE) || parent->particle.WallStyle == STYLE_WALL_SMOKE)
 		{
 			// Smoke wall
 			flamenoisey += FlameSpeed;
@@ -1004,7 +1004,7 @@ void ParticleScreen::SeedWall ()
 				*(tdata + x) = 64 + (unsigned char)(basis->Noise((float)x * FlameSpeed, flamenoisey, 2) * 191.0);
 			}
 		}
-		else if((parent->particle.WallStyle == STYLE_WALL_NORMAL && parent->particle.NoiseBurn == -1) || parent->particle.WallStyle == STYLE_WALL_NONE)
+		else if((parent->particle.WallStyle == STYLE_WALL_NORMAL && parent->particle.NoiseBurn == STYLE_WALL_NONE) || parent->particle.WallStyle == STYLE_WALL_NONE)
 		{
 			// No wall
 			for(x = BXOFF*pitchBit; x < WIDTH*pitchBit - BXOFF*pitchBit; x++)

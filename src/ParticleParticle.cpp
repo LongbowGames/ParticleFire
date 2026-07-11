@@ -53,7 +53,7 @@ void ParticleParticle::Init ()
 
 	IdentityAngle = 3.0f;
 	ParticleStyle = 0;
-	WallStyle = 0;
+	WallStyle = STYLE_WALL_NORMAL;
 	ZMoveSpeed = 2;
 	//Number of particles.
 	nParticles = 2000;
@@ -63,7 +63,7 @@ void ParticleParticle::Init ()
 	RANDEFFECT = 75;
 	AltColor = false;
 
-	NoiseBurn = 0;
+	NoiseBurn = STYLE_WALL_RAINBOW;
 	Follow = true; MultipleFollow = true; UseGravity = true;
 	fullscreen = true; Stretch = true; Explode = true; Attract = true;
 	SwitchMode = false; ShakeUp = false; Freeze = false; UseRandom = true;
@@ -131,7 +131,7 @@ void ParticleParticle::SetMode (int mode)
 void ParticleParticle::Frame_Starfield ()
 {
 	// Turn off the Wall of Fire for the starfield
-	NoiseBurn = -1;
+	NoiseBurn = STYLE_WALL_NONE;
 
 	static int starsinit = 0;
 
@@ -206,13 +206,13 @@ void ParticleParticle::Frame_Gravity ()
 			// Randomly modify the effects and styles
 			switch(rand() % 7)
 			{
-				case 0 : ShakeUp = true;					break;	// Modifier
-				case 1 : Freeze = true;						break;	// Modifier
-				case 2 : Comet = true;						break;
-				case 3 : Follow = !Follow;					break;	// Modifier
-				case 4 : MultipleFollow = !MultipleFollow;	break;	// Modifier
-				case 5 : NoiseBurn = rand()%3 - 1;			break;	// Modifier
-				case 6 : UseGravity = !UseGravity;			break;	// Modifier
+				case 0 : ShakeUp = true;										break;	// Modifier
+				case 1 : Freeze = true;											break;	// Modifier
+				case 2 : Comet = true;											break;
+				case 3 : Follow = !Follow;										break;	// Modifier
+				case 4 : MultipleFollow = !MultipleFollow;						break;	// Modifier
+				case 5 : NoiseBurn = EWallStyle(rand()%3 + STYLE_WALL_RAINBOW);	break;	// Modifier
+				case 6 : UseGravity = !UseGravity;								break;	// Modifier
 			}
 
 		} // End, Randomly change things

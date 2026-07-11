@@ -86,9 +86,6 @@ int CycleFrameDelay = 10;
 #include "ParticleContainer.hpp"
 ParticleContainer partFire;
 
-
-//#include <ddraw.h>
-//LPDIRECTDRAW m_lpDD = NULL;
 HWND m_hWnd = NULL;
 
 BOOL WINAPI RegisterDialogClasses(HANDLE hInst){
@@ -108,6 +105,36 @@ TEXTMETRIC tm;
 #ifdef COUNTQUOTE
 int QuoteCount[1000];
 #endif
+
+const wchar_t* ColorName[NUMSCHEMES] = {
+	L"Fiery Orange",
+	L"Skyish Teal",
+	L"Velvet Blue",
+	L"Slimy Green",
+	L"Burning Pink",
+	L"Flaming Metal"
+};
+
+const wchar_t* StyleName[NUMSTYLES] = {
+	L"Random",
+	L"StarField",
+	L"Explosive",
+	L"Rings",
+	L"Spirals",
+	L"Popcorn",
+	L"Rainbow Hole",
+	L"Worms",
+	L"Galactic Storm",
+	L"Pixie Dust"
+	//, L"Geoff"
+};
+
+const wchar_t* StyleWallName[NUMSTYLEWALLS] = {
+	L"Random",
+	L"Rainbow",
+	L"Smoke",
+	L"None"
+};
 
 // For testing out stuff or gathering errors
 void error_print (char *buff)
@@ -476,7 +503,7 @@ BOOL CALLBACK ScreenSaverConfigureDialog(HWND dlgwnd, UINT iMsg, WPARAM wParam, 
 
 				case IDC_COMBOSTYLE2 :
 					if(code == CBN_SELCHANGE){
-						partFire.particle.WallStyle = int(SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_GETCURSEL, 0, 0));
+						partFire.particle.WallStyle = EWallStyle(int(SendDlgItemMessage(dlgwnd, IDC_COMBOSTYLE2, CB_GETCURSEL, 0, 0)));
 					}
 					return TRUE;
 				}
