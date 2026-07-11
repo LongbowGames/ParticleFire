@@ -777,8 +777,8 @@ void ParticleScreen::DrawParticles ()
 		{
 			adx = parent->p[i].ax - parent->p[i].x;
 			ady = parent->p[i].ay - parent->p[i].y;
-			dist = sqrt(adx * adx + ady * ady);
-			dist2 = sqrt(parent->p[i].dx * parent->p[i].dx + parent->p[i].dy * parent->p[i].dy);
+			dist = sqrtf(adx * adx + ady * ady);
+			dist2 = sqrtf(parent->p[i].dx * parent->p[i].dx + parent->p[i].dy * parent->p[i].dy);
 			if(dist == 0.0f) dist = 2.0f;
 			if(dist2 == 0.0f) dist2 = 2.0f;
 
@@ -788,7 +788,7 @@ void ParticleScreen::DrawParticles ()
 			}
 			else
 			{
-				ang = atan2(parent->p[i].dy, parent->p[i].dx);
+				ang = atan2f(parent->p[i].dy, parent->p[i].dx);
 			}
 			//
 			if(adx == 0.0f && ady == 0.0f)
@@ -797,15 +797,15 @@ void ParticleScreen::DrawParticles ()
 			}
 			else
 			{
-				angd = atan2(ady, adx) - ang;
+				angd = atan2f(ady, adx) - ang;
 			}
 			//
 			if(angd > 3.14159f) angd -= 3.14159f * 2.0f;
 			if(angd < -3.14159f) angd += 3.14159f * 2.0f;
 			ang += angd * 0.05f;
 
-			parent->p[i].dx = cos(ang) * dist2;
-			parent->p[i].dy = sin(ang) * dist2;
+			parent->p[i].dx = cosf(ang) * dist2;
+			parent->p[i].dy = sinf(ang) * dist2;
 		}
 		parent->p[i].x += parent->p[i].dx;
 		parent->p[i].y += parent->p[i].dy;
@@ -813,7 +813,7 @@ void ParticleScreen::DrawParticles ()
 		if(parent->p[i].x < XOFF)
 		{
 			parent->p[i].x = (float)XOFF;
-			parent->p[i].dx = fabs(parent->p[i].dx) * BOUNCE;
+			parent->p[i].dx = fabsf(parent->p[i].dx) * BOUNCE;
 			parent->p[i].dy += frand(KICK_STRENGTH);
 			if(parent->particle.AltColor) parent->p[i].color = std::min(254, parent->p[i].color + 32);
 
@@ -821,21 +821,21 @@ void ParticleScreen::DrawParticles ()
 		if(parent->p[i].x >= WIDTH - XOFF)
 		{
 			parent->p[i].x = (float)(WIDTH - XOFF - 1);
-			parent->p[i].dx = -fabs(parent->p[i].dx) * BOUNCE;
+			parent->p[i].dx = -fabsf(parent->p[i].dx) * BOUNCE;
 			parent->p[i].dy += frand(KICK_STRENGTH);
 			if(parent->particle.AltColor) parent->p[i].color = std::min(254, parent->p[i].color + 32);
 		}
 		if(parent->p[i].y < YOFF)
 		{
 			parent->p[i].y = (float)YOFF;
-			parent->p[i].dy = fabs(parent->p[i].dy) * BOUNCE;
+			parent->p[i].dy = fabsf(parent->p[i].dy) * BOUNCE;
 			parent->p[i].dx += frand(KICK_STRENGTH);
 			if(parent->particle.AltColor) parent->p[i].color = std::min(254, parent->p[i].color + 32);
 		}
 		if(parent->p[i].y >= HEIGHT - YOFF)
 		{
 			parent->p[i].y = (float)(HEIGHT - YOFF - 1);
-			parent->p[i].dy = -fabs(parent->p[i].dy) * BOUNCE;
+			parent->p[i].dy = -fabsf(parent->p[i].dy) * BOUNCE;
 			parent->p[i].dx += frand(KICK_STRENGTH);
 			if(parent->particle.AltColor) parent->p[i].color = std::min(254, parent->p[i].color + 32);
 		}
@@ -861,7 +861,7 @@ void ParticleScreen::DrawParticles ()
 
 				if(UseTrueColor)
 				{
-					data2 = data + (x <<2 ) + y * pitch;// + (i % 3);
+					data2 = data + (x * 4) + y * pitch;// + (i % 3);
 				}
 				else
 				{
@@ -911,7 +911,7 @@ void ParticleScreen::DrawParticles ()
 				d = j = -dy; e = abs(dx);
 				if(UseTrueColor)
 				{
-					data2 = data + (x <<2) + y * pitch;// + (i % 3);
+					data2 = data + (x * 4) + y * pitch;// + (i % 3);
 				}
 				else
 				{
