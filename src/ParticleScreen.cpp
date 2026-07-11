@@ -76,7 +76,7 @@ void ParticleScreen::Init ()
 	CustomPE1.peRed = 220;	CustomPE1.peGreen = 220;	CustomPE1.peBlue = 255;	CustomPE1.peFlags = 0;
 	CustomPE2.peRed = 255;	CustomPE2.peGreen = 255;CustomPE2.peBlue = 255;	CustomPE2.peFlags = 0;
 
-	DisableFire = 0;
+	DisableFire = false;
 
 	FirstUseTime = 0;
 	SecsStart = 0;

@@ -58,6 +58,12 @@ public:
 	//individual cells different shades.
 	FeaturePoint *Cellular(float x, float y, int nth = 1, float irreg = 1.0, int xrpt = 0, int yrpt = 0, int manhattan = 0);
 
+	//Generate fractal noise
+	//Uses smoothed bilinear interpolation, a cheap approximation of Perlin.
+	// x, y: the x and y coords to sample in the 2D noise texture
+	// octaves: the frequency of the noise: higher = more roughness
+	// xrpt/yrpt: the repeat period. Set to 0 for infinite, non-repeating noise.
+	// Returns a value from 0.0f to 1.0f.
 	float Noise(float x, float y, int octaves = 0, int xrpt = 0, int yrpt = 0);
 };
 

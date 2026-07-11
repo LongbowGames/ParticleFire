@@ -55,12 +55,12 @@ void ParticleParticle::Init ()
 	ParticleStyle = 0;
 	WallStyle = 0;
 	ZMoveSpeed = 2;
-//Number of particles.
-	nParticles = 2000;//500;
-//Number of seconds between gravity direction shifts.
-	GRAV_TIME = 50;//60;
-//One in X chance of an effect happening every second.
-	RANDEFFECT = 75;//8;
+	//Number of particles.
+	nParticles = 2000;
+	//Number of seconds between gravity direction shifts.
+	GRAV_TIME = 50;
+	//One in X chance of an effect happening every second.
+	RANDEFFECT = 75;
 	AltColor = false;
 
 	NoiseBurn = 0;
@@ -204,7 +204,6 @@ void ParticleParticle::Frame_Gravity ()
 		if((rand() ) % RANDEFFECT == 0)
 		{
 			// Randomly modify the effects and styles
-//			switch((rand() >>3) % 17)
 			switch(rand() % 7)
 			{
 				case 0 : ShakeUp = true;					break;	// Modifier

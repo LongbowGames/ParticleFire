@@ -122,7 +122,7 @@ void ParticleRegistry::SaveOpts(bool resetOptions)
 		parent->particle.WallStyle = 0;
 		parent->screen.BURNFADE = 3;
 		parent->screen.DisableText = 1;
-		parent->screen.DisableFire = 0; // Using WallStyle now to disable Wall Fire 
+		parent->screen.DisableFire = false; // Using WallStyle now to disable Wall Fire 
 		parent->screen.CycleColors = 1;
 		parent->screen.UseTrueColor = 1;
 		parent->screen.QuoteSecs = 26;

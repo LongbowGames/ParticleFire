@@ -94,7 +94,7 @@ public:
 	// Particle style info
 	int BURNFADE;
 	PALETTEENTRY CustomPE1, CustomPE2;
-	int DisableFire;
+	bool DisableFire;
 
 	// Screen
 	int WIDTH, HEIGHT;
