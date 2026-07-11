@@ -50,15 +50,6 @@ void ParticleContainer::Init ()
 	XMouse = 0;
 	YMouse = 0;
 
-//	TimeStart; Time; LastTime;		// Not init'd
-
-//	p;				// Not init'd
-//	pe; cf; ct;		// Not init'd
-
-	// Clear before setting
-	tdata = NULL;
-	tdata2 = NULL;
-
 	// Save parent pointers for sub-classes
 	this->screen.parent = this;
 	this->particle.parent = this;

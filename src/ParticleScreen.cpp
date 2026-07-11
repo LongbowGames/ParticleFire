@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <algorithm>
+
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
 #include "commdlg.h"
@@ -270,13 +272,13 @@ void ParticleScreen::Draw ()
 						lptr++;
 					}
 					if(y & 1){
-						parent->tdata = (unsigned char*)bdescdata + y * bdescpitch + BXOFF;
+						unsigned char* tdata = (unsigned char*)bdescdata + y * bdescpitch + BXOFF;
 						if(y > BYOFF && y < HEIGHT - BYOFF - 1){	//Keeps boost splatter off edges.
-							parent->tdata2 = parent->tdata + 1 + (rand() % (bWIDTH - BXOFF * 2 - 2));
-							if(*parent->tdata2 > 32 && *parent->tdata2 < 128){
-								*(parent->tdata2 + 1) = *(parent->tdata2 - 1) =
-								*(parent->tdata2 + bdescpitch) = *(parent->tdata2 - bdescpitch) = 
-								__min(*parent->tdata2 << 1, 255);
+							unsigned char* tdata2 = tdata + 1 + (rand() % (bWIDTH - BXOFF * 2 - 2));
+							if(*tdata2 > 32 && *tdata2 < 128){
+								*(tdata2 + 1) = *(tdata2 - 1) =
+								*(tdata2 + bdescpitch) = *(tdata2 - bdescpitch) = 
+								std::min(*tdata2 << 1, 255);
 							}
 						}
 					}
@@ -301,13 +303,13 @@ void ParticleScreen::Draw ()
 						lptr++;
 					}
 					if(y & 1){
-						parent->tdata = (unsigned char*)bdescdata + y * bdescpitch + BXOFF;
+						unsigned char* tdata = (unsigned char*)bdescdata + y * bdescpitch + BXOFF;
 						if(y > BYOFF && y < HEIGHT - BYOFF - 1){	//Keeps boost splatter off edges.
-							parent->tdata2 = parent->tdata + 1 + (rand() % (bWIDTH - BXOFF * 2 - 2));
-							if(*parent->tdata2 > 32 && *parent->tdata2 < 128){
-								*(parent->tdata2 + 1) = *(parent->tdata2 - 1) =
-								*(parent->tdata2 + bdescpitch) = *(parent->tdata2 - bdescpitch) = 
-								__min(*parent->tdata2 << 1, 255);
+							unsigned char* tdata2 = tdata + 1 + (rand() % (bWIDTH - BXOFF * 2 - 2));
+							if(*tdata2 > 32 && *tdata2 < 128){
+								*(tdata2 + 1) = *(tdata2 - 1) =
+								*(tdata2 + bdescpitch) = *(tdata2 - bdescpitch) = 
+								std::min(*tdata2 << 1, 255);
 							}
 						}
 					}
@@ -1055,16 +1057,16 @@ void ParticleScreen::SeedWall ()
 
 	int pitchBit = dib.Pitch() / dib.Width();
 
-//
+	unsigned char* tdata;
 
 	if(parent->particle.BurnDown)
 	{
-		parent->tdata = (unsigned char*)bdescdata + (BYOFF) * bdescpitch;
+		tdata = (unsigned char*)bdescdata + (BYOFF) * bdescpitch;
 		memset((unsigned char*)bdescdata + (HEIGHT - BYOFF) * bdescpitch, 0, bdescwidth * pitchBit);
 	}
 	else
 	{
-		parent->tdata = (unsigned char*)bdescdata + (HEIGHT - BYOFF) * bdescpitch;
+		tdata = (unsigned char*)bdescdata + (HEIGHT - BYOFF) * bdescpitch;
 		memset((unsigned char*)bdescdata + (BYOFF) * bdescpitch, 0, bdescwidth * pitchBit);
 	}
 	
@@ -1078,7 +1080,7 @@ void ParticleScreen::SeedWall ()
 			flamenoisey += FlameSpeed;
 			for(x = BXOFF*pitchBit; x < WIDTH*pitchBit - BXOFF*pitchBit; x++)
 			{
-				*(parent->tdata + x) = 64 + (unsigned char)(basis->Noise((float)x * FlameSpeed, flamenoisey, 2) * 191.0);
+				*(tdata + x) = 64 + (unsigned char)(basis->Noise((float)x * FlameSpeed, flamenoisey, 2) * 191.0);
 			}
 		}
 		else if((parent->particle.WallStyle == STYLE_WALL_NORMAL && parent->particle.NoiseBurn == -1) || parent->particle.WallStyle == STYLE_WALL_NONE)
@@ -1086,7 +1088,7 @@ void ParticleScreen::SeedWall ()
 			// No wall
 			for(x = BXOFF*pitchBit; x < WIDTH*pitchBit - BXOFF*pitchBit; x++)
 			{
-				*(parent->tdata + x) = 0;
+				*(tdata + x) = 0;
 			}
 		}
 		else if (parent->particle.WallStyle != STYLE_WALL_NONE)
@@ -1095,14 +1097,14 @@ void ParticleScreen::SeedWall ()
 			y = rand() & 255;
 			for(x = BXOFF*pitchBit; x < WIDTH*pitchBit - BXOFF*pitchBit; x++)
 			{
-				if(*(parent->tdata + x))
+				if(*(tdata + x))
 				{
-					y = *(parent->tdata + x);
+					y = *(tdata + x);
 				}
 				y += rand() % 65 - 32;
 				if(y < 0) y = 0;
 				if(y > 254) y = 254;
-				*(parent->tdata + x) = y;
+				*(tdata + x) = y;
 			}
 		}
 	} // End, If the Fire isnt Disabled

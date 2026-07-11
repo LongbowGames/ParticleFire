@@ -53,9 +53,6 @@ public:
 	// Particles
 	Particle		p[MAX_PART];
 	PALETTEENTRY	pe[256], cf[256], ct[256];
-
-	// Global shared between Particle and Drawing
-	unsigned char *tdata, *tdata2;
 };
 
 #endif
