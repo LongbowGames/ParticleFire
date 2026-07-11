@@ -39,9 +39,6 @@
     <ClCompile Include="src\Tools\Basis.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tools\Image.cpp">
-      <Filter>Tools</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tools\neuquant.c">
       <Filter>Tools</Filter>
     </ClCompile>
@@ -111,9 +108,6 @@
     </ClInclude>
     <ClInclude Include="src\BackBuffer\cdib.h">
       <Filter>Backbuffer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tools\Image.h">
-      <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

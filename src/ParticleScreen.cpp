@@ -24,8 +24,6 @@
 #include "ParticleScreen.hpp"
 #include "ParticleContainer.hpp"
 
-#include "image.h"		// ToolsLib
-
 // For parent-> vars
 #include "ParticleParticle.hpp"
 
