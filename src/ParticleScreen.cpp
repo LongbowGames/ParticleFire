@@ -1015,7 +1015,7 @@ void ParticleScreen::SeedWall ()
 		else if (parent->particle.WallStyle != STYLE_WALL_NONE)
 		{
 			// Rainbow wall
-			y = rand() & 255;
+			y = rand() % 255;
 			for(x = BXOFF*pitchBit; x < WIDTH*pitchBit - BXOFF*pitchBit; x++)
 			{
 				if(*(tdata + x))
