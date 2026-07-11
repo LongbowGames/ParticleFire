@@ -199,7 +199,7 @@ LRESULT CALLBACK ScreenSaverProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			}
 			//
 			Frames++;
-			if(partFire.screen.CycleColors && Frames % __max(1, (partFire.screen.UseTrueColor ? CycleFrameDelay / 4 : CycleFrameDelay)) == 0){
+			if(partFire.screen.CycleColors && Frames % std::max(1, (partFire.screen.UseTrueColor ? CycleFrameDelay / 4 : CycleFrameDelay)) == 0){
 				CycleT += 0.01f;
 				if(CycleT >= 1.0f){
 					memcpy(partFire.cf, partFire.pe, sizeof(partFire.pe));	//Put current colors in from spot.

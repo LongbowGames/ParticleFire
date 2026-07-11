@@ -504,7 +504,7 @@ public:
 	};
 
 	bool MakeMipMap(MixTable *Mix, int mixmode = MIX50, int trans = 0){
-		if(InitSet(HiBit(__max(Width(), Height())))){
+		if(InitSet(HiBit(std::max(Width(), Height())))){
 			for(int n = 1; n < nBitmaps; n++) if(NULL == (*this)[n].MakeMipMap(&(*this)[n - 1], Mix, mixmode, trans)) return false;
 			return true;
 		}

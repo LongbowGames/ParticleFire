@@ -158,7 +158,7 @@ void ParticleParticle::Frame_Starfield ()
 		//
 		if(parent->p[i].color > 255)
 		{// || fabs(lx) > 1.0f || fabs(ly) > 1.0f){
-			parent->p[i].color = __max(0, parent->p[i].color - 255);
+			parent->p[i].color = std::max(0, parent->p[i].color - 255);
 			parent->p[i].SetTrueColor(parent->pe);
 			//
 			parent->p[i].ax = frand(1.0f);
@@ -493,8 +493,8 @@ void ParticleParticle::Do_Explode ()
 		}
 		else
 		{
-			ex = (float)__min(__max(ExplodeX, XOFF), parent->screen.WIDTH - XOFF - 1);
-			ey = (float)__min(__max(ExplodeY, YOFF), parent->screen.HEIGHT - YOFF - 1);
+			ex = (float)std::min(std::max(ExplodeX, XOFF), parent->screen.WIDTH - XOFF - 1);
+			ey = (float)std::min(std::max(ExplodeY, YOFF), parent->screen.HEIGHT - YOFF - 1);
 		}
 		ExplodeX = ExplodeY = 0;
 		float pvel, angle;
@@ -561,7 +561,7 @@ void ParticleParticle::Do_Emit ()
 			if(EmitRotate < 0) angscale = -angscale;
 			i = EmitCount;
 			if (!firstInit)
-				EmitCount = __max(EmitCount - __max(nParticles / 100, 1), 0);
+				EmitCount = std::max(EmitCount - std::max(nParticles / 100, 1), 0);
 
 			while(i-- > EmitCount)
 			{
@@ -658,15 +658,15 @@ void ParticleParticle::Do_RainbowHole (int initNow)
 	{
 		// Create velocity
 		velocity = float(fabs(frand(6.0f)));
-		velocity = __max (velocity, 1.0f);
+		velocity = std::max (velocity, 1.0f);
 
 		// Randomly pick new magnet point
 		MagnetX = parent->screen.WIDTH/2 + rand()%100 - 50;
 		// If we are burning up
 		if (!this->BurnDown)
-			MagnetY = __min (parent->screen.HEIGHT/2 + rand()%80 - 40 + (parent->screen.HEIGHT/4), parent->screen.HEIGHT-20);
+			MagnetY = std::min (parent->screen.HEIGHT/2 + rand()%80 - 40 + (parent->screen.HEIGHT/4), parent->screen.HEIGHT-20);
 		else
-			MagnetY = __max (parent->screen.HEIGHT/2 + rand()%80 - 40 - (parent->screen.HEIGHT/4), 20);
+			MagnetY = std::max (parent->screen.HEIGHT/2 + rand()%80 - 40 - (parent->screen.HEIGHT/4), 20);
 
 		// Cycle through the particles
 		for(int i = 0; i < nParticles; i++)
@@ -741,7 +741,7 @@ void ParticleParticle::Do_SquigglyWiggly (int init)
 
 	// Create velocity
 	velocity = float(fabs(frand(6.0f)));
-	velocity = __max (velocity, 1.0f);
+	velocity = std::max (velocity, 1.0f);
 
 	for (int i=0; i < nParticles; i++) {
 		// If this is a leader particle
@@ -790,7 +790,7 @@ void ParticleParticle::Do_GalacticStorm (int init)
 
 	// Create velocity
 	velocity = float(fabs(frand(6.0f)));
-	velocity = __max (velocity, 1.0f);
+	velocity = std::max (velocity, 1.0f);
 
 	// Init the particles, either the first time we start the routine, or when we are told to
 	if (init || !firstInit || rand() % 1500 == 0)
@@ -870,7 +870,7 @@ void ParticleParticle::Do_PixieDust (int init)
 
 	// Create velocity
 	velocity = float(fabs(frand(10.0f)));
-	velocity = __max (velocity, 1.0f);
+	velocity = std::max (velocity, 1.0f);
 
 	// Init the particles, either the first time we start the routine, or when we are told to
 	if (init || !firstInit || rand() % 1500 == 0)
@@ -987,7 +987,7 @@ void ParticleParticle::Do_Geoff (int init)
 
 	// Create velocity
 	velocity = float(fabs(frand(10.0f)));
-	velocity = __max (velocity, 1.0f);
+	velocity = std::max (velocity, 1.0f);
 
 	// Init the particles, either the first time we start the routine, or when we are told to
 	if (init || !firstInit || rand() % 1500 == 0)

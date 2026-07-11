@@ -167,8 +167,8 @@ bool Registry::RestoreWindowPos(HWND hwnd, const std::wstring& name, bool Size, 
 				rc.right = wrc.right - wrc.left;	//Compute current width and height of window and throw those into rc for MoveWindow call.
 				rc.bottom = wrc.bottom - wrc.top;
 			}
-			MoveWindow(hwnd, __min(__max(-8, rc.left), GetSystemMetrics(SM_CXSCREEN) - rc.right / 2),
-				__min(__max(-8, rc.top), GetSystemMetrics(SM_CYSCREEN) - rc.bottom / 2),
+			MoveWindow(hwnd, std::min(std::max(LONG(-8), rc.left), GetSystemMetrics(SM_CXSCREEN) - rc.right / 2),
+				std::min(std::max(LONG(-8), rc.top), GetSystemMetrics(SM_CYSCREEN) - rc.bottom / 2),
 				rc.right, rc.bottom, TRUE);
 		}
 		if(StateOK){

@@ -348,11 +348,11 @@ bool Bitmap::ColorCorrect(float rgain, float ggain, float bgain, float again,
 	if(bpp == 8 && ppe){
 		for(int i = 0; i < 256; i++){
 			t = (int)((Bias(rbias, Gain(rgain, (float)ppe[i].peRed * i255)) * rscale + rshift) * 255.0f);
-			ppe[i].peRed = __min(__max(t, 0), 255);
+			ppe[i].peRed = std::min(std::max(t, 0), 255);
 			t = (int)((Bias(gbias, Gain(ggain, (float)ppe[i].peGreen * i255)) * gscale + gshift) * 255.0f);
-			ppe[i].peGreen = __min(__max(t, 0), 255);
+			ppe[i].peGreen = std::min(std::max(t, 0), 255);
 			t = (int)((Bias(bbias, Gain(bgain, (float)ppe[i].peBlue * i255)) * bscale + bshift) * 255.0f);
-			ppe[i].peBlue = __min(__max(t, 0), 255);
+			ppe[i].peBlue = std::min(std::max(t, 0), 255);
 		}
 		flags |= BFLAG_COLORCORRECTED;
 		return 1;
@@ -360,13 +360,13 @@ bool Bitmap::ColorCorrect(float rgain, float ggain, float bgain, float again,
 		unsigned char tab[4][256];
 		for(int i = 0; i < 256; i++){
 			t = (int)((Bias(bbias, Gain(bgain, (float)i * i255)) * bscale + bshift) * 255.0f);
-			tab[0][i] = __min(__max(t, 0), 255);
+			tab[0][i] = std::min(std::max(t, 0), 255);
 			t = (int)((Bias(gbias, Gain(ggain, (float)i * i255)) * gscale + gshift) * 255.0f);
-			tab[1][i] = __min(__max(t, 0), 255);
+			tab[1][i] = std::min(std::max(t, 0), 255);
 			t = (int)((Bias(rbias, Gain(rgain, (float)i * i255)) * rscale + rshift) * 255.0f);
-			tab[2][i] = __min(__max(t, 0), 255);
+			tab[2][i] = std::min(std::max(t, 0), 255);
 			t = (int)((Bias(abias, Gain(again, (float)i * i255)) * ascale + ashift) * 255.0f);
-			tab[3][i] = __min(__max(t, 0), 255);
+			tab[3][i] = std::min(std::max(t, 0), 255);
 		}
 		for(int y = 0; y < height; y++){
 			unsigned char *p = data + pitch * y;
@@ -508,10 +508,10 @@ bool Bitmap::Scale(int NewWidth, int NewHeight, bool lerp){
 					unsigned char *td = newdata + y * NewPitch;
 					int bts = bpp / 8;
 					int h2 = ((SrcY + Dy) >>16) - (SrcY >>16);
-					h2 = __min(h2, height - (SrcY >>16));
+					h2 = std::min(h2, height - (SrcY >>16));
 					for(int x = 0; x < NewWidth; x++){
 						int w2 = ((SrcX + Dx) >>16) - (SrcX >>16);
-						w2 = __min(w2, width - (SrcX >>16));
+						w2 = std::min(w2, width - (SrcX >>16));
 						int pxls = w2 * h2;
 						if(pxls > 0){
 							int accum[4] = {0, 0, 0, 0};	//Color accumulators.
@@ -595,8 +595,8 @@ bool Bitmap::Suck(void *vsrc, int sw, int sh, int spitch, int sbpp){	//Works wit
 	unsigned char *src = (unsigned char*)vsrc;
 	if(sbpp <= 0) sbpp = bpp;	//Not entering value assumes identical bpps.
 	if(data && src && (sbpp == bpp || (sbpp >= 24 && bpp >= 24) || (bpp == 8 && sbpp >= 24))){	//Must be the same bpp, or both true color.  No mixing true and paletteded.
-		sw = __min(sw, width);
-		sh = __min(sh, height);
+		sw = std::min(sw, width);
+		sh = std::min(sh, height);
 		if(sw > 0 && sh > 0){
 			for(int y = 0; y < sh; y++){
 				if(sbpp == bpp){	//Bits per pixel match, so we just memcpy.
@@ -629,8 +629,8 @@ bool Bitmap::Suck(void *vsrc, int sw, int sh, int spitch, int sbpp){	//Works wit
 
 bool Bitmap::SuckARGB(Bitmap *bmp, ARGB *argb){
 	if(bmp && argb && bpp >= 16 && bmp->BPP() == 8 && data && bmp->Data()){
-		int sw = __min(bmp->Width(), width);
-		int sh = __min(bmp->Height(), height);
+		int sw = std::min(bmp->Width(), width);
+		int sh = std::min(bmp->Height(), height);
 		for(int y = 0; y < sh; y++){
 			unsigned char *dp = data + y * pitch, *sp = bmp->Data() + y * bmp->Pitch();
 			unsigned char *ta;
@@ -658,10 +658,10 @@ bool Bitmap::Blit(void *vdest, int dw, int dh, int dp, int dx, int dy,
 	if(data && dest && dw > 0 && dh > 0){
 		int t = 0;
 		//Initial values for rectangle to blit from Bitmap.
-		int inx = sx;//__min(__max(sx, 0), width);
-		int iny = sy;//__min(__max(sy, 0), height);
-		int w = __min(__max(sw, 0), width - inx);//width;
-		int h = __min(__max(sh, 0), height - iny);//height;
+		int inx = sx;
+		int iny = sy;
+		int w = std::min(std::max(sw, 0), width - inx);
+		int h = std::min(std::max(sh, 0), height - iny);
 		dx -= xhot;
 		dy -= yhot;
 		//Lets get clipping!
@@ -708,8 +708,8 @@ bool Bitmap::BlitRaw(void *vdest, int dpitch, int insetx, int insety, int w, int
 	if(data && dest && w > 0 && h > 0 && insetx >= 0 && insety >= 0){
 		if(w <= 0) w = width;
 		if(h <= 0) h = height;
-		w = __min(w, width - insetx);
-		h = __min(h, height - insety);
+		w = std::min(w, width - insetx);
+		h = std::min(h, height - insety);
 		int x, y;
 	//	unsigned long *lsource, *ltsrc, *ltdst;
 		unsigned char *source, *tsrc, *tdst;
@@ -843,11 +843,11 @@ bool Bitmap::Quantize32to8(Bitmap *destb, PALETTEENTRY *pe, int cols, int prequa
 			ColorOctree oct;
 			unsigned char *sp, *dp;
 			int skip = (bpp == 24 ? 0 : 1);	//Bytes to skip over (alpha channel).
-			w = __min(width, destb->Width());
-			h = __min(height, destb->Height());
+			w = std::min(width, destb->Width());
+			h = std::min(height, destb->Height());
 			//
 			unsigned char pqm = 0xff;
-			for(int i = 0; i < __min(prequantize, 8); i++) pqm = (pqm <<1) & 0xfe;
+			for(int i = 0; i < std::min(prequantize, 8); i++) pqm = (pqm <<1) & 0xfe;
 			//First pass, collect colors.
 			for(y = 0; y < h; y++){
 				sp = data + y * pitch;
@@ -903,7 +903,7 @@ bool Bitmap::Quantize32to8(Bitmap *destb, PALETTEENTRY *pe, int cols, int prequa
 
 bool Bitmap::MakeMipMap(Bitmap *sbm, MixTable *Mix, int mixmode, int trans){	//8bit ONLY!
 	if(sbm && sbm->data && Mix && sbm->bpp == 8){
-		if(Init(__max(sbm->width / 2, 1), __max(sbm->height / 2, 1), sbm->bpp)){
+		if(Init(std::max(sbm->width / 2, 1), std::max(sbm->height / 2, 1), sbm->bpp)){
 			flags |= BFLAG_MIPMAP;
 			if(sbm->width <= 1 || sbm->height <= 1) return true;	//Just abort on miniscule mipmaps for now.  Code below assumes at least 2x2 source bitmap.
 			unsigned char ul, ur, dl, dr, u, d, *ts, *td;
@@ -1041,7 +1041,7 @@ bool ImageSet::LoadSet(FILE *f){
 			}
 			for(i = 0; i < nImg; i++){
 				pos = int(ReadLong(f));	//Size of name.
-				fread(buf, __min(sizeof(buf) - 1, pos), 1, f);
+				fread(buf, std::min(sizeof(buf) - 1, size_t(pos)), 1, f);
 				if(size_t(i) < names.size()) names[i] = buf;	//Set the name.
 				ip = &((*this)[i]);
 				w = int(ReadLong(f));

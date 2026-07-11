@@ -23,6 +23,8 @@ along with Particle Fire.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "BackBuffer.h"
 
+#include <algorithm>
+
 void TrueColorFormat::SetMasks(unsigned int bpp, unsigned int rm, unsigned int gm, unsigned int bm){
 	BPP = bpp;
 	RedMask = rm;
@@ -160,7 +162,7 @@ bool BackBuffer::CooperateNot(){
 }
 
 bool BackBuffer::SetWindowPos(int x, int y){
-	m_x = __max(x, 0);  m_y = __max(y, 0);
+	m_x = std::max(x, 0);  m_y = std::max(y, 0);
 	if(!m_fullscreen2 && m_hwnd){
 		ShowWindow(m_hwnd, SW_SHOWNORMAL);	//This is needed or else we can move/size the window while Maximised and Windows gets confoozed.
 		MoveWindow(m_hwnd, m_x, m_y, m_realw, m_realh, true);
@@ -251,10 +253,10 @@ bool BackBuffer::AddDirtyRect(int x, int y, int w, int h){
 		//Does NOT concatenate properly if you overlap more than one...
 		for(i = 0; i < ndirty; i++){
 			if(dirty[i].x2 >= x && dirty[i].x1 <= x2 && dirty[i].y2 >= y && dirty[i].y1 <= y2){
-				dirty[i].x1 = __min(dirty[i].x1, x);
-				dirty[i].x2 = __max(dirty[i].x2, x2);
-				dirty[i].y1 = __min(dirty[i].y1, y);
-				dirty[i].y2 = __max(dirty[i].y2, y2);
+				dirty[i].x1 = std::min(dirty[i].x1, x);
+				dirty[i].x2 = std::max(dirty[i].x2, x2);
+				dirty[i].y1 = std::min(dirty[i].y1, y);
+				dirty[i].y2 = std::max(dirty[i].y2, y2);
 				return true;
 			}
 		}
@@ -270,10 +272,10 @@ bool BackBuffer::AddDirtyRect(int x, int y, int w, int h){
 }
 
 inline void DirtyToScreen(RECT *rcs, RECT *rcd, DirtyRect *dr, RECT *outs, RECT *outd){	//Thwacks dirty rectangle from rcs space into rcd space and plops it in out.
-	outs->left = __max(0, dr->x1);
-	outs->right = __min(rcs->right, dr->x2);
-	outs->top = __max(0, dr->y1);
-	outs->bottom = __min(rcs->bottom, dr->y2);
+	outs->left = std::max(0, dr->x1);
+	outs->right = std::min(rcs->right, LONG(dr->x2));
+	outs->top = std::max(0, dr->y1);
+	outs->bottom = std::min(rcs->bottom, LONG(dr->y2));
 	//
 	outd->left = (outs->left) * rcd->right / rcs->right;
 	outd->right = (outs->right) * rcd->right / rcs->right;

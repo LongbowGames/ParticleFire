@@ -138,7 +138,7 @@ void ParticleScreen::InitScreen (HWND hwnd)
 	int i;
 	//Create fading lookup table.
 	for(i = 0; i < 256; i++){
-		half[i] = i >>1;//__max(i & ~63, i & ~63 + (int)((i & 63) / 1.5));
+		half[i] = i >> 1;
 	}
 	//Initialize particles.
 	for(i = 0; i < MAX_PART; i++){
@@ -319,85 +319,6 @@ void ParticleScreen::Draw ()
 
 		// Setup for fade-zoom
 		int UseFadeZoom = 1;
-
-		//Try fade-zoom here.
-	//	{
-/*		static Frames = 0;
-		Frames++;
-		static Bitmap TBM;
-		if(UseFadeZoom){
-			if(TBM.Width() != bdescwidth || TBM.Height() != bdescheight || TBM.Data() == 0){
-				TBM.Init(bdescwidth, bdescheight, 8);
-			}
-			if(TBM.Width() == bdescwidth && TBM.Height() == bdescheight && TBM.Data()){
-				TBM.Suck(bdescdata, bdescwidth, bdescheight, bdescpitch, dib.BPP() );//8);
-				int Blast = 0;
-			//	if((Time / 1) % 10 == 0) Blast = 1;
-				if((Frames / 10) % 10 == 0) Blast = 1;
-				int xshrink = WIDTH / 50, yshrink = HEIGHT / 50;
-			//	int xshrink = WIDTH / 10, yshrink = HEIGHT / 10;
-				if(Blast){
-					xshrink = WIDTH / 40; yshrink = HEIGHT / 40;
-			//		xshrink = WIDTH / 10; yshrink = HEIGHT / 10;
-				}
-				int xerr, yerr, xeadd, yeadd;
-				int srcy, srcx;
-				unsigned char *src, *dst;
-				int x, y;
-				int w = WIDTH - BXOFF * 2;
-				int h = (HEIGHT - BYOFF * 2) - 1;
-				yerr = h / 2;
-				yeadd = yshrink;
-				xeadd = xshrink;
-				srcy = yshrink >>1;
-				//
-				unsigned char clamptab[512];
-				for(int i = 0; i < 512; i++) clamptab[i] = __min(i, 255);
-				//
-				for(y = 0; y < h; y++){
-					srcx = (xshrink >>1) + BXOFF;
-				//	src = bdescdata + srcx + srcy * bdescpitch;
-					src = TBM.Data() + srcx + (srcy + BYOFF) * TBM.Pitch();
-					dst = bdescdata + BXOFF + (y + BYOFF) * bdescpitch;
-					xerr = w / 2;
-					if(Blast){
-						for(x = w; x; x--){
-							unsigned char tc = *src >>1;
-						//	int t = (*dst >>1) + (tc >>2) + (tc);//(((*src <<7)) >>8);
-						//	if(t > 255) *dst = 255;
-						//	else *dst = (unsigned char)t;
-							*dst = clamptab[(*dst >>1) + (tc >>2) + (tc)];//(((*src <<7)) >>8);
-							//
-							xerr += xeadd;
-							if(xerr >= w) xerr -= w;
-							else src++;
-							dst++;
-						}
-					}else{
-						for(x = w; x; x--){
-							*dst = (*dst >>1) + (*src >>1);
-						//	int t = (*dst >>1) + (*src >>1) - 2;
-						//	if(t < 0) *dst = 0;
-						//	else *dst = (unsigned char)t;
-							dst++;
-							xerr += xeadd;
-							if(xerr >= w) xerr -= w;
-							else src++;
-						}
-					}
-					//
-					yerr += yeadd;
-					if(yerr >= h){
-					//	srcy++;
-						yerr -= h;
-					}else{
-						srcy++;
-					}
-				//	srcy++;
-				}
-			}
-		}
-*/		// End Fade Zoom
 
 		// End timer for burning
 		BurnTimes += tmr.Check(10000);
@@ -896,7 +817,7 @@ void ParticleScreen::DrawParticles ()
 			parent->p[i].x = (float)XOFF;
 			parent->p[i].dx = fabs(parent->p[i].dx) * BOUNCE;
 			parent->p[i].dy += frand(KICK_STRENGTH);
-			if(parent->particle.AltColor) parent->p[i].color = __min(254, parent->p[i].color + 32);
+			if(parent->particle.AltColor) parent->p[i].color = std::min(254, parent->p[i].color + 32);
 
 		}
 		if(parent->p[i].x >= WIDTH - XOFF)
@@ -904,21 +825,21 @@ void ParticleScreen::DrawParticles ()
 			parent->p[i].x = (float)(WIDTH - XOFF - 1);
 			parent->p[i].dx = -fabs(parent->p[i].dx) * BOUNCE;
 			parent->p[i].dy += frand(KICK_STRENGTH);
-			if(parent->particle.AltColor) parent->p[i].color = __min(254, parent->p[i].color + 32);
+			if(parent->particle.AltColor) parent->p[i].color = std::min(254, parent->p[i].color + 32);
 		}
 		if(parent->p[i].y < YOFF)
 		{
 			parent->p[i].y = (float)YOFF;
 			parent->p[i].dy = fabs(parent->p[i].dy) * BOUNCE;
 			parent->p[i].dx += frand(KICK_STRENGTH);
-			if(parent->particle.AltColor) parent->p[i].color = __min(254, parent->p[i].color + 32);
+			if(parent->particle.AltColor) parent->p[i].color = std::min(254, parent->p[i].color + 32);
 		}
 		if(parent->p[i].y >= HEIGHT - YOFF)
 		{
 			parent->p[i].y = (float)(HEIGHT - YOFF - 1);
 			parent->p[i].dy = -fabs(parent->p[i].dy) * BOUNCE;
 			parent->p[i].dx += frand(KICK_STRENGTH);
-			if(parent->particle.AltColor) parent->p[i].color = __min(254, parent->p[i].color + 32);
+			if(parent->particle.AltColor) parent->p[i].color = std::min(254, parent->p[i].color + 32);
 		}
 		x = (int)parent->p[i].lx;
 		y = (int)parent->p[i].ly;
@@ -959,16 +880,16 @@ void ParticleScreen::DrawParticles ()
 					{
 						for(int px = 0; px < 3; px++)
 						{
-							*(data2 - pitch + px) = __max(*(data2 - pitch + px), tc[px] >>1);
-							*(data2 + px) = __max(*(data2 + px), tc[px]);
-							*(data2 + pitch + px) = __max(*(data2 + pitch + px), tc[px] >>1);
+							*(data2 - pitch + px) = std::max(*(data2 - pitch + px), BYTE(tc[px] >> 1));
+							*(data2 + px) = std::max(*(data2 + px), tc[px]);
+							*(data2 + pitch + px) = std::max(*(data2 + pitch + px), BYTE(tc[px] >> 1));
 						}
 					}
 					else
 					{
-						*(data2 - pitch) = __max(*(data2 - pitch), hc);
-						*(data2) = __max(*(data2), c);
-						*(data2 + pitch) = __max(*(data2 + pitch), hc);
+						*(data2 - pitch) = std::max(*(data2 - pitch), hc);
+						*(data2) = std::max(*(data2), c);
+						*(data2 + pitch) = std::max(*(data2 + pitch), hc);
 					}
 					d += e;
 					if(d >= 0){
@@ -1017,16 +938,16 @@ void ParticleScreen::DrawParticles ()
 					{
 						for(int px = 0; px < 3; px++)
 						{
-							*(data2 - dir + px) = __max(*(data2 - dir + px), tc[px] >>1);
-							*(data2 + px) = __max(*(data2 + px), tc[px]);
-							*(data2 + dir + px) = __max(*(data2 + dir + px), tc[px] >>1);
+							*(data2 - dir + px) = std::max(*(data2 - dir + px), BYTE(tc[px] >> 1));
+							*(data2 + px) = std::max(*(data2 + px), tc[px]);
+							*(data2 + dir + px) = std::max(*(data2 + dir + px), BYTE(tc[px] >> 1));
 						}
 					}
 					else
 					{
-						*(data2 - dir) = __max(*(data2 - dir), hc);
-						*(data2) = __max(*(data2), c);
-						*(data2 + dir) = __max(*(data2 + dir), hc);
+						*(data2 - dir) = std::max(*(data2 - dir), hc);
+						*(data2) = std::max(*(data2), c);
+						*(data2 + dir) = std::max(*(data2 + dir), hc);
 					}
 					d += e;
 					if(d >= 0)

@@ -78,14 +78,14 @@ void ParticleRegistry::LoadOpts()
 	// Get the Quote String
 	REG.ReadString(L"QuoteFileName", parent->QuoteFilename);
 	
-	parent->particle.RANDEFFECT = __max(parent->particle.RANDEFFECT, 1);
-	parent->particle.GRAV_TIME = __max(parent->particle.GRAV_TIME, 1);
-	parent->screen.ColorScheme = __min(parent->screen.ColorScheme, NUMSCHEMES);
-	parent->particle.nParticles = __min(parent->particle.nParticles, MAX_PART);
+	parent->particle.RANDEFFECT = std::max(parent->particle.RANDEFFECT, 1);
+	parent->particle.GRAV_TIME = std::max(parent->particle.GRAV_TIME, 1);
+	parent->screen.ColorScheme = std::min(parent->screen.ColorScheme, NUMSCHEMES);
+	parent->particle.nParticles = std::min(parent->particle.nParticles, MAX_PART);
 
 	// Bound the Wall Styles
-	parent->particle.WallStyle = __min (parent->particle.WallStyle, NUMSTYLEWALLS);
-	parent->particle.WallStyle = __max (parent->particle.WallStyle, 0);
+	parent->particle.WallStyle = std::min (parent->particle.WallStyle, int(NUMSTYLEWALLS));
+	parent->particle.WallStyle = std::max (parent->particle.WallStyle, 0);
 	//
 	// First Time Use
 	parent->screen.FirstUseTime = 0;
