@@ -1062,12 +1062,12 @@ void ParticleScreen::SeedWall ()
 	if(parent->particle.BurnDown)
 	{
 		tdata = (unsigned char*)bdescdata + (BYOFF) * bdescpitch;
-		memset((unsigned char*)bdescdata + (HEIGHT - BYOFF) * bdescpitch, 0, bdescwidth * pitchBit);
+		memset((unsigned char*)bdescdata + (HEIGHT - BYOFF) * bdescpitch, 0, bdescpitch);
 	}
 	else
 	{
 		tdata = (unsigned char*)bdescdata + (HEIGHT - BYOFF) * bdescpitch;
-		memset((unsigned char*)bdescdata + (BYOFF) * bdescpitch, 0, bdescwidth * pitchBit);
+		memset((unsigned char*)bdescdata + (BYOFF) * bdescpitch, 0, bdescpitch);
 	}
 	
 	// If the Fire isnt Disabled

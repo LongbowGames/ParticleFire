@@ -22,8 +22,6 @@ enum{
 	ATTRACT_ANGLE = 2
 };
 
-//struct PALETTEENTRY;
-
 struct Particle{
 	float x, y, dx, dy, lx, ly;	//Particle position, velocity, and last position.
 	float ax, ay;	//Particle's attractor location.

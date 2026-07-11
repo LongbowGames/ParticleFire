@@ -40,7 +40,9 @@ public:
 	Timer();
 	~Timer();
 	void Start();
-	int Check(int FracSec);	//Enter the fractions of a second you'd like the result in, e.g. 1000 for ms.
+
+	//Enter the fractions of a second you'd like the result in, e.g. 1000 for ms.
+	int Check(int FracSec);
 };
 
 #endif

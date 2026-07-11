@@ -35,8 +35,6 @@ struct FeaturePoint{
 
 class Basis{
 public:
-//	double NthDist[MAXNTH];	//Array of distances for cellular return.
-//	int NthAss[MAXNTH];
 	FeaturePoint NthFeature[MAXNTH];
 private:
 	float NoiseFloatTable[TABSIZE * 2];	//0.0 - 1.0
@@ -47,43 +45,45 @@ public:
 	Basis(){};
 	Basis(int seed){ Seed(seed); };
 	~Basis(){};
-	void Seed(int seed);
+
 	//Seed must be called before Noise or Cellular!
 	//One Seed call sets seed pattern for all subsequent Noise calls, until seed changed again.
 	//Zero is an invalid seed and will be changed to 1.
+	void Seed(int seed);
 
-	FeaturePoint *Cellular(float x, float y, int nth = 1, float irreg = 1.0, int xrpt = 0, int yrpt = 0, int manhattan = 0);
 	//returns a pointer to an array of MAXNTH FeaturePoints, the first being the
 	//first closest feature point distance, the next being the second closest
 	//distance, etc.  Values in the array are x*x + y*y, un-SQRTed!  The int part
 	//of feature point is a 0-255 value unique to that point, suitable for coloring
 	//individual cells different shades.
+	FeaturePoint *Cellular(float x, float y, int nth = 1, float irreg = 1.0, int xrpt = 0, int yrpt = 0, int manhattan = 0);
 
 	float Noise(float x, float y, int octaves = 0, int xrpt = 0, int yrpt = 0);
-//	int Noise(unsigned char *table, int length, float x, float y, float xdelta, float ydelta,
-//		int octaves = 0, int xrpt = 0, int yrpt = 0);
 };
 
 double Bias(double b, double v);
 double Gain(double g, double v);
 
-float Spline1d(float T, float k0, float k1, float k2, float k3);
 //Simple 1 dimensional Catmull-Rom, T is 0.0 to 1.0 and interpolates between k1 and k2.
 //k0 and k3 are the external control points before and behind the spline span.
-float Spline1d(float T, float knot[], int nknot);
+float Spline1d(float T, float k0, float k1, float k2, float k3);
+
 //Arbitrary knot vector version of above.  T of 0.0 is the second knot (index 1),
 //again.  To make a closed loop spline of n control points, put your points in
 //knots 1 to n, then put point n - 1 in knot 0, and point 0 in knot n + 1, for
 //a total of n + 2 knots passed in.
+float Spline1d(float T, float knot[], int nknot);
+
+//2 dimensional version of above.  Coord is returned to dx, dy pointers.
 inline void Spline2d(float T, float *dx, float *dy,
 					  float k0x, float k0y, float k1x, float k1y,
 					  float k2x, float k2y, float k3x, float k3y);
-//2 dimensional version of above.  Coord is returned to dx, dy pointers.
-inline void Spline2d(float T, float *dx, float *dy, float knot[], int nknot);
-//Ditto.  Same.  knot is array of x, y float pairs.
 
-inline float Hermite1d(float T, float p0, float p1, float g0, float g1);
+//Ditto.  Same.  knot is array of x, y float pairs.
+inline void Spline2d(float T, float *dx, float *dy, float knot[], int nknot);
+
 //Interpolates point 0 and point 1, using geometry vectors g0 and g1 to
 //decide how "fast" and in what direction the curve is moving at the two points.
+inline float Hermite1d(float T, float p0, float p1, float g0, float g1);
 
 #endif

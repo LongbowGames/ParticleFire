@@ -92,7 +92,6 @@ public:
 	float FlameSpeed;
 
 	// Particle style info
-//	unsigned char BURNFADE;
 	int BURNFADE;
 	PALETTEENTRY CustomPE1, CustomPE2;
 	int DisableFire;
@@ -107,10 +106,6 @@ public:
 	int TotalSecs;
 	int LastTextTime;
 	int RegLine;
-
-	// Registration text
-//#define REGLINES 34
-//	char RegText[REGLINES][100];
 
 	// Text
 	wchar_t *RealQuotes;

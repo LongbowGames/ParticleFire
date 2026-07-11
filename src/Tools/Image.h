@@ -70,6 +70,7 @@ struct ARGB{
 bool BGRAfromPE(ARGB *argb, PALETTEENTRY *pe, unsigned char alpha = 0);	//Fills an array of 256 longs with 32bit ARGB intel format color entries matching 256 entry PE array, for quick 8bit to 32bit conversion.
 bool RGBAfromPE(ARGB *argb, PALETTEENTRY *pe, unsigned char alpha = 0);	//Same in OpenGL style format.
 
+//Returns the number of the highest bit set, starting from 0.
 inline int HiBit(int num){
 	int bit = 31;
 	while(bit){
@@ -77,29 +78,35 @@ inline int HiBit(int num){
 		bit--;
 	}
 	return 0;
-};	//Returns the number of the highest bit set, starting from 0.
+};
 
+//Makes a remapping table to remap from oldpe to pe.
 bool MakeRemapTable(unsigned char *Remap, const PALETTEENTRY *oldpe, const PALETTEENTRY *pe);
-	//Makes a remapping table to remap from oldpe to pe.
+
+//Makes a remapping table to remap from oldpe to pe.
 bool MakeRemapTable(unsigned char *Remap, const PALETTEENTRY *oldpe, const InversePal *inv);
-	//Makes a remapping table to remap from oldpe to pe.
+
 
 class Bitmap;
 
+//Opens file and hands off to file stream based load function.
 bool LoadBMP(const char *name, Bitmap *bmp, PALETTEENTRY *pe);
-	//Opens file and hands off to file stream based load function.
+
+//Loads a .BMP file from the current seek position in the file
+//stream.  Suitable for loading from uncompressed "pack" archive
+//files.
 bool LoadBMP(FILE *f, Bitmap *bmp, PALETTEENTRY *pe);
-	//Loads a .BMP file from the current seek position in the file
-	//stream.  Suitable for loading from uncompressed "pack" archive
-	//files.
+
+//Loads a packed format BMP from RAM, with a pointer to the
+//BITMAPINFOHEADER structure starting the packed bitmap.
 bool LoadPackedBMP(void *bmi, Bitmap *bmp, PALETTEENTRY *pe);
-	//Loads a packed format BMP from RAM, with a pointer to the
-	//BITMAPINFOHEADER structure starting the packed bitmap.
+
+//Saves a packed format BMP to a file
 bool SaveBMP(const char *name, Bitmap *bmp, PALETTEENTRY *pe, int noflip = 0);
-	//Ditto.
+
+//Saves a packed format BMP to any location in a larger file.
+//Will overwrite data after seek position.
 bool SaveBMP(FILE *f, Bitmap *bmp, PALETTEENTRY *pe, int noflip = 0);
-	//Ditto for saving a .BMP to any location in a larger file.
-	//Will overwrite data after seek position.
 
 //*******************************************************************
 //                                Bitmap
@@ -108,27 +115,19 @@ bool SaveBMP(FILE *f, Bitmap *bmp, PALETTEENTRY *pe, int noflip = 0);
 //No palette or palette handling.
 //Now supports 16, 24 and 32bit bitmap storage, but not all members work in high color.
 //Bitmap flags:
-#define BFLAG_ROTATED	0x01
-//Bitmap has been rotated.
-#define BFLAG_REMAPPED	0x02
-//Bitmap has been remapped (not just had remap tables set).
-#define BFLAG_MIPMAP	0x04
-//Bitmap is a mip-map of another bitmap.
-#define BFLAG_QUANTIZED	0x08
-//Bitmap has been quantized from high color to paletted.
-#define BFLAG_CLEARED	0x10
-//Bitmap has been cleared since init.
-#define BFLAG_SCALED	0x20
-//Bitmap has been scaled.
-#define BFLAG_COLORCORRECTED	0x40
-//Bitmap has been color corrected.
-#define BFLAG_WANTDOWNLOAD	0x80
-//Bitmap wants redownload to friendly neighborhood graphics card.
-#define BFLAG_BYTEORDER_RGBA	0x100
-//Bitmap is in OpenGL-style RGBA byte order, rather than DIB style BGRA.
-#define BFLAG_DONTDOWNLOAD	0x200
-//Bitmap does NOT want to be downloaded to graphics card.
-//
+
+
+#define BFLAG_ROTATED	0x01			//Bitmap has been rotated.
+#define BFLAG_REMAPPED	0x02			//Bitmap has been remapped (not just had remap tables set).
+#define BFLAG_MIPMAP	0x04			//Bitmap is a mip-map of another bitmap.
+#define BFLAG_QUANTIZED	0x08			//Bitmap has been quantized from high color to paletted.
+#define BFLAG_CLEARED	0x10			//Bitmap has been cleared since init.
+#define BFLAG_SCALED	0x20			//Bitmap has been scaled.
+#define BFLAG_COLORCORRECTED	0x40	//Bitmap has been color corrected.
+#define BFLAG_WANTDOWNLOAD	0x80		//Bitmap wants redownload to friendly neighborhood graphics card.
+#define BFLAG_BYTEORDER_RGBA	0x100	//Bitmap is in OpenGL-style RGBA byte order, rather than DIB style BGRA.
+#define BFLAG_DONTDOWNLOAD	0x200		//Bitmap does NOT want to be downloaded to graphics card.
+
 class Bitmap{
 friend class Image;
 private:
@@ -153,61 +152,73 @@ protected:
 public:
 	int id;	//User-specifiable ID number, for e.g. OpenGL texture caching.  Set to 0 on init.
 	int flags;	//Flags that record what has been done to the bitmap.  Set to 0 on init.
-//	unsigned int xmask, xshift;	//ONLY VALID FOR POW2-WIDTH IMAGES!
-//	unsigned int ymask, yshift;	//Andable-masks for dimensions, and shift-values (in bytes).
-//	void MakeMasks();
 public:
 	Bitmap();
 	Bitmap(const Bitmap &bmp);
-//	Bitmap(int x, int y, int bpp = 8){ Bitmap(); Init(x, y, bpp); };
 	virtual ~Bitmap();	//Make destructors virtual!
 	Bitmap& operator=(const Bitmap &bmp);
 	void Free();	//Free not virtual!!!
-//	void Palette(PALETTEENTRY *pe){ ppe = pe; };	//Set and get palette pointer.  POINTED TO ARRAY MUST EXIST THROUGH LIFE OF BITMAP!
 	PALETTEENTRY *Palette(){ return ppe; };
-//	void RemapTable(unsigned char *remap){ premap = remap; };	//Set and get 256 entry remap table pointer.  DITTO!
 	unsigned char *RemapTable(){ return premap; };
+	
+	//Frees and/or allocates new image data for w and h dimensions.
 	bool Init(int w, int h, int bpp = 8);
-		//Frees and/or allocates new image data for w and h dimensions.
+
 	bool Init(Bitmap *bmp){	//Clones geometry of bitmap.
 		if(bmp) return Init(bmp->Width(), bmp->Height(), bmp->BPP());
 		return false;
 	};
+
+	//Clears bitmap to supplied value.
 	bool Clear(unsigned char color = 0);
-		//Clears bitmap to supplied value.
+		
+	//Converts a 24bit or 8bit image to 32bit.
 	bool To32Bit(PALETTEENTRY *pe = NULL);
-		//Converts a 24bit or 8bit image to 32bit.
+		
+	//Rotates image.
 	bool RotateRight90();
-		//Rotates image.
+		
+	//Rotates image.
 	bool RotateLeft90();
-		//Ditto.
+		
+	//If need be, scales width and height to nearest (lower) power of 2 size.
 	bool ScaleToPow2();
-		//If need be, scales width and height to nearest (lower) power of 2 size.
+		
+	//Scales image to new arbitrary dimensions.
 	bool Scale(int wnew, int hnew, bool lerp = false);
-		//Scales image to new arbitrary dimensions.
+		
+	//Allocates line registration data tables for height of bitmap.
 	bool InitAnalyze();
-		//Allocates line registration data tables for height of bitmap.
+		
+	//Analyzes amount of color-0 space at beginning and end of each line.
 	bool AnalyzeLines();
-		//Analyzes amount of color-0 space at beginning and end of each line.
+		
+	//Frees data tables.
 	void FreeAnalyze();
-		//Frees data tables.
+		
+	//Sanity-checked high-level pixel plotting funcs.
 	unsigned int GetPixel(int x, int y);
 	bool PutPixel(int x, int y, unsigned int pixel);
-		//Sanity-checked high-level pixel plotting funcs.
+		
+	//Sucks bytes from source data into bitmap data.  sbpp is Source BPP, source and bitmap must both be 8bit or both some flavour of true color.
+	//Bitmap can be 8 bit and source true color, and blit will average to grayscale.
 	bool Suck(void *src, int w, int h, int pitch, int sbpp = 0);
-		//Sucks bytes from source data into bitmap data.  sbpp is Source BPP, source and bitmap must both be 8bit or both some flavour of true color.
-		//New, bitmap can be 8 bit and source true color, and blit will average to grayscale.
+		
 	bool Suck(Bitmap *bmp){
 		if(bmp) return Suck(bmp->Data(), bmp->Width(), bmp->Height(), bmp->Pitch(), bmp->BPP());
 		return 0;
 	};
+
+	//Sucks from an 8-bit bitmap to high/true-color self using ARGB array for pixel conversion.
 	bool SuckARGB(Bitmap *bmp, ARGB *argb);
-		//Sucks from an 8-bit bitmap to high/true-color self using ARGB array for pixel conversion.
+		
+	//Clipped and optionally transparent blit.  Provide top-left pointer of the
+	//entire destination graphics area, and full width and height values.
 	bool Blit(void *dest, int dw, int dh, int dp, int dx = 0, int dy = 0, int trans = 0);
-		//Clipped and optionally transparent blit.  Provide top-left pointer of the
-		//entire destination graphics area, and full width and height values.
+	
+	//Version of same that accepts a rectangle in the source bitmap too.
 	bool Blit(void *dest, int dw, int dh, int dp, int dx, int dy, int sx, int sy, int sw, int sh, int trans = 0);
-		//Version of same that accepts a rectangle in the source bitmap too.
+		
 	bool Blit(Bitmap *bmp, int dx = 0, int dy = 0, int trans = 0){
 		if(bmp) return Blit(bmp->Data(), bmp->Width(), bmp->Height(), bmp->Pitch(), dx, dy, trans);
 		return 0;
@@ -216,22 +227,30 @@ public:
 		if(bmp) return Blit(bmp->Data(), bmp->Width(), bmp->Height(), bmp->Pitch(), dx, dy, sx, sy, sw, sh, trans);
 		return 0;
 	};
+
+	//Unclipped blit.  Provide top-left pointer of where bitmap should land.
 	bool BlitRaw(void *dest, int pitch, int insetx, int insety, int w, int h, int trans = 0);
-		//Unclipped blit.  Provide top-left pointer of where bitmap should land.
+		
+	//Unclipped blit from 8bit source to 32bit dest using supplied ARGB table.
 	bool BlitRaw8to32(unsigned long *dest, int dpitch, int insetx, int insety, int w, int h, bool trans = false, ARGB *argb = NULL);
-		//Unclipped blit from 8bit source to 32bit dest using supplied ARGB table.
-	bool Quantize32to8(Bitmap *destb, PALETTEENTRY *pe = NULL, int cols = 256, int prequantize = 0);	//Destination palette.  prequantize is number of low bits to throw out in each color to speed quantization.
+		
+	//Destination palette.  prequantize is number of low bits to throw out in each color to speed quantization.
+	bool Quantize32to8(Bitmap *destb, PALETTEENTRY *pe = NULL, int cols = 256, int prequantize = 0);
+	
+	//High quality (slow) color quantization.
 	bool Quantize32to8HighQuality(Bitmap *destb, PALETTEENTRY *pe = NULL);
-		//High quality (slow) color quantization.
+		
+	//Creates half-sized (with mixing) image in current bitmap of source bitmap.
+	//Set mixmode to the define for the type of mixing you would like.  Higher
+	//values (e.g. MIX75) will bias towards the top-left pixel of each box sampled
+	//quartet from the source.  Set trans to true to zero all dest pixels when
+	//the top-left of the source box sample is zero, instead of mixing a really
+	//dark output color if say only one of the other 3 pixels is non-trans.
 	bool MakeMipMap(Bitmap *Source, MixTable *Mix, int mixmode = MIX50, int trans = 0);
-		//Creates half-sized (with mixing) image in current bitmap of source bitmap.
-		//Set mixmode to the define for the type of mixing you would like.  Higher
-		//values (e.g. MIX75) will bias towards the top-left pixel of each box sampled
-		//quartet from the source.  Set trans to true to zero all dest pixels when
-		//the top-left of the source box sample is zero, instead of mixing a really
-		//dark output color if say only one of the other 3 pixels is non-trans.
+	
+	//Remaps bitmap using 256 byte remap table provided.
 	bool Remap(unsigned char *RemapTable = NULL);
-		//Remaps bitmap using 256 byte remap table provided.
+		
 	bool ColorCorrect(float rgain, float ggain, float bgain, float again,
 					float rbias, float gbias, float bbias, float abias,
 					float rscale, float gscale, float bscale, float ascale,
@@ -242,7 +261,9 @@ public:
 	bool SaveBMP(const char *bmp, int noflip = 0){ return ::SaveBMP(bmp, this, ppe, noflip); };
 	bool LoadBMP(FILE *f){ return ::LoadBMP(f, this, ppe); };
 	bool SaveBMP(FILE *f, int noflip = 0){ return ::SaveBMP(f, this, ppe, noflip); };
-	bool LoadBMP8(const char *bmp){	//Forces the loaded bitmap down to 8 bit, if true color.
+
+	//Forces the loaded bitmap down to 8 bit, if true color.
+	bool LoadBMP8(const char *bmp){	
 		FILE *f;
 		if(bmp && (f = fopen(bmp, "rb"))){
 			if(LoadBMP8(f)){
@@ -281,10 +302,12 @@ public:
 	int XHot(){ return xhot; };
 	int YHot(){ return yhot; };
 	void Hotspot(int x, int y){ xhot = x; yhot = y; };
+
+	//Number of linear transparent pixels on left of specified line.
 	int LineL(int n){ if(n >= 0 && n < nLines) return LineLeft[n]; return 0; };
-		//Number of linear transparent pixels on left of specified line.
+	
+	//Number of linear transparent pixels on right of specified line.
 	int LineR(int n){ if(n >= 0 && n < nLines) return LineRight[n]; return 0; };
-		//Ditto the right side of line, moving left.
 };
 
 //*******************************************************************
@@ -325,7 +348,7 @@ public:
 
 	Image &operator=(const Image &img){
 		if(&img == this) return *this;	//Identity.
-		InitSet(img.nBitmaps);\
+		InitSet(img.nBitmaps);
 		for(int i = 0; i < (nBitmaps - 0); i++) (*this)[i] = img[i];
 		SetPalette(img.pe);
 		SetRemapTable(img.remap);
